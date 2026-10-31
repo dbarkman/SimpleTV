@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SimpleTV</string>
+    <string name="remote_buttons_label">SimpleTV remote buttons</string>
+    <string name="remote_buttons_description">Lets the remote\'s app, Guide, Settings and Star buttons work with SimpleTV.</string>
+</resources>

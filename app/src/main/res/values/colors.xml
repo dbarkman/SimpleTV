@@ -1,0 +1,4 @@
+<resources>
+    <!-- Matches Ground in ui/theme/Color.kt so launch shows no flash. -->
+    <color name="ground">#FFF4ECE1</color>
+</resources>

@@ -1,0 +1,6 @@
+<resources>
+
+    <style name="Theme.SimpleTV" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/ground</item>
+    </style>
+</resources>
