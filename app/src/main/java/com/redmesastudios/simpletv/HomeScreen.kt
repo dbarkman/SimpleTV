@@ -109,7 +109,10 @@ fun HomeScreen(
     onOpenChannel: (Channel) -> Unit,
 ) {
     val context = LocalContext.current
-    var apps by remember { mutableStateOf(emptyList<StreamingApp>()) }
+    var installed by remember { mutableStateOf(emptyList<StreamingApp>()) }
+    // Apps SimpleTV wasn't told about get a folder once they're matched to a service.
+    val services by ServiceDirectory.services.collectAsState()
+    val apps = remember(installed, services) { installed.map(services::resolve) }
     // The focused tile: an app's package name, or MoreTile.
     var focusedTile by remember { mutableStateOf<String?>(null) }
     val searchButton = remember { FocusRequester() }
@@ -126,7 +129,7 @@ fun HomeScreen(
     // Re-check on every return to the home screen, so installs and removals show up,
     // most-watched first.
     LifecycleResumeEffect(Unit) {
-        apps = context.homeOrder(homeApps(context.installedTvApps()))
+        installed = context.homeOrder(homeApps(context.installedTvApps()))
         onPauseOrDispose { }
     }
 

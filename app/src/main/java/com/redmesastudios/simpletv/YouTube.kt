@@ -230,7 +230,7 @@ object YouTubeApi {
             tmdbId = 0,
             kind = TitleKind.Video,
             name = snippet.text("title"),
-            overview = snippet.text("description").substringBefore("\n\n").take(400),
+            overview = snippet.text("description").trim(),
             backdropPath = large,
             note = "${snippet.text("channelTitle")} · ${videoAge(published, now)}",
             videoId = id,

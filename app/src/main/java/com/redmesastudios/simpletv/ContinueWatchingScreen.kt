@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 fun ContinueWatchingScreen(onClose: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    fun load() = context.homeOrder(homeApps(context.installedTvApps()))
+    fun load() = context.homeOrder(homeApps(context.installedTvApps())).map(ServiceDirectory.services.value::resolve)
         .map { it to WatchHistory.forApp(context, it.packageName) }
         .filter { (_, titles) -> titles.isNotEmpty() }
     var rows by remember { mutableStateOf(load()) }

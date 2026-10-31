@@ -104,7 +104,7 @@ fun SearchScreen(onClose: () -> Unit) {
     val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val keyboard = LocalSoftwareKeyboardController.current
-    val installed = remember { installedApps(StreamingApps) { context.packageManager.tvLaunchIntent(it) != null } }
+    val installed = remember { homeApps(context.installedTvApps()).map(ServiceDirectory.services.value::resolve) }
 
     var query by remember { mutableStateOf("") }
     var results by remember { mutableStateOf<SearchResults?>(null) }

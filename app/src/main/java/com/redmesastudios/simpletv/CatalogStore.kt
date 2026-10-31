@@ -39,8 +39,13 @@ object CatalogStore {
                 state.value = rows
             }
         }
-        if (builtOn == today) return@withLock
-        runCatching { build(apps.filter { it.hasGuide }, today) }
+        // A service with a guide but no rows yet (an app installed today) rebuilds early, and
+        // so does a guide with nothing in it at all (built while the network was down).
+        val guided = apps.filter { it.hasGuide }
+        val complete = guided.all { it.packageName in state.value } && state.value.values.any { it.isNotEmpty() }
+        if (builtOn == today && complete) return@withLock
+        runCatching { build(guided, today) }
+            .mapCatching { rows -> rows.also { check(it.values.any { row -> row.isNotEmpty() }) { "Every service came back empty" } } }
             .onSuccess { rows ->
                 builtOn = today
                 state.value = rows

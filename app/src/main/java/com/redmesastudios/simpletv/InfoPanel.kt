@@ -7,6 +7,7 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import java.time.Duration
@@ -52,6 +53,26 @@ fun titleMeta(title: Title): String = when (title.kind) {
     ).joinToString(" · ")
 }
 
+// The description scrolls inside the panel (Up/Down, see RemoteButtons), with a ▼ under it
+// while there's more below. These tags find them again in a shown panel.
+const val OverviewTag = "overview"
+const val MoreBelowTag = "moreBelow"
+private const val OverviewMaxHeightDp = 104f
+private const val ScrollStepDp = 60f
+
+// Scrolls a shown panel's description by a step; false when it has nowhere further to go.
+fun scrollPanel(panel: View, down: Boolean): Boolean {
+    val scroller = panel.findViewWithTag<ScrollView>(OverviewTag) ?: return false
+    val direction = if (down) 1 else -1
+    if (!scroller.canScrollVertically(direction)) return false
+    val step = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, ScrollStepDp, panel.resources.displayMetrics)
+    scroller.smoothScrollBy(0, (direction * step).toInt())
+    return true
+}
+
+fun panelCanScroll(panel: View): Boolean =
+    panel.findViewWithTag<ScrollView>(OverviewTag)?.let { it.canScrollVertically(1) || it.canScrollVertically(-1) } == true
+
 // The panel itself: a wide card along the bottom of the screen, in the fall palette.
 fun infoPanelView(context: Context, info: PanelInfo): View {
     fun dp(value: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, context.resources.displayMetrics)
@@ -69,7 +90,31 @@ fun infoPanelView(context: Context, info: PanelInfo): View {
         orientation = LinearLayout.VERTICAL
         addView(text(info.heading, 24f, 800, PanelInk, lines = 2))
         addView(text(info.meta, 13f, 600, PanelInkSoft).apply { setPadding(0, dp(4f).toInt(), 0, 0) })
-        addView(text(info.overview, 13.5f, 500, PanelInk, lines = 3).apply { setPadding(0, dp(8f).toInt(), 0, 0) })
+        if (info.overview.isNotEmpty()) {
+            val maxHeight = dp(OverviewMaxHeightDp).toInt()
+            val moreBelow = text("▼", 11f, 700, PanelInkSoft).apply {
+                tag = MoreBelowTag
+                gravity = Gravity.CENTER_HORIZONTAL
+                alpha = 0f
+            }
+            // Never taller than about five lines; the rest scrolls.
+            val scroller = object : ScrollView(context) {
+                override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) =
+                    super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(maxHeight, MeasureSpec.AT_MOST))
+            }.apply {
+                tag = OverviewTag
+                isVerticalScrollBarEnabled = false
+                isVerticalFadingEdgeEnabled = true
+                setFadingEdgeLength(dp(18f).toInt())
+                setPadding(0, dp(8f).toInt(), 0, 0)
+                addView(text(info.overview, 13.5f, 500, PanelInk, lines = Int.MAX_VALUE))
+                fun showMore() = moreBelow.animate().alpha(if (canScrollVertically(1)) 1f else 0f).setDuration(200).start()
+                setOnScrollChangeListener { _, _, _, _, _ -> showMore() }
+                addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> showMore() }
+            }
+            addView(scroller, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
+            addView(moreBelow, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
+        }
     }
     val clock = LinearLayout(context).apply {
         orientation = LinearLayout.VERTICAL

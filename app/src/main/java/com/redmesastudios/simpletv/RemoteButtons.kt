@@ -135,9 +135,19 @@ class RemoteButtons : AccessibilityService() {
         }
     }
 
-    // While the info panel is up: the TV button or Back closes it; any other button closes
-    // it and does its usual thing.
+    // While the info panel is up: Up and Down scroll a long description (and keep the panel
+    // up a while longer), the TV button or Back closes it, and any other button closes it
+    // and does its usual thing.
     private fun answerPanel(event: KeyEvent): Boolean {
+        val open = panel ?: return false
+        if (event.keyCode == KeyEvent.KEYCODE_DPAD_DOWN || event.keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+            if (panelCanScroll(open.view)) {
+                scrollPanel(open.view, down = event.keyCode == KeyEvent.KEYCODE_DPAD_DOWN)
+                main.removeCallbacks(open.timeout)
+                main.postDelayed(open.timeout, PanelSeconds * 1_000L)
+                return true
+            }
+        }
         if (event.repeatCount > 0) return true
         dismissPanel()
         val action = buttonAction(event.keyCode)

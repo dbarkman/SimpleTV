@@ -54,6 +54,12 @@ object Tmdb {
 
     suspend fun details(kind: TitleKind, id: Int): Title? = title(get("/${kind.path()}/$id?language=en-US"), kind)
 
+    // Every US streaming service TMDB tracks, for shows and movies.
+    suspend fun services(): List<GuideService> = listOf("tv", "movie").flatMap { kind ->
+        get("/watch/providers/$kind?watch_region=US").getJSONArray("results").objects()
+            .map { GuideService(it.getInt("provider_id"), it.getString("provider_name")) }
+    }.distinctBy { it.id }
+
     // What's popular on a service right now; enough votes to skip obscure titles.
     suspend fun popular(kind: TitleKind, providers: Set<Int>): List<Title> =
         get("/discover/${kind.path()}?watch_region=US&with_watch_providers=${providers.joinToString("|")}&sort_by=popularity.desc&vote_count.gte=100&language=en-US")
@@ -146,6 +152,12 @@ object Watchmode {
                     date = LocalDate.parse(json.text("source_release_date")),
                 )
             }
+
+    // Every US service Watchmode tracks, except stores that only rent and sell.
+    suspend fun services(): List<GuideService> =
+        JSONArray(get("/sources/?regions=US")).objects()
+            .filter { it.text("type") != "purchase" }
+            .map { GuideService(it.getInt("id"), it.text("name")) }
 
     // The service's own web link for a title, which its TV app opens; null when the
     // service doesn't carry it.

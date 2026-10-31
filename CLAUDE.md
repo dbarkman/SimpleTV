@@ -71,8 +71,10 @@ description when SimpleTV started it in that app (`NowPlaying`, a file the
 service reads across processes), otherwise "Watching <app>"; always the time,
 date and weather. The service forgets the started show when its app leaves the
 front, when Back is pressed inside the app (to its menus or another show), or
-after 4 hours. TV or Back closes it; it closes by
-itself after 10 seconds.
+after 4 hours. The full description scrolls inside the panel with Up and
+Down, with a ▼ while there's more below; each scroll keeps the panel up
+another 10 seconds. TV or Back closes it; it closes by itself after 10
+seconds.
 Every other key passes through. The service runs in its own process
 (`:buttons`): every remote press waits on it, and on SimpleTV's busy UI thread
 a delayed key release turned one press into several. Keys sent with
@@ -181,6 +183,12 @@ source of truth.
   pile) and the falling leaves. Leaf motion is pure math in design px
   (1920×1080). The leaves step about 30 times a second and stop while another
   app is in front; that keeps SimpleTV near 40% of one core on the stick.
+- `ServiceDirectory.kt` — TMDB's and Watchmode's US service lists (cached a
+  week in `files/services.json`). An app SimpleTV wasn't told about is matched
+  to its service by name (`matchService`: "ESPN" takes ESPN and ESPN Plus,
+  never "… Amazon Channel" resales); one that matches both lists gets a folder
+  like the known services. The catalog rebuilds early when a newly matched
+  service has no rows yet, and never keeps a guide that came back all empty.
 - `StreamingApps.kt` — every installed TV app gets a tile (`homeApps`): the
   known services first, in their curated order with their guide IDs, then the
   rest by name. Settings, the Play Store (Get Apps) and SimpleTV itself get no

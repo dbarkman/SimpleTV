@@ -103,8 +103,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        // The show guide refreshes at most once a day, in the background.
-        lifecycleScope.launch { CatalogStore.refreshIfStale(applicationContext, StreamingApps) }
+        // The show guide refreshes at most once a day, in the background, for the known
+        // services and any installed app matched to a service by name.
+        lifecycleScope.launch {
+            ServiceDirectory.refreshIfStale(applicationContext)
+            val matched = homeApps(installedTvApps()).map(ServiceDirectory.services.value::resolve)
+            CatalogStore.refreshIfStale(applicationContext, (StreamingApps + matched).distinctBy { it.packageName })
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
