@@ -71,6 +71,9 @@ Every other key passes through. The service runs in its own process
 (`:buttons`): every remote press waits on it, and on SimpleTV's busy UI thread
 a delayed key release turned one press into several. Keys sent with
 `adb shell input` skip the service, so test buttons with the real remote.
+Never `am force-stop` SimpleTV (or `am start -S` it): Android turns a
+force-stopped app's accessibility service off, and every remote button goes
+dead until the two commands above are run again. Installing over it is fine.
 Voice search uses the remote's mic: `adb shell pm grant
 com.redmesastudios.simpletv android.permission.RECORD_AUDIO`, or the prompt on
 first use.
