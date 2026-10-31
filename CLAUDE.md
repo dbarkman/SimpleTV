@@ -108,6 +108,11 @@ source of truth.
   and a More apps tile, which slides the next page in; Back slides back. Apps
   with a folder open it; the rest launch directly. Focus starts on the
   top-left app of the first page, and every Home press returns it there.
+- `RemoveApp.kt` — holding OK on an app tile for 1.5 s shows "Remove <app> from
+  this TV?" (Cancel selected). The prompt takes no focus: the home screen steers
+  it with Left/Right/OK/Back and swallows the held OK's release. Remove hands
+  over to Android's uninstall prompt; apps that came with the TV open their
+  settings page instead, where they can be turned off.
 - `Glance.kt` / `GlanceCards.kt` — the At a glance cards: weather, news count and
   markets, refreshed at most every 15 minutes while the home screen is up.
   Each card opens its channel page.

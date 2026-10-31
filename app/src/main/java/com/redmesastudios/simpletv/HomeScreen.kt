@@ -1,5 +1,6 @@
 package com.redmesastudios.simpletv
 
+import android.view.KeyEvent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
@@ -55,6 +56,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -164,6 +166,39 @@ fun HomeScreen(
         }
     }
 
+    // Holding OK on an app tile offers to remove it. The prompt takes no focus; the keys
+    // below steer it, and the held OK's release is swallowed so it can't answer the prompt.
+    var removing by remember { mutableStateOf<StreamingApp?>(null) }
+    var removeChoice by remember { mutableStateOf(RemoveChoice.Cancel) }
+    var swallowRelease by remember { mutableStateOf(false) }
+    val builtIn = remember(removing) { removing?.let { context.cameWithTv(it) } ?: false }
+    fun answerRemove(event: KeyEvent): Boolean {
+        val select = event.keyCode in SelectKeys
+        if (swallowRelease && select) {
+            if (event.action == KeyEvent.ACTION_UP) swallowRelease = false
+            return true
+        }
+        val app = removing ?: return false
+        val handled = select || event.keyCode in setOf(
+            KeyEvent.KEYCODE_DPAD_LEFT,
+            KeyEvent.KEYCODE_DPAD_RIGHT,
+            KeyEvent.KEYCODE_DPAD_UP,
+            KeyEvent.KEYCODE_DPAD_DOWN,
+            KeyEvent.KEYCODE_BACK,
+        )
+        if (!handled || event.action != KeyEvent.ACTION_UP) return handled
+        when (event.keyCode) {
+            KeyEvent.KEYCODE_DPAD_LEFT -> removeChoice = RemoveChoice.Remove
+            KeyEvent.KEYCODE_DPAD_RIGHT -> removeChoice = RemoveChoice.Cancel
+            KeyEvent.KEYCODE_BACK -> removing = null
+            in SelectKeys -> {
+                removing = null
+                if (removeChoice == RemoveChoice.Remove) context.removeApp(app)
+            }
+        }
+        return true
+    }
+
     // This is the home screen: Back has nowhere further to go, except back a page.
     BackHandler { }
     BackHandler(enabled = page > 0) {
@@ -171,7 +206,7 @@ fun HomeScreen(
         gridFocus = MoreTile
     }
 
-    Box(Modifier.fillMaxSize().background(Ground)) {
+    Box(Modifier.fillMaxSize().background(Ground).onPreviewKeyEvent { answerRemove(it.nativeKeyEvent) }) {
         FallScene(Modifier.fillMaxSize())
         Column(Modifier.fillMaxSize().padding(start = 60.dp, end = 60.dp, top = 32.dp, bottom = 28.dp)) {
             Header(
@@ -208,6 +243,11 @@ fun HomeScreen(
                     aboveGrid = searchButton,
                     onFocused = { focusedTile = it },
                     onOpen = { if (it.hasFolder) onOpenFolder(it) else context.launchApp(it) },
+                    onHold = {
+                        removeChoice = RemoveChoice.Cancel
+                        swallowRelease = true
+                        removing = it
+                    },
                     onMore = {
                         gridFocus = pages.getOrNull(shown.index + 1)?.firstOrNull()?.packageName
                         page = shown.index + 1
@@ -217,6 +257,7 @@ fun HomeScreen(
             Spacer(Modifier.weight(1f))
             GlanceCards(glance, glanceCards, onOpenChannel)
         }
+        RemoveAppPrompt(removing, builtIn, removeChoice)
     }
 }
 
@@ -280,6 +321,7 @@ private fun AppGrid(
     aboveGrid: FocusRequester,
     onFocused: (String) -> Unit,
     onOpen: (StreamingApp) -> Unit,
+    onHold: (StreamingApp) -> Unit,
     onMore: () -> Unit,
 ) {
     val tiles = page.apps.map { it.packageName } + if (page.hasMore) listOf(MoreTile) else emptyList()
@@ -328,6 +370,7 @@ private fun AppGrid(
                             modifier = modifier,
                             onFocused = { onFocused(app.packageName) },
                             onClick = { onOpen(app) },
+                            onHold = { onHold(app) },
                         )
                     }
                 }
@@ -358,8 +401,9 @@ private fun AppTile(
     modifier: Modifier,
     onFocused: () -> Unit,
     onClick: () -> Unit,
+    onHold: () -> Unit,
 ) {
-    TileFrame(modifier, fallback, onFocused, onClick) {
+    TileFrame(modifier, fallback, onFocused, onClick, onHold) {
         when (art) {
             is AppArt.Banner -> Image(art.image, app.label, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
             is AppArt.Icon -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -378,6 +422,7 @@ private fun TileFrame(
     fill: Color,
     onFocused: () -> Unit,
     onClick: () -> Unit,
+    onHold: (() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     var focused by remember { mutableStateOf(false) }
@@ -408,6 +453,11 @@ private fun TileFrame(
             .onFocusChanged {
                 focused = it.isFocused
                 if (it.isFocused) onFocused()
+            }
+            .onPreviewKeyEvent { event ->
+                val hold = onHold?.takeIf { isHoldToRemove(event.nativeKeyEvent) } ?: return@onPreviewKeyEvent false
+                hold()
+                true
             }
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },

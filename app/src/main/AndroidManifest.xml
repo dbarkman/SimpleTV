@@ -15,6 +15,9 @@
     <!-- The stick's own Wi-Fi address, for the photo upload page's QR code. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- Holding OK on an app tile hands its removal to Android's own uninstall prompt. -->
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+
     <!-- Voice search, through the remote's microphone. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
