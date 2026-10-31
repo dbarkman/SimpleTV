@@ -1,4 +1,6 @@
 <resources>
     <!-- Matches Ground in ui/theme/Color.kt so launch shows no flash. -->
     <color name="ground">#FFF4ECE1</color>
+    <!-- The app icon's and banner's clay. -->
+    <color name="icon_clay">#FFC8643B</color>
 </resources>

@@ -216,7 +216,12 @@ Plain Compose foundation only (no tv-material). Unit tests in `app/src/test`.
 The design canvas lives at https://claude.ai/artifact/BnhjnTjfFvcc1RH6VxxBWk.
 "Fall — Home, app banners" is the built home screen; "Fall — Netflix folder",
 "Fall — Weather channel" and "News card states" are the approved designs for
-the folders and info channels.
+the folders and info channels. "App icon and logo" holds the icon: direction A,
+Horizon (a sun over fall hills in a TV, on clay `#C8643B`). `docs/logo.svg` is
+its source; the launcher icon is an adaptive icon (`mipmap-anydpi/ic_launcher.xml`
+with `drawable/ic_launcher_foreground.xml`), and the TV banner
+(`drawable-xhdpi/banner.png`, 640×360) and `docs/banner.png` are the icon plus the
+Manrope "Simple**TV**" wordmark, rendered from HTML with headless Chrome.
 
 ## Data sources
 

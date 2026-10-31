@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/banner.png" width="480" alt="The SimpleTV logo: a sun over fall hills inside a TV, on clay orange"></p>
+
 # SimpleTV
 
 A calm, simple home screen for Android TV, built for people who just want to watch

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Horizon mark: a sun over fall hills in a TV, on docs/logo.svg's 100-unit grid,
+     centered in the adaptive icon's 108 dp so it stays inside the 66 dp safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:translateX="4"
+        android:translateY="4">
+        <path
+            android:fillColor="#FBF4EA"
+            android:pathData="M27,24 H73 A9,9 0 0 1 82,33 V59 A9,9 0 0 1 73,68 H27 A9,9 0 0 1 18,59 V33 A9,9 0 0 1 27,24 Z" />
+        <path
+            android:fillColor="#E7A86B"
+            android:pathData="M55,40 A7,7 0 1 0 69,40 A7,7 0 1 0 55,40 Z" />
+        <path
+            android:fillColor="#D98A3D"
+            android:pathData="M22,60 C34,50 44,54 52,57 S70,52 78,56 L78,60 Q78,64 74,64 L26,64 Q22,64 22,60 Z" />
+        <path
+            android:fillColor="#A84B3A"
+            android:pathData="M22,62 C36,57 50,62 60,60 S74,58 78,61 L78,60 Q78,64 74,64 L26,64 Q22,64 22,62 Z" />
+        <path
+            android:fillColor="#FBF4EA"
+            android:pathData="M42.5,74 H57.5 A2.5,2.5 0 0 1 57.5,79 H42.5 A2.5,2.5 0 0 1 42.5,74 Z" />
+    </group>
+</vector>

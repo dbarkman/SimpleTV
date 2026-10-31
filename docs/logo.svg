@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 100 100" role="img" aria-label="SimpleTV">
+  <rect width="100" height="100" rx="22" fill="#C8643B"/>
+  <rect x="18" y="24" width="64" height="44" rx="9" fill="#FBF4EA"/>
+  <circle cx="62" cy="40" r="7" fill="#E7A86B"/>
+  <path d="M22 60 C 34 50, 44 54, 52 57 S 70 52, 78 56 L78 60 Q78 64 74 64 L26 64 Q22 64 22 60 Z" fill="#D98A3D"/>
+  <path d="M22 62 C 36 57, 50 62, 60 60 S 74 58, 78 61 L78 60 Q78 64 74 64 L26 64 Q22 64 22 62 Z" fill="#A84B3A"/>
+  <rect x="40" y="74" width="20" height="5" rx="2.5" fill="#FBF4EA"/>
+</svg>
