@@ -118,14 +118,22 @@ source of truth.
   while open; Back returns to its card.
 - `InfoPanel.kt` — the TV button's panel (see Remote buttons).
 - `ScreensaverScreen.kt` / `Photos.kt` / `PhotoUploadServer.kt` — the family photo
-  screensaver (Free TV button): a slow crossfading, drifting slideshow with a
-  clock; Left/Right step, OK opens "Add family photos", Back leaves. "Add family
+  screensaver (Free TV button): a slow crossfading slideshow with a clock.
+  Landscape photos fill the screen and drift; portrait and square ones show
+  whole, full height, over a blurred copy of themselves. Left/Right step,
+  Up/Down change the time per photo (5 s to 2 min, kept on the box), OK opens
+  "Add family photos", Back leaves. "Add family
   photos" runs a small web server on the home network only while it's showing,
   with a QR code and a fresh four-digit code; phones pick photos, the page
   shrinks them, and the stick decodes (JPEG/PNG/HEIC), turns upright and
   resizes each to 1920×1080 in `files/photos`. The page also lists and removes
   photos. Photos never leave the stick and never go in the repo. The slideshow
-  keeps the screen on so Google TV's own screensaver stays away.
+  keeps the screen on so the idle screensaver stays away.
+- `PhotoDream.kt` — the same slideshow as the TV's idle screensaver (a
+  DreamService hosting Compose). Chosen once over adb:
+  `adb shell settings put secure screensaver_components com.redmesastudios.simpletv/.PhotoDream`;
+  `settings delete secure screensaver_components` restores Google TV's own.
+  Dreams can't be started from adb without root, so test by letting the TV idle.
 - `Holidays.kt` / `HalloweenScene.kt` — holiday decorations over the scene, each
   on for a stretch of days around its holiday and gone afterwards (Halloween:
   Oct 24 – Nov 1: harvest moon, bats, a graveyard, a hay bale with a black

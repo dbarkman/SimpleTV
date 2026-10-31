@@ -28,7 +28,9 @@ SimpleTV opens them, or deep-links straight to a show inside them.
   have come in, and the markets. Each card opens its own page: a 6-day forecast with
   weather alerts, the day's top stories, and the major indexes plus your own stocks,
   each with a detail page.
-- **Family photo screensaver.** Free TV starts a slow slideshow of your own photos. To
+- **Family photo screensaver.** Free TV starts a slow slideshow of your own photos, and the
+  same slideshow can be the TV's screensaver when it sits idle. Portrait photos show
+  whole, over a soft blurred fill; Up and Down change how long each photo stays up. To
   add some, scan the QR code on the TV with any phone on the same Wi-Fi and pick photos.
   The TV resizes them itself, and the same page shows what's on the TV so you can remove
   photos. Photos stay on the TV; nothing goes to the cloud.
@@ -131,6 +133,9 @@ adb shell appops set com.redmesastudios.simpletv GET_USAGE_STATS allow
 
 # Voice search through the remote's microphone (or accept the prompt on first use)
 adb shell pm grant com.redmesastudios.simpletv android.permission.RECORD_AUDIO
+
+# Your family photos as the TV's screensaver (undo with: settings delete secure screensaver_components)
+adb shell settings put secure screensaver_components com.redmesastudios.simpletv/.PhotoDream
 ```
 
 It also helps to set the TV's sleep timer to **Never**. The onn drops off Wi-Fi in

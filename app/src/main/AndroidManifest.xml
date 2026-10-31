@@ -58,6 +58,18 @@
             </intent-filter>
         </activity>
 
+        <!-- The family photo slideshow as the TV's screensaver. See PhotoDream.kt. -->
+        <service
+            android:name=".PhotoDream"
+            android:exported="true"
+            android:label="@string/photo_dream_label"
+            android:permission="android.permission.BIND_DREAM_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.dreams.DreamService" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
         <!-- The remote's extra buttons, system-wide. See RemoteButtons.kt. It runs in its own
              process: every remote press waits on it, so it must never queue behind SimpleTV's
              screen work, or a held-up release turns one press into several. -->

@@ -22,6 +22,34 @@ fun fitWithin(width: Int, height: Int, maxWidth: Int, maxHeight: Int): Pair<Int,
     return (width * scale).roundToInt().coerceAtLeast(1) to (height * scale).roundToInt().coerceAtLeast(1)
 }
 
+// Portrait and square photos show whole rather than cropped to the screen's shape.
+fun showsWhole(width: Int, height: Int) = width.toFloat() / height < 1.2f
+
+// How long each photo stays up, chosen with Up and Down during the slideshow and kept on the box.
+object SlideshowTiming {
+    val Choices = listOf(5, 8, 12, 20, 30, 60, 120)
+    private const val Default = 12
+
+    fun seconds(context: Context): Int =
+        context.getSharedPreferences("screensaver", Context.MODE_PRIVATE).getInt("seconds", Default).takeIf { it in Choices } ?: Default
+
+    fun change(context: Context, current: Int, longer: Boolean): Int {
+        val next = nextChoice(current, longer)
+        context.getSharedPreferences("screensaver", Context.MODE_PRIVATE).edit().putInt("seconds", next).apply()
+        return next
+    }
+
+    fun nextChoice(current: Int, longer: Boolean): Int {
+        val i = Choices.indexOf(current).takeIf { it >= 0 } ?: Choices.indexOf(Default)
+        return Choices[(if (longer) i + 1 else i - 1).coerceIn(0, Choices.lastIndex)]
+    }
+
+    fun describe(seconds: Int): String = when {
+        seconds >= 60 && seconds % 60 == 0 -> if (seconds == 60) "1 minute" else "${seconds / 60} minutes"
+        else -> "$seconds seconds"
+    }
+}
+
 // Only names this store made itself are ever read or deleted.
 fun isPhotoName(name: String) = name.matches(Regex("[a-f0-9-]{36}\\.jpg"))
 

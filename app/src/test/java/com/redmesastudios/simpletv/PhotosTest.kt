@@ -39,4 +39,23 @@ class PhotosTest {
         assertEquals("12", request.headers["content-length"])
         assertNull(parseRequest("garbage", emptyList()))
     }
+
+    @Test
+    fun portraitAndSquarePhotosShowWhole() {
+        assertTrue(showsWhole(608, 1080))
+        assertTrue(showsWhole(1080, 1080))
+        assertFalse(showsWhole(1440, 1080))
+        assertFalse(showsWhole(1920, 1080))
+    }
+
+    @Test
+    fun timingStepsThroughItsChoicesAndStopsAtTheEnds() {
+        assertEquals(20, SlideshowTiming.nextChoice(12, longer = true))
+        assertEquals(8, SlideshowTiming.nextChoice(12, longer = false))
+        assertEquals(120, SlideshowTiming.nextChoice(120, longer = true))
+        assertEquals(5, SlideshowTiming.nextChoice(5, longer = false))
+        assertEquals("20 seconds", SlideshowTiming.describe(20))
+        assertEquals("1 minute", SlideshowTiming.describe(60))
+        assertEquals("2 minutes", SlideshowTiming.describe(120))
+    }
 }

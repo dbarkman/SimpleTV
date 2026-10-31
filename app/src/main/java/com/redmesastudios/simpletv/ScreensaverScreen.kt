@@ -41,6 +41,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.asImageBitmap
@@ -69,11 +70,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-private const val PhotoSeconds = 12
-
 // Family photos, one at a time, each drifting slowly and fading into the next, with a quiet
-// clock in the corner. Left and Right step through them, OK opens "Add photos", and Back
-// (or any other button) leaves.
+// clock in the corner. Left and Right step through them, Up and Down change how long each
+// stays up, OK opens "Add photos", and Back (or any other button) leaves.
 @Composable
 fun ScreensaverScreen(onClose: () -> Unit) {
     val context = LocalContext.current
@@ -81,6 +80,10 @@ fun ScreensaverScreen(onClose: () -> Unit) {
     var adding by remember { mutableStateOf(photos.isEmpty()) }
     var index by remember { mutableIntStateOf(0) }
     var step by remember { mutableIntStateOf(0) }
+    var seconds by remember { mutableIntStateOf(SlideshowTiming.seconds(context)) }
+    // Shown briefly after Up or Down: "Each photo: 20 seconds".
+    var timingNote by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(timingNote) { if (timingNote != null) { delay(2_500); timingNote = null } }
     val focus = remember { FocusRequester() }
 
     // The TV's own screensaver mustn't take over the slideshow.
@@ -91,11 +94,13 @@ fun ScreensaverScreen(onClose: () -> Unit) {
     }
 
     LaunchedEffect(adding) { if (!adding) runCatching { focus.requestFocus() } }
-    // Moves on every few seconds; stepping by hand restarts the wait.
-    LaunchedEffect(photos, step, adding) {
+    // Moves on every few seconds; stepping by hand or changing the timing restarts the wait.
+    LaunchedEffect(photos, step, adding, seconds) {
         if (adding || photos.isEmpty()) return@LaunchedEffect
-        delay(PhotoSeconds * 1_000L)
-        index = (index + 1) % photos.size
+        while (true) {
+            delay(seconds * 1_000L)
+            index = (index + 1) % photos.size
+        }
     }
 
     BackHandler {
@@ -113,6 +118,11 @@ fun ScreensaverScreen(onClose: () -> Unit) {
                 when (event.key) {
                     Key.DirectionRight -> { index = (index + 1) % photos.size; step++ }
                     Key.DirectionLeft -> { index = (index - 1 + photos.size) % photos.size; step++ }
+                    Key.DirectionUp, Key.DirectionDown -> {
+                        seconds = SlideshowTiming.change(context, seconds, longer = event.key == Key.DirectionUp)
+                        timingNote = "Each photo: ${SlideshowTiming.describe(seconds)}"
+                        step++
+                    }
                     Key.DirectionCenter, Key.Enter -> adding = true
                     // Back is the BackHandler's; volume belongs to the TV.
                     Key.Back, Key.VolumeUp, Key.VolumeDown, Key.VolumeMute -> return@onPreviewKeyEvent false
@@ -121,8 +131,15 @@ fun ScreensaverScreen(onClose: () -> Unit) {
                 true
             },
     ) {
-        photos.getOrNull(index)?.let { Slide(it, index) }
+        photos.getOrNull(index)?.let { Slide(it, index, seconds) }
         ScreensaverClock(Modifier.align(Alignment.BottomEnd).padding(36.dp))
+        AnimatedVisibility(timingNote != null, Modifier.align(Alignment.TopCenter).padding(top = 40.dp), enter = fadeIn(tween(200)), exit = fadeOut(tween(400))) {
+            BasicText(
+                timingNote.orEmpty(),
+                Modifier.background(Color.Black.copy(alpha = 0.55f), RoundedCornerShape(50)).padding(horizontal = 22.dp, vertical = 10.dp),
+                style = SimpleTVType.serviceName.copy(color = Color.White, fontSize = 18.sp),
+            )
+        }
         AnimatedVisibility(adding, enter = fadeIn(tween(300)), exit = fadeOut(tween(300))) {
             AddPhotos(
                 count = photos.size,
@@ -132,20 +149,50 @@ fun ScreensaverScreen(onClose: () -> Unit) {
     }
 }
 
-// One photo, filling the screen, slowly zooming and drifting, crossfading from the last.
+// A decoded photo, plus a tiny copy for the soft background behind portrait photos.
+private class SlideImage(val photo: ImageBitmap, val backdrop: ImageBitmap?)
+
+// One photo, crossfading from the last. Landscape photos fill the screen, slowly zooming and
+// drifting. Portrait and square ones show whole, full height, over a blurred, enlarged copy
+// of themselves, so no one's head gets cut off.
 @Composable
-private fun Slide(file: File, index: Int) {
-    val image by produceState<ImageBitmap?>(null, file) {
-        value = withContext(Dispatchers.IO) { BitmapFactory.decodeFile(file.path)?.asImageBitmap() }
+internal fun Slide(file: File, index: Int, seconds: Int) {
+    val image by produceState<SlideImage?>(null, file) {
+        value = withContext(Dispatchers.IO) {
+            val bitmap = BitmapFactory.decodeFile(file.path) ?: return@withContext null
+            // Shrunk to a few dozen pixels and stretched back up, a photo reads as a soft blur.
+            val backdrop = if (showsWhole(bitmap.width, bitmap.height)) {
+                android.graphics.Bitmap.createScaledBitmap(bitmap, maxOf(1, bitmap.width / 24), maxOf(1, bitmap.height / 24), true).asImageBitmap()
+            } else {
+                null
+            }
+            SlideImage(bitmap.asImageBitmap(), backdrop)
+        }
     }
-    Crossfade(image, animationSpec = tween(1500), label = "slide") { bitmap ->
-        if (bitmap == null) return@Crossfade
+    Crossfade(image, animationSpec = tween(1500), label = "slide") { shown ->
+        if (shown == null) return@Crossfade
         val zoom = remember { Animatable(1f) }
-        LaunchedEffect(bitmap) { zoom.animateTo(1.08f, tween((PhotoSeconds + 2) * 1_000, easing = LinearEasing)) }
+        val backdrop = shown.backdrop
+        LaunchedEffect(shown) {
+            zoom.animateTo(if (backdrop == null) 1.08f else 1.03f, tween((seconds + 2) * 1_000, easing = LinearEasing))
+        }
+        if (backdrop != null) {
+            Box(Modifier.fillMaxSize()) {
+                Image(backdrop, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop, filterQuality = FilterQuality.High)
+                Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)))
+                Image(
+                    shown.photo,
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxSize().graphicsLayer { scaleX = zoom.value; scaleY = zoom.value },
+                )
+            }
+            return@Crossfade
+        }
         // Alternate the drift so consecutive photos don't all slide the same way.
         val drift = if (index % 2 == 0) 1f else -1f
         Image(
-            bitmap,
+            shown.photo,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize().graphicsLayer {
@@ -158,7 +205,7 @@ private fun Slide(file: File, index: Int) {
 }
 
 @Composable
-private fun ScreensaverClock(modifier: Modifier) {
+internal fun ScreensaverClock(modifier: Modifier) {
     val now by rememberMinuteClock()
     val shadow = Shadow(Color.Black.copy(alpha = 0.6f), Offset(0f, 2f), 8f)
     Column(modifier, horizontalAlignment = Alignment.End) {
@@ -206,7 +253,10 @@ private fun AddPhotos(count: Int, onChange: () -> Unit) {
                     if (count == 0) "No photos yet." else if (count == 1) "1 photo on the TV." else "$count photos on the TV.",
                     style = SimpleTVType.serviceName.copy(fontSize = 16.sp),
                 )
-                BasicText(if (count == 0) "Back to leave" else "Back to watch the slideshow", style = SimpleTVType.hint.copy(color = InkSoft))
+                BasicText(
+                    if (count == 0) "Back to leave" else "Back to watch the slideshow · Up and Down change how long each photo shows",
+                    style = SimpleTVType.hint.copy(color = InkSoft),
+                )
             }
         }
     }
