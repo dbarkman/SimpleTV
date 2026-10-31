@@ -50,7 +50,7 @@ adb shell settings put secure accessibility_enabled 1
 | Button | Key code | Job |
 |---|---|---|
 | YouTube / Netflix / Disney+ / Paramount+ | BUTTON_3 / 4 / 9 / 10 | open that app (asks first over another app) |
-| Free TV | FEATURED_APP_1 | open Fandango at Home (asks first over another app) |
+| Free TV | FEATURED_APP_1 | family photo screensaver (asks first over another app) |
 | ★ Star | MACRO_1 | SimpleTV search |
 | 👤 Person | PROFILE_SWITCH | SimpleTV Continue Watching |
 | ⚙ Settings | NOTIFICATION | Android settings |
@@ -114,6 +114,15 @@ source of truth.
   market cap and P/E need Yahoo's cookie-gated quote API, so they're left out). Each refreshes every 10 minutes
   while open; Back returns to its card.
 - `InfoPanel.kt` — the TV button's panel (see Remote buttons).
+- `ScreensaverScreen.kt` / `Photos.kt` / `PhotoUploadServer.kt` — the family photo
+  screensaver (Free TV button): a slow crossfading, drifting slideshow with a
+  clock; Left/Right step, OK opens "Add family photos", Back leaves. "Add family
+  photos" runs a small web server on the home network only while it's showing,
+  with a QR code and a fresh four-digit code; phones pick photos, the page
+  shrinks them, and the stick decodes (JPEG/PNG/HEIC), turns upright and
+  resizes each to 1920×1080 in `files/photos`. The page also lists and removes
+  photos. Photos never leave the stick and never go in the repo. The slideshow
+  keeps the screen on so Google TV's own screensaver stays away.
 - `Holidays.kt` / `HalloweenScene.kt` — holiday decorations over the scene, each
   on for a stretch of days around its holiday and gone afterwards (Halloween:
   Oct 24 – Nov 1: harvest moon, bats, a graveyard, a hay bale with a black

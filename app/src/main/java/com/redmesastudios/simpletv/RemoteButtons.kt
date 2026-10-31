@@ -36,6 +36,7 @@ sealed interface ButtonAction {
     data object Settings : ButtonAction
     data class Media(val keyCode: Int) : ButtonAction
     data object Info : ButtonAction
+    data object Screensaver : ButtonAction
 }
 
 // Key codes as the onn remote sends them. Buttons not listed here pass through untouched.
@@ -44,8 +45,8 @@ fun buttonAction(keyCode: Int): ButtonAction? = when (keyCode) {
     KeyEvent.KEYCODE_BUTTON_4 -> ButtonAction.OpenApp("com.netflix.ninja")
     KeyEvent.KEYCODE_BUTTON_9 -> ButtonAction.OpenApp("com.disney.disneyplus")
     KeyEvent.KEYCODE_BUTTON_10 -> ButtonAction.OpenApp("com.cbs.ott")
-    // Free TV: Fandango at Home, a library of bought and free movies.
-    KeyEvent.KEYCODE_FEATURED_APP_1 -> ButtonAction.OpenApp("air.com.vudu.air.DownloaderTablet")
+    // Free TV: the family photo screensaver.
+    KeyEvent.KEYCODE_FEATURED_APP_1 -> ButtonAction.Screensaver
     KeyEvent.KEYCODE_MACRO_1 -> ButtonAction.Search
     KeyEvent.KEYCODE_PROFILE_SWITCH -> ButtonAction.ContinueWatching
     KeyEvent.KEYCODE_NOTIFICATION -> ButtonAction.Settings
@@ -116,11 +117,11 @@ class RemoteButtons : AccessibilityService() {
     // watching, and any other button closes it and does its usual thing.
     private fun answerPrompt(open: SwitchPrompt, event: KeyEvent): Boolean {
         if (event.repeatCount > 0) return true
-        val sameButton = (buttonAction(event.keyCode) as? ButtonAction.OpenApp)?.packageName == open.packageName
+        val sameButton = buttonAction(event.keyCode) == open.action
         return when {
             event.keyCode in ConfirmKeys || sameButton -> {
                 dismissPrompt()
-                launch(open.packageName)
+                open.go()
                 true
             }
             event.keyCode == KeyEvent.KEYCODE_BACK -> {
@@ -154,6 +155,10 @@ class RemoteButtons : AccessibilityService() {
         when (action) {
             is ButtonAction.OpenApp -> openApp(action.packageName)
             ButtonAction.Search -> openSimpleTV(OpenSearch)
+            ButtonAction.Screensaver -> when (foregroundPackage) {
+                null, packageName -> openSimpleTV(OpenScreensaver)
+                else -> showPrompt("Photos", action) { openSimpleTV(OpenScreensaver) }
+            }
             ButtonAction.ContinueWatching -> openSimpleTV(OpenContinueWatching)
             ButtonAction.Settings -> openSystemSettings()
             // Goes to whichever app is playing, through its media session.
@@ -178,7 +183,7 @@ class RemoteButtons : AccessibilityService() {
         when (foregroundPackage) {
             target -> Unit
             null, packageName -> launch(target)
-            else -> showPrompt(target)
+            else -> showPrompt(appLabel(target), ButtonAction.OpenApp(target)) { launch(target) }
         }
     }
 
@@ -186,10 +191,12 @@ class RemoteButtons : AccessibilityService() {
         packageManager.tvLaunchIntent(target)?.let { startActivity(it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
     }
 
-    private fun showPrompt(target: String) {
+    private fun appLabel(target: String) = StreamingApps.firstOrNull { it.packageName == target }?.label
+        ?: packageManager.getApplicationLabel(packageManager.getApplicationInfo(target, 0)).toString()
+
+    // "Switch to <label>?" for a button whose job would take over the screen.
+    private fun showPrompt(label: String, action: ButtonAction, go: () -> Unit) {
         dismissPrompt()
-        val label = StreamingApps.firstOrNull { it.packageName == target }?.label
-            ?: packageManager.getApplicationLabel(packageManager.getApplicationInfo(target, 0)).toString()
         val view = promptView(label)
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -205,7 +212,7 @@ class RemoteButtons : AccessibilityService() {
         view.scaleY = 0.96f
         view.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(200).start()
         val timeout = Runnable { dismissPrompt() }
-        prompt = SwitchPrompt(target, view, timeout)
+        prompt = SwitchPrompt(action, go, view, timeout)
         main.postDelayed(timeout, PromptSeconds * 1_000L)
     }
 
@@ -318,7 +325,7 @@ class RemoteButtons : AccessibilityService() {
         super.onDestroy()
     }
 
-    private class SwitchPrompt(val packageName: String, val view: View, val timeout: Runnable)
+    private class SwitchPrompt(val action: ButtonAction, val go: () -> Unit, val view: View, val timeout: Runnable)
     private class InfoOverlay(val view: View, val timeout: Runnable)
 
     private companion object {

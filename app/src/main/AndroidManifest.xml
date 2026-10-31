@@ -12,6 +12,9 @@
     <!-- Show guides for the folders: TMDB, Watchmode and Netflix's Top 10. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- The stick's own Wi-Fi address, for the photo upload page's QR code. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <!-- Voice search, through the remote's microphone. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 

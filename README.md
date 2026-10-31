@@ -28,12 +28,17 @@ SimpleTV opens them, or deep-links straight to a show inside them.
   have come in, and the markets. Each card opens its own page: a 6-day forecast with
   weather alerts, the day's top stories, and the major indexes plus your own stocks,
   each with a detail page.
+- **Family photo screensaver.** Free TV starts a slow slideshow of your own photos. To
+  add some, scan the QR code on the TV with any phone on the same Wi-Fi and pick photos.
+  The TV resizes them itself, and the same page shows what's on the TV so you can remove
+  photos. Photos stay on the TV; nothing goes to the cloud.
 - **Remote buttons that work.** The onn remote's app buttons, Star, Person, Settings,
   Free TV, channel and TV buttons get their jobs back once the stock home screen is
   gone:
   - The app buttons open their apps. While something's playing, they first ask
     "Switch to …?", so a bumped button doesn't interrupt the show.
-  - ★ Star opens search, and 👤 Person opens Continue Watching.
+  - ★ Star opens search, 👤 Person opens Continue Watching, and Free TV starts the photo
+    screensaver.
   - Channel ▲ and ▼ are play and pause.
   - TV shows an info panel over whatever's playing.
 - **Seasonal scenes.** Falling leaves in autumn, and decorations for holidays, like a

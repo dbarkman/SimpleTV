@@ -18,14 +18,16 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
-// Ask SimpleTV to open a screen, from inside or outside the app (the remote's Star and Person buttons).
+// Ask SimpleTV to open a screen, from inside or outside the app (the remote's Star, Person and Free TV buttons).
 const val OpenSearch = "com.redmesastudios.simpletv.OPEN_SEARCH"
 const val OpenContinueWatching = "com.redmesastudios.simpletv.OPEN_CONTINUE_WATCHING"
+const val OpenScreensaver = "com.redmesastudios.simpletv.OPEN_SCREENSAVER"
 
 private sealed interface Screen {
     data object Home : Screen
     data object Search : Screen
     data object ContinueWatching : Screen
+    data object Screensaver : Screen
     data class Info(val channel: Channel) : Screen
     data class Folder(val app: StreamingApp) : Screen
 }
@@ -36,6 +38,7 @@ private data class ScreenRequest(val screen: Screen, val number: Int)
 private fun requestedScreen(action: String?): Screen? = when (action) {
     OpenSearch -> Screen.Search
     OpenContinueWatching -> Screen.ContinueWatching
+    OpenScreensaver -> Screen.Screensaver
     else -> null
 }
 
@@ -90,6 +93,7 @@ class MainActivity : ComponentActivity() {
                     )
                     Screen.Search -> SearchScreen(onClose = { screen = Screen.Home })
                     Screen.ContinueWatching -> ContinueWatchingScreen(onClose = { screen = Screen.Home })
+                    Screen.Screensaver -> ScreensaverScreen(onClose = { screen = Screen.Home })
                     is Screen.Info -> ChannelScreen(shown.channel, onClose = { screen = Screen.Home })
                     is Screen.Folder -> FolderScreen(shown.app, onClose = { screen = Screen.Home })
                 }
