@@ -108,6 +108,11 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 The `JAVA_HOME` path above is for macOS; on Windows or Linux, point it at Android Studio's
 `jbr` folder.
 
+Steps 3 and 4 below are also one command: `scripts/setup-stick.sh <tv-ip>` installs the
+APK, turns on the extras and makes SimpleTV the home screen. The stick can drop off Wi-Fi
+when its home screen changes; wake it and run the script again. To copy the family
+photos from one TV to another, run `scripts/copy-photos.sh <from-ip> <to-ip>`.
+
 ### 3. Make it the home screen
 
 SimpleTV answers the Home button, but the stock Google TV home screen has to step aside

@@ -22,6 +22,12 @@ recommendation feeds, no clutter. Every visual state change animates.
 adb runs over Wi-Fi: `adb connect <stick-ip>:5555`. The stick's sleep timer
 is set to Never; in standby it drops off Wi-Fi and adb can't reach it.
 
+There are two sticks, one per TV. `scripts/setup-stick.sh <stick-ip>` sets
+one up (install, extras, home screen; safe to repeat), and
+`scripts/copy-photos.sh <from-ip> <to-ip>` copies the family photos between
+them. Disabling the stock home can knock the stick off Wi-Fi until someone
+wakes it, so the script does that last.
+
 ## Home screen
 
 SimpleTV is the box's home screen. `MainActivity` has a HOME intent filter,
