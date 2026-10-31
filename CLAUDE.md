@@ -119,7 +119,9 @@ source of truth.
   markets, refreshed at most every 15 minutes while the home screen is up.
   Each card opens its channel page.
 - `ChannelData.kt` / `ChannelScreens.kt` — the channel pages: Weather (now, NWS
-  alerts, 6 days), News (SignalPost's top and world stories from the last 24
+  alerts, 6 days; Down selects a day and OK opens it: the forecaster's words for
+  the day and night, rain chance, wind and every third hour's temperature,
+  with ◀ ▶ stepping to the day before and after), News (SignalPost's top and world stories from the last 24
   hours and local stories from the last 3 days, by newsroom count; OK opens
   a story in full, Back returns to it in the list) and
   Markets (S&P 500, Dow, Nasdaq, then the family's own stocks three to a row,

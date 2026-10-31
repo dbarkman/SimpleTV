@@ -3,6 +3,8 @@ package com.redmesastudios.simpletv
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.LocalDate
 import java.time.ZoneId
 
 class ChannelDataTest {
@@ -36,8 +38,32 @@ class ChannelDataTest {
         )
         val days = foldDays(periods, ZoneId.of("America/Phoenix"))
         assertEquals(listOf("Saturday", "Sunday"), days.map { it.name })
-        assertEquals(DayForecast("Saturday", 78, 64, "Partly Sunny", 13), days[0])
-        assertEquals(DayForecast("Sunday", 72, null, "Thunderstorms", 0), days[1])
+        assertEquals(listOf(78, 72), days.map { it.high })
+        assertEquals(listOf(64, null), days.map { it.low })
+        assertEquals(periods[2], days[0].night)
+        assertEquals(LocalDate.of(2026, 11, 1), days[1].date)
+    }
+
+    @Test
+    fun eachDayGetsItsOwnHours() {
+        val periods = listOf(
+            NwsPeriod("2026-10-31T06:00:00-07:00", true, 78, "Partly Sunny", 13),
+            NwsPeriod("2026-11-01T06:00:00-07:00", true, 72, "Thunderstorms", 0),
+        )
+        val hours = listOf(
+            HourForecast(LocalDateTime.of(2026, 10, 31, 9, 0), 70, 0),
+            HourForecast(LocalDateTime.of(2026, 11, 1, 9, 0), 66, 40),
+        )
+        val days = foldDays(periods, ZoneId.of("America/Phoenix"), hours)
+        assertEquals(listOf(70), days[0].hours.map { it.temperature })
+        assertEquals(listOf(66), days[1].hours.map { it.temperature })
+    }
+
+    @Test
+    fun theDayStripShowsEveryThirdHourFromSixToNine() {
+        val hours = (0..23).map { HourForecast(LocalDateTime.of(2026, 11, 1, it, 0), 60 + it, 0) }
+        assertEquals(listOf(6, 9, 12, 15, 18, 21), daytimeHours(hours).map { it.time.hour })
+        assertEquals(listOf("6 AM", "12 PM", "9 PM"), listOf(6, 12, 21).map { hourLabel(LocalDateTime.of(2026, 11, 1, it, 0)) })
     }
 
     @Test

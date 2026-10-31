@@ -1,6 +1,13 @@
 package com.redmesastudios.simpletv
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -169,30 +176,31 @@ private fun partOfDay(now: LocalDateTime): String = when (now.hour) {
 private fun WeatherPage() {
     val report = rememberChannelData { Channels.weather() }
     val now by rememberMinuteClock()
+    // A day picked from the forecast fills the page; Left and Right step through the days,
+    // and Back returns to the forecast with that day selected.
+    var viewing by remember { mutableStateOf<Int?>(null) }
+    var lastViewed by remember { mutableStateOf<Int?>(null) }
+    val dayCards = remember { mutableMapOf<Int, FocusRequester>() }
+    BackHandler(enabled = viewing != null) { viewing = null }
     ChannelPage(
         title = report?.place?.let { "Weather in $it" } ?: "Weather",
         subtitle = "${now.format(DateTimeFormatter.ofPattern("EEEE"))} ${partOfDay(now)} · National Weather Service",
+        backTo = if (viewing != null) "Forecast" else "Home",
     ) {
         Loading(report, if (Home.hasWeather) "Checking the forecast…" else "Set weather_point in ~/.config/simpletv/home.txt and rebuild to see the weather.") { weather ->
-            Column(verticalArrangement = Arrangement.spacedBy(22.dp)) {
-                weather.alerts.take(2).forEach { alert ->
-                    Box(Modifier.fillMaxWidth().background(AlertFill, CardShape).padding(horizontal = 16.dp, vertical = 9.dp)) {
-                        BasicText(alert, style = BodyStyle.copy(color = OnInk, fontWeight = FontWeight.Bold), maxLines = 2, overflow = TextOverflow.Ellipsis)
-                    }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(28.dp), verticalAlignment = Alignment.CenterVertically) {
-                    BasicText(
-                        "${weather.temperature}°",
-                        style = SimpleTVType.greeting.copy(fontSize = 96.sp, lineHeight = 96.sp, letterSpacing = (-3).sp),
-                    )
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        BasicText(weather.summary, style = SimpleTVType.serviceName.copy(fontSize = 23.sp))
-                        weather.rainLine?.let { BasicText(it, style = SimpleTVType.heroMeta.copy(fontSize = 15.sp)) }
-                        weather.nextLine?.let { BasicText(it, style = SimpleTVType.heroMeta.copy(fontSize = 15.sp)) }
-                    }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    weather.days.forEach { DayCard(it) }
+            val open = { index: Int ->
+                lastViewed = index
+                viewing = index
+            }
+            AnimatedContent(
+                targetState = viewing != null && weather.days.isNotEmpty(),
+                transitionSpec = { fadeIn(tween(250)) togetherWith fadeOut(tween(250)) },
+                label = "weatherDay",
+            ) { showingDay ->
+                if (showingDay) {
+                    DayView(weather.days, (viewing ?: 0).coerceIn(weather.days.indices), onStep = open)
+                } else {
+                    Forecast(weather, dayCards, lastViewed, onOpen = open)
                 }
             }
         }
@@ -200,9 +208,57 @@ private fun WeatherPage() {
 }
 
 @Composable
-private fun RowScope.DayCard(day: DayForecast) {
+private fun Forecast(weather: WeatherReport, dayCards: MutableMap<Int, FocusRequester>, lastViewed: Int?, onOpen: (Int) -> Unit) {
+    val windowFocused = LocalWindowInfo.current.isWindowFocused
+    LaunchedEffect(windowFocused) {
+        val target = lastViewed ?: return@LaunchedEffect
+        if (!windowFocused) return@LaunchedEffect
+        // The forecast may still be fading back in, so ask a few times as it settles.
+        repeat(4) {
+            runCatching { dayCards[target]?.requestFocus() }
+            delay(60)
+        }
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(22.dp)) {
+        weather.alerts.take(2).forEach { alert ->
+            Box(Modifier.fillMaxWidth().background(AlertFill, CardShape).padding(horizontal = 16.dp, vertical = 9.dp)) {
+                BasicText(alert, style = BodyStyle.copy(color = OnInk, fontWeight = FontWeight.Bold), maxLines = 2, overflow = TextOverflow.Ellipsis)
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(28.dp), verticalAlignment = Alignment.CenterVertically) {
+            BasicText(
+                "${weather.temperature}°",
+                style = SimpleTVType.greeting.copy(fontSize = 96.sp, lineHeight = 96.sp, letterSpacing = (-3).sp),
+            )
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                BasicText(weather.summary, style = SimpleTVType.serviceName.copy(fontSize = 23.sp))
+                weather.rainLine?.let { BasicText(it, style = SimpleTVType.heroMeta.copy(fontSize = 15.sp)) }
+                weather.nextLine?.let { BasicText(it, style = SimpleTVType.heroMeta.copy(fontSize = 15.sp)) }
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            weather.days.forEachIndexed { index, day ->
+                DayCard(day, dayCards.getOrPut(index) { FocusRequester() }, onOpen = { onOpen(index) })
+            }
+        }
+    }
+}
+
+@Composable
+private fun RowScope.DayCard(day: DayForecast, focusRequester: FocusRequester, onOpen: () -> Unit) {
+    var focused by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(if (focused) 1.04f else 1f, tween(200), label = "dayScale")
+    val edge by animateColorAsState(if (focused) Ink else CardEdge, tween(200), label = "dayEdge")
     Column(
-        Modifier.weight(1f).background(CardFill, CardShape).border(1.dp, CardEdge, CardShape).padding(horizontal = 12.dp, vertical = 12.dp),
+        Modifier
+            .weight(1f)
+            .graphicsLayer { scaleX = scale; scaleY = scale }
+            .focusRequester(focusRequester)
+            .background(CardFill, CardShape)
+            .border(if (focused) 2.dp else 1.dp, edge, CardShape)
+            .onFocusChanged { focused = it.isFocused }
+            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onOpen)
+            .padding(horizontal = 12.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         BasicText(day.name, style = SimpleTVType.serviceName.copy(fontSize = 14.sp))
@@ -213,6 +269,124 @@ private fun RowScope.DayCard(day: DayForecast) {
         )
         BasicText(day.summary, style = SmallStyle, maxLines = 2, overflow = TextOverflow.Ellipsis)
         BasicText("Rain ${day.rain}%", style = SmallStyle)
+    }
+}
+
+// One day in full, between ◀ and ▶ that step to the day before and after. The arrows stay
+// put while the day's card slides.
+@Composable
+private fun DayView(days: List<DayForecast>, index: Int, onStep: (Int) -> Unit) {
+    val focus = remember { FocusRequester() }
+    LaunchedEffect(Unit) {
+        repeat(4) {
+            runCatching { focus.requestFocus() }
+            delay(60)
+        }
+    }
+    Row(
+        Modifier
+            .fillMaxSize()
+            .focusRequester(focus)
+            .focusable()
+            .onKeyEvent { event ->
+                if (event.type != KeyEventType.KeyDown) return@onKeyEvent false
+                when (event.key) {
+                    Key.DirectionLeft -> { if (index > 0) onStep(index - 1); true }
+                    Key.DirectionRight -> { if (index < days.lastIndex) onStep(index + 1); true }
+                    else -> false
+                }
+            },
+        horizontalArrangement = Arrangement.spacedBy(20.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        StepArrow("◀", visible = index > 0)
+        AnimatedContent(
+            targetState = index,
+            transitionSpec = {
+                val direction = if (targetState > initialState) 1 else -1
+                (slideInHorizontally(tween(300)) { direction * it / 4 } + fadeIn(tween(300))) togetherWith
+                    (slideOutHorizontally(tween(300)) { -direction * it / 4 } + fadeOut(tween(300)))
+            },
+            modifier = Modifier.weight(1f),
+            label = "day",
+        ) { shown -> DayCardInFull(days[shown]) }
+        StepArrow("▶", visible = index < days.lastIndex)
+    }
+}
+
+@Composable
+private fun StepArrow(symbol: String, visible: Boolean) {
+    val alpha by animateFloatAsState(if (visible) 1f else 0f, tween(200), label = "stepArrow")
+    Box(
+        Modifier
+            .graphicsLayer { this.alpha = alpha }
+            .size(44.dp)
+            .background(CardFill, RoundedCornerShape(50))
+            .border(1.dp, CardEdge, RoundedCornerShape(50)),
+        contentAlignment = Alignment.Center,
+    ) {
+        BasicText(symbol, style = SimpleTVType.serviceName.copy(fontSize = 16.sp, color = InkSoft))
+    }
+}
+
+@Composable
+private fun DayCardInFull(day: DayForecast) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .background(CardFill, CardShape)
+            .border(1.dp, CardEdge, CardShape)
+            .padding(horizontal = 28.dp, vertical = 18.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(20.dp), verticalAlignment = Alignment.CenterVertically) {
+            Canvas(Modifier.size(48.dp)) { drawSky(skyFor(day.summary)) }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                BasicText(
+                    day.date?.format(DateTimeFormatter.ofPattern("EEEE, MMMM d", Locale.US)) ?: day.name,
+                    style = SimpleTVType.heroTitle.copy(fontSize = 26.sp, lineHeight = 30.sp),
+                )
+                BasicText(day.summary, style = SimpleTVType.heroMeta.copy(fontSize = 15.sp))
+            }
+            BasicText(
+                day.low?.let { "${day.high}° / $it°" } ?: "${day.high}°",
+                style = SimpleTVType.greeting.copy(fontSize = 36.sp),
+            )
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            DayFact("Rain ${day.rain}%")
+            if (day.wind.isNotEmpty()) DayFact("Wind ${day.wind}")
+        }
+        DayPart("Day", day.detail.ifEmpty { day.summary })
+        day.night?.let { DayPart("Night", it.detail.ifEmpty { it.summary }) }
+        val hours = daytimeHours(day.hours)
+        if (hours.isNotEmpty()) {
+            Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                hours.forEach { hour ->
+                    // "3 PM  74°", with the rain chance only when it's worth a look.
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        BasicText(hourLabel(hour.time), style = SmallStyle)
+                        BasicText("${hour.temperature}°", style = SimpleTVType.serviceName.copy(fontSize = 16.sp))
+                        if (hour.rain >= 20) BasicText("${hour.rain}%", style = SmallStyle)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DayFact(text: String) {
+    Box(Modifier.border(1.dp, CardEdge, RoundedCornerShape(50)).padding(horizontal = 12.dp, vertical = 5.dp)) {
+        BasicText(text, style = SimpleTVType.heroMeta.copy(fontSize = 13.sp))
+    }
+}
+
+@Composable
+private fun DayPart(label: String, text: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+        BasicText(label, style = SimpleTVType.rowHeading.copy(fontSize = 13.sp, color = InkSoft))
+        BasicText(text, style = BodyStyle.copy(fontSize = 15.sp, lineHeight = 21.sp), maxLines = 3, overflow = TextOverflow.Ellipsis)
     }
 }
 

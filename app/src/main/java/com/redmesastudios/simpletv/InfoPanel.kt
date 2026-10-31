@@ -53,10 +53,11 @@ fun titleMeta(title: Title): String = when (title.kind) {
     ).joinToString(" · ")
 }
 
-// The description scrolls inside the panel (Up/Down, see RemoteButtons), with a ▼ under it
-// while there's more below. These tags find them again in a shown panel.
+// The description scrolls inside the panel (Up/Down, see RemoteButtons), with a ▲ over it
+// while there's more above and a ▼ under it while there's more below. These tags find them again in a shown panel.
 const val OverviewTag = "overview"
 const val MoreBelowTag = "moreBelow"
+const val MoreAboveTag = "moreAbove"
 private const val OverviewMaxHeightDp = 104f
 private const val ScrollStepDp = 60f
 
@@ -92,11 +93,13 @@ fun infoPanelView(context: Context, info: PanelInfo): View {
         addView(text(info.meta, 13f, 600, PanelInkSoft).apply { setPadding(0, dp(4f).toInt(), 0, 0) })
         if (info.overview.isNotEmpty()) {
             val maxHeight = dp(OverviewMaxHeightDp).toInt()
-            val moreBelow = text("▼", 11f, 700, PanelInkSoft).apply {
-                tag = MoreBelowTag
+            fun arrow(symbol: String, arrowTag: String) = text(symbol, 11f, 700, PanelInkSoft).apply {
+                tag = arrowTag
                 gravity = Gravity.CENTER_HORIZONTAL
                 alpha = 0f
             }
+            val moreAbove = arrow("▲", MoreAboveTag).apply { setPadding(0, dp(2f).toInt(), 0, 0) }
+            val moreBelow = arrow("▼", MoreBelowTag)
             // Never taller than about five lines; the rest scrolls.
             val scroller = object : ScrollView(context) {
                 override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) =
@@ -106,12 +109,15 @@ fun infoPanelView(context: Context, info: PanelInfo): View {
                 isVerticalScrollBarEnabled = false
                 isVerticalFadingEdgeEnabled = true
                 setFadingEdgeLength(dp(18f).toInt())
-                setPadding(0, dp(8f).toInt(), 0, 0)
                 addView(text(info.overview, 13.5f, 500, PanelInk, lines = Int.MAX_VALUE))
-                fun showMore() = moreBelow.animate().alpha(if (canScrollVertically(1)) 1f else 0f).setDuration(200).start()
+                fun showMore() {
+                    moreAbove.animate().alpha(if (canScrollVertically(-1)) 1f else 0f).setDuration(200).start()
+                    moreBelow.animate().alpha(if (canScrollVertically(1)) 1f else 0f).setDuration(200).start()
+                }
                 setOnScrollChangeListener { _, _, _, _, _ -> showMore() }
                 addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> showMore() }
             }
+            addView(moreAbove, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
             addView(scroller, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
             addView(moreBelow, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
         }

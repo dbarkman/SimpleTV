@@ -6,6 +6,8 @@ import org.json.JSONObject
 import android.content.Context
 import java.net.URLEncoder
 import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.TextStyle
@@ -30,7 +32,23 @@ fun skyFor(summary: String): Sky {
     }
 }
 
-data class DayForecast(val name: String, val high: Int, val low: Int?, val summary: String, val rain: Int)
+data class DayForecast(
+    val name: String,
+    val high: Int,
+    val low: Int?,
+    val summary: String,
+    val rain: Int,
+    // The day's own page: its date, the forecaster's words for the day and the night, wind,
+    // and the hour-by-hour temperatures.
+    val date: LocalDate? = null,
+    val detail: String = "",
+    val wind: String = "",
+    val night: NwsPeriod? = null,
+    val hours: List<HourForecast> = emptyList(),
+)
+
+// One hour of the NWS hourly forecast, in local time.
+data class HourForecast(val time: LocalDateTime, val temperature: Int, val rain: Int)
 
 data class WeatherReport(
     val place: String,
@@ -106,23 +124,48 @@ fun bigNumber(value: Long): String = when {
 }
 
 // One NWS forecast period: a 12-hour half, day or night.
-data class NwsPeriod(val start: String, val daytime: Boolean, val temperature: Int, val summary: String, val rain: Int)
+data class NwsPeriod(
+    val start: String,
+    val daytime: Boolean,
+    val temperature: Int,
+    val summary: String,
+    val rain: Int,
+    val detail: String = "",
+    val wind: String = "",
+)
 
-// Periods folded into days, each daytime high paired with the night after it.
-fun foldDays(periods: List<NwsPeriod>, zone: ZoneId): List<DayForecast> {
+// Periods folded into days, each daytime high paired with the night after it, with that
+// day's hours from the hourly forecast.
+fun foldDays(periods: List<NwsPeriod>, zone: ZoneId, hours: List<HourForecast> = emptyList()): List<DayForecast> {
     val days = mutableListOf<DayForecast>()
     periods.forEachIndexed { i, period ->
         if (!period.daytime) return@forEachIndexed
         val night = periods.getOrNull(i + 1)?.takeIf { !it.daytime }
+        val date = ZonedDateTime.parse(period.start).withZoneSameInstant(zone).toLocalDate()
         days += DayForecast(
-            name = ZonedDateTime.parse(period.start).withZoneSameInstant(zone).dayOfWeek.getDisplayName(TextStyle.FULL, Locale.US),
+            name = date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.US),
             high = period.temperature,
             low = night?.temperature,
             summary = period.summary,
             rain = period.rain,
+            date = date,
+            detail = period.detail,
+            wind = period.wind,
+            night = night,
+            hours = hours.filter { it.time.toLocalDate() == date },
         )
     }
     return days
+}
+
+// Every third hour from 6 AM to 9 PM, the stretch of a day people plan around.
+fun daytimeHours(hours: List<HourForecast>): List<HourForecast> =
+    hours.filter { it.time.hour in 6..21 && it.time.hour % 3 == 0 }
+
+// "6 AM", "3 PM".
+fun hourLabel(time: LocalDateTime): String {
+    val hour = time.hour % 12
+    return "${if (hour == 0) 12 else hour} ${if (time.hour < 12) "AM" else "PM"}"
 }
 
 private fun nwsPeriod(json: JSONObject) = NwsPeriod(
@@ -130,6 +173,14 @@ private fun nwsPeriod(json: JSONObject) = NwsPeriod(
     daytime = json.getBoolean("isDaytime"),
     temperature = json.getInt("temperature"),
     summary = json.getString("shortForecast"),
+    rain = rainChance(json),
+    detail = json.optString("detailedForecast"),
+    wind = listOf(json.optString("windDirection"), json.optString("windSpeed")).filter { it.isNotEmpty() }.joinToString(" "),
+)
+
+private fun hourForecast(json: JSONObject, zone: ZoneId) = HourForecast(
+    time = ZonedDateTime.parse(json.getString("startTime")).withZoneSameInstant(zone).toLocalDateTime(),
+    temperature = json.getInt("temperature"),
     rain = rainChance(json),
 )
 
@@ -175,7 +226,8 @@ object Channels {
                     .getJSONArray("features").objects().map { it.getJSONObject("properties").text("headline").ifEmpty { it.getJSONObject("properties").text("event") } }
             }.getOrDefault(emptyList())
         }
-        val now = hourly.await().getJSONObject("properties").getJSONArray("periods").getJSONObject(0)
+        val hours = hourly.await().getJSONObject("properties").getJSONArray("periods").objects()
+        val now = hours.first()
         val periods = daily.await().getJSONObject("properties").getJSONArray("periods").objects()
         val first = periods.first()
         val next = periods.getOrNull(1)
@@ -186,7 +238,7 @@ object Channels {
             summary = now.getString("shortForecast"),
             rainLine = if (rain >= 10) "$rain% chance of rain ${whenSaid(first.getString("name"))}" else null,
             nextLine = next?.let { "${it.getString("name")} ${it.getInt("temperature")}° · ${it.getString("shortForecast")}" },
-            days = foldDays(periods.map(::nwsPeriod), zone).drop(if (first.getBoolean("isDaytime")) 1 else 0).take(6),
+            days = foldDays(periods.map(::nwsPeriod), zone, hours.map { hourForecast(it, zone) }).drop(if (first.getBoolean("isDaytime")) 1 else 0).take(6),
             alerts = alerts.await(),
         )
     }

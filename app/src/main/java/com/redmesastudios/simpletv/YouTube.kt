@@ -214,6 +214,11 @@ object YouTubeApi {
             .map { video(it.getString("id"), it.getJSONObject("snippet"), Instant.parse(it.getJSONObject("snippet").getString("publishedAt")), now) }
 
     // Which of these videos are full-length, checked 50 at a time.
+    // A video's whole description, as it reads on YouTube now.
+    suspend fun description(token: String, videoId: String): String? =
+        get(token, "/videos?part=snippet&id=$videoId").getJSONArray("items").objects().firstOrNull()
+            ?.getJSONObject("snippet")?.text("description")?.trim()
+
     suspend fun fullLength(token: String, videoIds: List<String>): Set<String> = videoIds.chunked(50).flatMap { ids ->
         get(token, "/videos?part=contentDetails&id=${ids.joinToString(",")}").getJSONArray("items").objects()
             .filter { isFullLength(it.getJSONObject("contentDetails")) }

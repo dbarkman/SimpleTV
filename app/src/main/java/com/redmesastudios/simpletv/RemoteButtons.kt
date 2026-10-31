@@ -268,6 +268,18 @@ class RemoteButtons : AccessibilityService() {
                 (open.view as? android.view.ViewGroup)?.let { swapPanelContent(it, updated) }
             }
         }
+        // A video's saved description can be an old, shortened copy (Continue Watching keeps
+        // its own); fetch the current one and fill it in if the panel is still up.
+        val videoId = title?.videoId
+        if (title != null && videoId != null) {
+            scope.launch {
+                val token = runCatching { YouTubeAccount.token(this@RemoteButtons) }.getOrNull() ?: return@launch
+                val full = runCatching { YouTubeApi.description(token, videoId) }.getOrNull() ?: return@launch
+                if (panel !== open || full.isEmpty() || full == title.overview) return@launch
+                val updated = info(started.copy(title = title.copy(overview = full)))
+                (open.view as? android.view.ViewGroup)?.let { swapPanelContent(it, updated) }
+            }
+        }
     }
 
     private fun swapPanelContent(container: android.view.ViewGroup, info: PanelInfo) {
