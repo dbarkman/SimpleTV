@@ -184,6 +184,19 @@ standby, and adb can't reach it there.
 Your API keys are baked into the app you build. That's fine for your own TV, but don't
 share your APK. Watch history, the YouTube sign-in and your stock list stay on the TV.
 
+## Screenshots
+
+All from the onn stick, in the fall theme. Select one to see it full size.
+
+<table>
+<tr><td width="50%"><a href="docs/screenshots/folder-disney.jpg"><img src="docs/screenshots/folder-disney.jpg" alt="A service's folder: open the app, or pick a show to open it inside the app."></a><br><sub>A service's folder: open the app, or pick a show to open it inside the app.</sub></td><td width="50%"><a href="docs/screenshots/folder-popular.jpg"><img src="docs/screenshots/folder-popular.jpg" alt="Popular shows and movies on the service, ranked."></a><br><sub>Popular shows and movies on the service, ranked.</sub></td></tr>
+<tr><td width="50%"><a href="docs/screenshots/folder-top10.jpg"><img src="docs/screenshots/folder-top10.jpg" alt="Netflix's own Top 10."></a><br><sub>Netflix's own Top 10.</sub></td><td width="50%"><a href="docs/screenshots/folder-coming.jpg"><img src="docs/screenshots/folder-coming.jpg" alt="New seasons on the way, with their dates."></a><br><sub>New seasons on the way, with their dates.</sub></td></tr>
+<tr><td width="50%"><a href="docs/screenshots/search.jpg"><img src="docs/screenshots/search.jpg" alt="Search by typing or voice; each result says where it streams."></a><br><sub>Search by typing or voice; each result says where it streams.</sub></td><td width="50%"><a href="docs/screenshots/weather.jpg"><img src="docs/screenshots/weather.jpg" alt="Weather: now, alerts and six days."></a><br><sub>Weather: now, alerts and six days.</sub></td></tr>
+<tr><td width="50%"><a href="docs/screenshots/weather-day.jpg"><img src="docs/screenshots/weather-day.jpg" alt="One day in full; Left and Right step through the days."></a><br><sub>One day in full; Left and Right step through the days.</sub></td><td width="50%"><a href="docs/screenshots/news.jpg"><img src="docs/screenshots/news.jpg" alt="News, ranked by how many newsrooms cover each story."></a><br><sub>News, ranked by how many newsrooms cover each story.</sub></td></tr>
+<tr><td width="50%"><a href="docs/screenshots/news-story.jpg"><img src="docs/screenshots/news-story.jpg" alt="A story in full."></a><br><sub>A story in full.</sub></td><td width="50%"><a href="docs/screenshots/markets.jpg"><img src="docs/screenshots/markets.jpg" alt="Markets: the major indexes, then your own stocks."></a><br><sub>Markets: the major indexes, then your own stocks.</sub></td></tr>
+<tr><td width="50%"><a href="docs/screenshots/market-detail.jpg"><img src="docs/screenshots/market-detail.jpg" alt="A market's day, its year and how it's done lately."></a><br><sub>A market's day, its year and how it's done lately.</sub></td><td></td></tr>
+</table>
+
 ## License
 
 SimpleTV is released under the MIT License; see `LICENSE`. The Manrope typeface it
