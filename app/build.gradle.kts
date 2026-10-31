@@ -28,6 +28,8 @@ android {
         buildConfigField("String", "TMDB_TOKEN", "\"${secret(".config/tmdb/read_token")}\"")
         buildConfigField("String", "WATCHMODE_KEY", "\"${secret(".config/watchmode/api_key")}\"")
         buildConfigField("String", "SIGNALPOST_KEY", "\"${secret(".config/signalpost/api_key")}\"")
+        // Sticks built with the same key share Continue Watching and photos (Sync.kt).
+        buildConfigField("String", "SYNC_KEY", "\"${secret(".config/simpletv/sync_key")}\"")
         // Where the TV is, for weather and local news; see README.
         buildConfigField("String", "WEATHER_POINT", "\"${credential(".config/simpletv/home.txt", "weather_point")}\"")
         buildConfigField("String", "LOCAL_NEWS_MARKET", "\"${credential(".config/simpletv/home.txt", "local_news_market")}\"")

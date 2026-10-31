@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
+import org.json.JSONObject
 import java.io.File
 import java.nio.ByteBuffer
 import java.util.UUID
@@ -53,6 +54,8 @@ object SlideshowTiming {
 // Only names this store made itself are ever read or deleted.
 fun isPhotoName(name: String) = name.matches(Regex("[a-f0-9-]{36}\\.jpg"))
 
+private const val RemovedFile = "photos_removed.json"
+
 object PhotoStore {
     fun folder(context: Context) = File(context.filesDir, "photos").apply { mkdirs() }
 
@@ -73,10 +76,47 @@ object PhotoStore {
         val name = "${UUID.randomUUID()}.jpg"
         File(folder(context), name).outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 88, it) }
         bitmap.recycle()
+        Sync.changed(context)
         return name
     }
 
-    fun delete(context: Context, name: String): Boolean = isPhotoName(name) && File(folder(context), name).delete()
+    // Removing a photo leaves a note of it, so the other sticks remove it too (see Sync).
+    fun delete(context: Context, name: String): Boolean {
+        val deleted = isPhotoName(name) && File(folder(context), name).delete()
+        if (deleted) {
+            synchronized(this) { writeRemoved(context, removed(context) + (name to System.currentTimeMillis())) }
+            Sync.changed(context)
+        }
+        return deleted
+    }
+
+    // Photos removed on any stick: name to when.
+    fun removed(context: Context): Map<String, Long> = runCatching {
+        val json = JSONObject(File(context.filesDir, RemovedFile).readText())
+        json.keys().asSequence().filter(::isPhotoName).associateWith { json.getLong(it) }
+    }.getOrDefault(emptyMap())
+
+    fun writeRemoved(context: Context, removed: Map<String, Long>) {
+        File(context.filesDir, RemovedFile).writeText(JSONObject(removed).toString())
+    }
+
+    fun bytes(context: Context, name: String): ByteArray? =
+        if (isPhotoName(name)) File(folder(context), name).takeIf { it.exists() }?.readBytes() else null
+
+    // A photo another stick already resized, kept as it came with its own date.
+    fun adopt(context: Context, name: String, bytes: ByteArray, modified: Long) {
+        if (!isPhotoName(name)) return
+        val target = File(folder(context), name)
+        val partial = File(folder(context), "$name.part")
+        partial.writeBytes(bytes)
+        partial.renameTo(target)
+        target.setLastModified(modified)
+    }
+
+    // A photo removed elsewhere, without leaving a new note.
+    fun drop(context: Context, name: String) {
+        if (isPhotoName(name)) File(folder(context), name).delete()
+    }
 
     fun thumbnail(context: Context, name: String): ByteArray? {
         if (!isPhotoName(name)) return null

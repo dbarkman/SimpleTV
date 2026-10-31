@@ -53,6 +53,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Continue Watching and the family photos, shared with the household's other sticks.
+        Sync.start(applicationContext)
         requestedScreen(intent?.action)?.let(::request)
         setContent {
             var screen by remember { mutableStateOf<Screen>(Screen.Home) }
@@ -103,6 +105,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        Sync.pullSoon()
         // The show guide refreshes at most once a day, in the background, for the known
         // services and any installed app matched to a service by name.
         lifecycleScope.launch {

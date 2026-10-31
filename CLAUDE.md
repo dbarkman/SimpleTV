@@ -144,6 +144,15 @@ source of truth.
   resizes each to 1920×1080 in `files/photos`. The page also lists and removes
   photos. Photos never leave the stick and never go in the repo. The slideshow
   keeps the screen on so the idle screensaver stays away.
+- `Sync.kt` — the household's sticks share Continue Watching (`WatchHistory`,
+  each entry with its `watchedAt`) and the family photos. Each runs a small
+  server on port 8724 while SimpleTV runs, announces it over NSD
+  (`_simpletv._tcp`) and pulls from every other stick: on start, every 10
+  minutes, on resume, and when another stick pokes it after a change. Removed
+  photos leave a note (`files/photos_removed.json`) so removals spread too.
+  Requests carry `BuildConfig.SYNC_KEY` (from `~/.config/simpletv/sync_key`);
+  without a key, sync is off. Requests use a plain socket, since Android blocks
+  cleartext `HttpURLConnection`. App order stays per stick.
 - `PhotoDream.kt` — the same slideshow as the TV's idle screensaver (a
   DreamService hosting Compose). Chosen once over adb:
   `adb shell settings put secure screensaver_components com.redmesastudios.simpletv/.PhotoDream`;

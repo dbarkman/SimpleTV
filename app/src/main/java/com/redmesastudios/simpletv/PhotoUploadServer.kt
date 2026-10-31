@@ -122,24 +122,29 @@ class PhotoUploadServer(private val context: Context, val pin: String, private v
         }
     }
 
-    private fun readLine(input: InputStream): String? {
-        val line = StringBuilder()
-        while (true) {
-            val b = input.read()
-            if (b == -1) return if (line.isEmpty()) null else line.toString()
-            if (b == '\n'.code) return line.toString().trimEnd('\r')
-            line.append(b.toChar())
-            if (line.length > 8192) return null
-        }
-    }
+    private fun readLine(input: InputStream): String? = readHttpLine(input)
 
-    private fun respond(out: OutputStream, status: Int, type: String, body: ByteArray) {
-        val reason = mapOf(200 to "OK", 403 to "Forbidden", 404 to "Not Found", 413 to "Payload Too Large", 415 to "Unsupported Media Type")[status] ?: "OK"
-        val head = "HTTP/1.1 $status $reason\r\nContent-Type: $type\r\nContent-Length: ${body.size}\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n"
-        out.write(head.toByteArray())
-        out.write(body)
-        out.flush()
+    private fun respond(out: OutputStream, status: Int, type: String, body: ByteArray) = writeHttpResponse(out, status, type, body)
+}
+
+// One header line of a request, or null at the end of the stream (or a line far too long).
+internal fun readHttpLine(input: InputStream): String? {
+    val line = StringBuilder()
+    while (true) {
+        val b = input.read()
+        if (b == -1) return if (line.isEmpty()) null else line.toString()
+        if (b == '\n'.code) return line.toString().trimEnd('\r')
+        line.append(b.toChar())
+        if (line.length > 8192) return null
     }
+}
+
+internal fun writeHttpResponse(out: OutputStream, status: Int, type: String, body: ByteArray) {
+    val reason = mapOf(200 to "OK", 403 to "Forbidden", 404 to "Not Found", 413 to "Payload Too Large", 415 to "Unsupported Media Type")[status] ?: "OK"
+    val head = "HTTP/1.1 $status $reason\r\nContent-Type: $type\r\nContent-Length: ${body.size}\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n"
+    out.write(head.toByteArray())
+    out.write(body)
+    out.flush()
 }
 
 // The stick's own address on the home network.

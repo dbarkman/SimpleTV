@@ -38,16 +38,33 @@ private suspend fun Context.showLink(app: StreamingApp, title: Title): String? {
 object WatchHistory {
     private const val Prefs = "history"
 
-    fun forApp(context: Context, packageName: String): List<Title> {
+    fun forApp(context: Context, packageName: String): List<Title> = entries(context, packageName).map { it.title }
+
+    // Newest first, each with when it was started (shared between sticks, see Sync).
+    fun entries(context: Context, packageName: String): List<Watched> {
         val stored = context.getSharedPreferences(Prefs, Context.MODE_PRIVATE).getString(packageName, null) ?: return emptyList()
-        val entries = JSONArray(stored)
-        return List(entries.length()) { titleFromJson(entries.getJSONObject(it)) }
+        val entries = JSONArray(stored).objects()
+        // Entries saved before watch times were kept count back a second each from the epoch,
+        // which keeps their order and sorts them behind anything with a real time.
+        return entries.mapIndexed { i, json ->
+            val at = json.optString("watchedAt").takeIf { it.isNotEmpty() }?.let(Instant::parse)
+                ?: Instant.EPOCH.plusSeconds((entries.size - i).toLong())
+            Watched(titleFromJson(json), at)
+        }
     }
 
+    fun all(context: Context): Map<String, List<Watched>> =
+        context.getSharedPreferences(Prefs, Context.MODE_PRIVATE).all.keys.associateWith { entries(context, it) }
+
     fun record(context: Context, packageName: String, title: Title) {
-        val updated = listOf(title.copy(note = "")) + forApp(context, packageName).filterNot { it.key == title.key }
+        val updated = listOf(Watched(title.copy(note = ""), Instant.now())) + entries(context, packageName).filterNot { it.title.key == title.key }
+        save(context, packageName, updated)
+        Sync.changed(context)
+    }
+
+    fun save(context: Context, packageName: String, entries: List<Watched>) {
         context.getSharedPreferences(Prefs, Context.MODE_PRIVATE).edit()
-            .putString(packageName, JSONArray(updated.map(Title::toJson)).toString())
+            .putString(packageName, JSONArray(entries.map { it.title.toJson().put("watchedAt", it.at.toString()) }).toString())
             .apply()
     }
 }

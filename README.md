@@ -34,6 +34,9 @@ SimpleTV opens them, or deep-links straight to a show inside them.
   add some, scan the QR code on the TV with any phone on the same Wi-Fi and pick photos.
   The TV resizes them itself, and the same page shows what's on the TV so you can remove
   photos. Photos stay on the TV; nothing goes to the cloud.
+- **Every TV in the house shares.** TVs built with the same sync key find each other on
+  the home Wi-Fi and share Continue Watching and the family photos, including removals.
+  Each TV keeps its own app order.
 - **Remote buttons that work.** The onn remote's app buttons, Star, Person, Settings,
   Free TV, channel and TV buttons get their jobs back once the stock home screen is
   gone:
@@ -72,6 +75,7 @@ where shown.
 | `~/.config/youtube/credentials.txt` | `client_id=` and `client_secret=` lines | Google Cloud, see below |
 | `~/.config/signalpost/api_key` | SignalPost API key (optional, for news) | SignalPost |
 | `~/.config/simpletv/home.txt` | Your location and local news market | You, see below |
+| `~/.config/simpletv/sync_key` | A random secret shared by your TVs (optional) | `openssl rand -hex 24` |
 
 Keep them private, for example with `chmod 600`. Any feature whose key or setting is
 missing turns itself off and says so on screen.
