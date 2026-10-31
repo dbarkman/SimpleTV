@@ -148,8 +148,9 @@ standby, and adb can't reach it there.
 
 ## Making it yours
 
-- **Apps.** `StreamingApps.kt` lists the apps, in their starting order, with each
-  service's TMDB and Watchmode IDs. Apps that aren't installed are skipped.
+- **Apps.** Every installed TV app gets a tile. `StreamingApps.kt` lists the known
+  services, in their starting order, with each service's TMDB and Watchmode IDs; other
+  apps follow by name.
 - **Remote buttons.** `buttonAction()` in `RemoteButtons.kt` maps key codes to jobs. Other
   remotes send different codes for their extra buttons.
 - **Holidays.** `Holidays.kt` decides which decorations show on which dates, and each

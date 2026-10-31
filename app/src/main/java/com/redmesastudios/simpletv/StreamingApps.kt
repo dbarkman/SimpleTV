@@ -20,7 +20,8 @@ data class StreamingApp(
     val hasFolder: Boolean get() = hasGuide || packageName == YouTubePackage
 }
 
-// Home-screen order before there's any watch time. Apps that aren't installed are skipped.
+// The services SimpleTV knows, in home-screen order before there's any watch time. Every
+// other installed TV app gets a tile too, after these (see homeApps).
 const val YouTubePackage = "com.google.android.youtube.tv"
 
 val StreamingApps = listOf(
@@ -41,6 +42,28 @@ val StreamingApps = listOf(
 
 fun installedApps(apps: List<StreamingApp>, isInstalled: (String) -> Boolean): List<StreamingApp> =
     apps.filter { isInstalled(it.packageName) }
+
+// Apps with a place of their own on the home screen (Get Apps, Settings), and SimpleTV itself.
+val NoTile = setOf(BuildConfig.APPLICATION_ID, PlayStorePackage, "com.android.tv.settings")
+
+// Every installed TV app (package to label): the known services first in their curated
+// order, then the rest by name.
+fun homeApps(installed: Map<String, String>, known: List<StreamingApp> = StreamingApps): List<StreamingApp> {
+    val shown = installed.filterKeys { it !in NoTile }
+    val knownPackages = known.map { it.packageName }.toSet()
+    val others = shown.filterKeys { it !in knownPackages }
+        .map { (pkg, label) -> StreamingApp(label, pkg) }
+        .sortedBy { it.label.lowercase() }
+    return installedApps(known) { it in shown } + others
+}
+
+// Package to label for every app with a TV launcher entry.
+fun Context.installedTvApps(): Map<String, String> {
+    val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
+    return packageManager.queryIntentActivities(intent, 0).associate {
+        it.activityInfo.packageName to it.activityInfo.applicationInfo.loadLabel(packageManager).toString()
+    }
+}
 
 // Most-watched first. The sort is stable, so ties (including apps never opened)
 // keep the curated order.

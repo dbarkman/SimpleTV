@@ -181,8 +181,10 @@ source of truth.
   pile) and the falling leaves. Leaf motion is pure math in design px
   (1920×1080). The leaves step about 30 times a second and stop while another
   app is in front; that keeps SimpleTV near 40% of one core on the stick.
-- `StreamingApps.kt` — the curated app list in home-screen order; apps that
-  aren't installed are skipped. Launches via the leanback launch intent.
+- `StreamingApps.kt` — every installed TV app gets a tile (`homeApps`): the
+  known services first, in their curated order with their guide IDs, then the
+  rest by name. Settings, the Play Store (Get Apps) and SimpleTV itself get no
+  tile. Launches via the leanback launch intent.
 - `Greeting.kt` — greeting by hour.
 - `ui/theme/` — Fall palette and Manrope type (bundled variable font in
   `res/font`, OFL licence in `FONT-LICENSE-OFL.txt`). Text sizes are the design's

@@ -126,8 +126,7 @@ fun HomeScreen(
     // Re-check on every return to the home screen, so installs and removals show up,
     // most-watched first.
     LifecycleResumeEffect(Unit) {
-        val installed = installedApps(StreamingApps) { context.packageManager.tvLaunchIntent(it) != null }
-        apps = context.homeOrder(installed)
+        apps = context.homeOrder(homeApps(context.installedTvApps()))
         onPauseOrDispose { }
     }
 

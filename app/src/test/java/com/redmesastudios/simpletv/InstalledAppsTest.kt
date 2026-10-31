@@ -19,6 +19,33 @@ class InstalledAppsTest {
     }
 
     @Test
+    fun everyInstalledAppGetsATileWithKnownServicesFirst() {
+        val installed = mapOf(
+            "com.tubitv" to "Tubi",
+            "com.netflix.ninja" to "Netflix",
+            "com.haystack.android" to "Haystack News",
+            "com.google.android.youtube.tv" to "YouTube",
+            "air.com.vudu.air.DownloaderTablet" to "Fandango at Home",
+        )
+
+        val result = homeApps(installed)
+
+        assertEquals(listOf("YouTube", "Netflix", "Fandango at Home", "Haystack News", "Tubi"), result.map { it.label })
+    }
+
+    @Test
+    fun appsWithTheirOwnButtonAndSimpleTvItselfGetNoTile() {
+        val installed = mapOf(
+            "com.android.vending" to "Google Play Store",
+            "com.android.tv.settings" to "Settings",
+            BuildConfig.APPLICATION_ID to "SimpleTV",
+            "com.tubitv" to "Tubi",
+        )
+
+        assertEquals(listOf("com.tubitv"), homeApps(installed).map { it.packageName })
+    }
+
+    @Test
     fun packageNamesAreUnique() {
         assertEquals(StreamingApps.size, StreamingApps.map { it.packageName }.toSet().size)
     }
