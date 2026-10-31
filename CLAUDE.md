@@ -102,7 +102,7 @@ source of truth.
   Watching and a folder; the Home button always returns to the home screen,
   the remote's Star and Person buttons arrive as intents, and the show guide
   refreshes on resume.
-- `HomeScreen.kt` — header (greeting, date, clock, Search, Settings), app banner
+- `HomeScreen.kt` — header (greeting, date, clock, Get Apps (the Play Store), Search, Settings), app banner
   tiles in pages of ten (two rows of five), and the At a glance cards along the
   bottom, all over the fall scene. A page with more apps after it shows nine
   and a More apps tile, which slides the next page in; Back slides back. Apps

@@ -177,6 +177,7 @@ fun HomeScreen(
             Header(
                 now = now,
                 searchButton = searchButton,
+                onOpenApps = { context.openAppStore() },
                 onOpenSearch = onOpenSearch,
                 onOpenSettings = { context.openSystemSettings() },
             )
@@ -223,6 +224,7 @@ fun HomeScreen(
 private fun Header(
     now: LocalDateTime,
     searchButton: FocusRequester,
+    onOpenApps: () -> Unit,
     onOpenSearch: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
@@ -234,6 +236,7 @@ private fun Header(
         Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(5.dp)) {
             BasicText(now.format(TimeFormat), style = SimpleTVType.clock)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                HeaderButton("Get Apps", Modifier, onOpenApps)
                 HeaderButton("Search", Modifier.focusRequester(searchButton), onOpenSearch)
                 HeaderButton("Settings", Modifier, onOpenSettings)
             }

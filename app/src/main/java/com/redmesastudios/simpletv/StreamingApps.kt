@@ -61,6 +61,14 @@ fun Context.openSystemSettings() {
     startActivity(Intent(Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
 }
 
+const val PlayStorePackage = "com.android.vending"
+
+// The Play Store, for installing apps; SimpleTV's tiles only cover the curated apps.
+fun Context.openAppStore() {
+    val intent = packageManager.tvLaunchIntent(PlayStorePackage) ?: return
+    startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+}
+
 fun Context.launchApp(app: StreamingApp) {
     val intent = packageManager.tvLaunchIntent(app.packageName) ?: return
     startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
