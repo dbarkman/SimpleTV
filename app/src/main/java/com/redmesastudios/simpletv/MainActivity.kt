@@ -26,6 +26,7 @@ const val OpenScreensaver = "com.redmesastudios.simpletv.OPEN_SCREENSAVER"
 private sealed interface Screen {
     data object Home : Screen
     data object Search : Screen
+    data object Movies : Screen
     data object ContinueWatching : Screen
     data object Screensaver : Screen
     data class Info(val channel: Channel) : Screen
@@ -88,12 +89,17 @@ class MainActivity : ComponentActivity() {
                             returnFocusTo = SearchButtonFocus
                             screen = Screen.Search
                         },
+                        onOpenMovies = {
+                            returnFocusTo = MoviesButtonFocus
+                            screen = Screen.Movies
+                        },
                         onOpenChannel = {
                             returnFocusTo = glanceFocus(it)
                             screen = Screen.Info(it)
                         },
                     )
                     Screen.Search -> SearchScreen(onClose = { screen = Screen.Home })
+                    Screen.Movies -> MoviesScreen(onClose = { screen = Screen.Home })
                     Screen.ContinueWatching -> ContinueWatchingScreen(onClose = { screen = Screen.Home })
                     Screen.Screensaver -> ScreensaverScreen(onClose = { screen = Screen.Home })
                     is Screen.Info -> ChannelScreen(shown.channel, onClose = { screen = Screen.Home })

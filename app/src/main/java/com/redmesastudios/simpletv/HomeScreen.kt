@@ -95,9 +95,10 @@ private val DateFormat = DateTimeFormatter.ofPattern("EEEE, MMMM d")
 
 // returnFocusTo names the app whose folder was just closed, so focus lands back on its tile;
 // otherwise the top-left app takes focus. arrival changes with every Home press, which sends
-// focus back to the start. Pass SearchButtonFocus as returnFocusTo to land on the Search button,
-// or glanceFocus(channel) for a glance card.
+// focus back to the start. Pass SearchButtonFocus or MoviesButtonFocus as returnFocusTo to land
+// on that header button, or glanceFocus(channel) for a glance card.
 const val SearchButtonFocus = "search"
+const val MoviesButtonFocus = "movies"
 fun glanceFocus(channel: Channel) = "glance:${channel.name}"
 
 @Composable
@@ -106,6 +107,7 @@ fun HomeScreen(
     arrival: Int,
     onOpenFolder: (StreamingApp) -> Unit,
     onOpenSearch: () -> Unit,
+    onOpenMovies: () -> Unit,
     onOpenChannel: (Channel) -> Unit,
 ) {
     val context = LocalContext.current
@@ -116,6 +118,7 @@ fun HomeScreen(
     // The focused tile: an app's package name, or MoreTile.
     var focusedTile by remember { mutableStateOf<String?>(null) }
     val searchButton = remember { FocusRequester() }
+    val moviesButton = remember { FocusRequester() }
     val now by rememberMinuteClock()
 
     val windowFocused = LocalWindowInfo.current.isWindowFocused
@@ -123,6 +126,7 @@ fun HomeScreen(
     LaunchedEffect(windowFocused) {
         if (!windowFocused) return@LaunchedEffect
         if (returnFocusTo == SearchButtonFocus) searchButton.requestFocus()
+        if (returnFocusTo == MoviesButtonFocus) moviesButton.requestFocus()
         Channel.entries.firstOrNull { glanceFocus(it) == returnFocusTo }?.let { runCatching { glanceCards.getValue(it).requestFocus() } }
     }
 
@@ -214,7 +218,9 @@ fun HomeScreen(
             Header(
                 now = now,
                 searchButton = searchButton,
+                moviesButton = moviesButton,
                 onOpenApps = { context.openAppStore() },
+                onOpenMovies = onOpenMovies,
                 onOpenSearch = onOpenSearch,
                 onOpenSettings = { context.openSystemSettings() },
             )
@@ -267,7 +273,9 @@ fun HomeScreen(
 private fun Header(
     now: LocalDateTime,
     searchButton: FocusRequester,
+    moviesButton: FocusRequester,
     onOpenApps: () -> Unit,
+    onOpenMovies: () -> Unit,
     onOpenSearch: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
@@ -280,6 +288,7 @@ private fun Header(
             BasicText(now.format(TimeFormat), style = SimpleTVType.clock)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 HeaderButton("Get Apps", Modifier, onOpenApps)
+                HeaderButton("Movies", Modifier.focusRequester(moviesButton), onOpenMovies)
                 HeaderButton("Search", Modifier.focusRequester(searchButton), onOpenSearch)
                 HeaderButton("Settings", Modifier, onOpenSettings)
             }
@@ -335,7 +344,7 @@ private fun AppGrid(
     val currentFocus by rememberUpdatedState(focusedTile)
     val windowFocused = LocalWindowInfo.current.isWindowFocused
     LaunchedEffect(startKey, windowFocused, arrival) {
-        val elsewhere = initialFocus == SearchButtonFocus || initialFocus?.startsWith("glance:") == true
+        val elsewhere = initialFocus == SearchButtonFocus || initialFocus == MoviesButtonFocus || initialFocus?.startsWith("glance:") == true
         if (elsewhere || startKey == null || !windowFocused) return@LaunchedEffect
         // The grid may still be sliding or fading in, or something else may grab focus first,
         // so keep asking for a moment until the tile holds it.

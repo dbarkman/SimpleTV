@@ -104,7 +104,7 @@ source of truth.
   Watching and a folder; the Home button always returns to the home screen,
   the remote's Star and Person buttons arrive as intents, and the show guide
   refreshes on resume.
-- `HomeScreen.kt` — header (greeting, date, clock, Get Apps (the Play Store), Search, Settings), app banner
+- `HomeScreen.kt` — header (greeting, date, clock, Get Apps (the Play Store), Movies, Search, Settings), app banner
   tiles in pages of ten (two rows of five), and the At a glance cards along the
   bottom, all over the fall scene. A page with more apps after it shows nine
   and a More apps tile, which slides the next page in; Back slides back. Apps
@@ -179,6 +179,18 @@ source of truth.
   (`files/youtube.json`). Shorts are left out.
 - `SearchScreen.kt` — search by typing or voice: shows, movies and people, each
   title marked with where it streams (including services not on this TV).
+- `Movies.kt` / `MoviesScreen.kt` — the Movies page (header button): every
+  movie with a US digital or disc release by today, from TMDB's discover
+  (`region=US`, release types 4|5, so each date is the US home release), sorted
+  Newest, Popular or Top rated (300+ votes; the others need 10, which keeps out
+  titles TMDB knows nothing about), with genre buttons. The grid loads a page
+  at a time as it scrolls. Each movie's runtime, rating, genres and US offers
+  come from one TMDB call, and its scores from OMDb (`BuildConfig.OMDB_KEY`,
+  1,000 lookups a day), cached in `files/movies.json` (offers 3 days, scores
+  2 weeks, dropped after a month). OK streams in your own app first;
+  otherwise Fandango at Home, which rents nearly everything out at home. Its
+  TV app takes no web links and its search intent drops the query, so it opens
+  on its own home page.
 - `ContinueWatchingScreen.kt` — everything started from SimpleTV, one row per
   app in home-screen order.
 - `RemoteButtons.kt` — the remote's extra buttons (see Remote buttons).
@@ -235,7 +247,8 @@ The YouTube client is a "TVs and Limited Input devices" client in the Google
 Cloud project SimpleTV, published to production but unverified (scope
 `youtube.readonly`), so sign-ins don't expire weekly; approving the code shows
 Google's "unverified app" warning once. The SignalPost API key is in
-`~/.config/signalpost/api_key`. `~/.config/simpletv/home.txt` holds
+`~/.config/signalpost/api_key`, and OMDb's (an `API_KEY=` line) in
+`~/.config/omdb/api_key`. `~/.config/simpletv/home.txt` holds
 `weather_point` (latitude,longitude), `local_news_market` and
 `local_news_name`; a blank one turns its feature off with a note on screen
 (`Home` in `Glance.kt`). Netflix Top 10 comes from

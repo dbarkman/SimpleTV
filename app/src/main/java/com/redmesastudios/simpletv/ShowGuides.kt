@@ -96,14 +96,34 @@ object Tmdb {
     }
 
     // Where a title streams, rents or sells in the US.
-    suspend fun offers(title: Title): List<Offer> {
-        val us = get("/${title.kind.path()}/${title.tmdbId}/watch/providers").getJSONObject("results").optJSONObject("US")
-            ?: return emptyList()
-        fun list(key: String, rentOrBuy: Boolean) = us.optJSONArray(key)?.objects().orEmpty()
-            .map { Offer(it.getInt("provider_id"), it.text("provider_name"), rentOrBuy) }
-        return (list("flatrate", false) + list("ads", false) + list("free", false) + list("rent", true) + list("buy", true))
-            .distinctBy { it.providerId to it.rentOrBuy }
+    suspend fun offers(title: Title): List<Offer> =
+        parseOffers(get("/${title.kind.path()}/${title.tmdbId}/watch/providers").getJSONObject("results").optJSONObject("US"))
+
+    // One page of the movies out to watch at home in the US: released to stream, rent or buy
+    // (a digital or disc release) by today. Each movie's date is that US home release.
+    suspend fun homeMovies(sort: MovieSort, genre: Int?, page: Int, today: LocalDate): MoviePage {
+        val order = when (sort) {
+            MovieSort.Newest -> "release_date.desc"
+            MovieSort.Popular -> "popularity.desc"
+            MovieSort.TopRated -> "vote_average.desc"
+        }
+        val json = get(
+            "/discover/movie?region=US&with_release_type=4|5&release_date.lte=$today&sort_by=$order" +
+                "&vote_count.gte=${sort.minVotes}&include_adult=false&language=en-US&page=$page" +
+                (genre?.let { "&with_genres=$it" } ?: ""),
+        )
+        val movies = json.getJSONArray("results").objects().mapNotNull { movie ->
+            title(movie, TitleKind.Movie)?.let { HomeMovie(it, runCatching { LocalDate.parse(movie.text("release_date")) }.getOrNull()) }
+        }
+        return MoviePage(movies, json.optInt("total_pages", page))
     }
+
+    // A movie's runtime, genres, rating, US release dates and where it is, in one call.
+    suspend fun movieFacts(id: Int): MovieFacts =
+        parseMovieFacts(get("/movie/$id?append_to_response=release_dates,watch/providers&language=en-US"))
+
+    suspend fun movieGenres(): List<Genre> =
+        get("/genre/movie/list?language=en-US").getJSONArray("genres").objects().map { Genre(it.getInt("id"), it.text("name")) }
 
     private fun person(json: JSONObject) = Person(
         id = json.getInt("id"),
@@ -129,6 +149,32 @@ object Tmdb {
             rating = json.optDouble("vote_average", 0.0),
         )
     }
+}
+
+fun parseOffers(us: JSONObject?): List<Offer> {
+    if (us == null) return emptyList()
+    fun list(key: String, rentOrBuy: Boolean) = us.optJSONArray(key)?.objects().orEmpty()
+        .map { Offer(it.getInt("provider_id"), it.text("provider_name"), rentOrBuy) }
+    return (list("flatrate", false) + list("ads", false) + list("free", false) + list("rent", true) + list("buy", true))
+        .distinctBy { it.providerId to it.rentOrBuy }
+}
+
+// TMDB's release types: 3 in theaters, 4 digital, 5 disc.
+fun parseMovieFacts(json: JSONObject): MovieFacts {
+    val us = json.optJSONObject("release_dates")?.optJSONArray("results")?.objects().orEmpty()
+        .firstOrNull { it.text("iso_3166_1") == "US" }?.optJSONArray("release_dates")?.objects().orEmpty()
+    fun dates(type: Int) = us.filter { it.optInt("type") == type }
+        .mapNotNull { runCatching { LocalDate.parse(it.text("release_date").take(10)) }.getOrNull() }
+    val rated = us.sortedBy { if (it.optInt("type") == 3) 0 else 1 }.map { it.text("certification").trim() }.firstOrNull { it.isNotEmpty() }
+    return MovieFacts(
+        year = json.text("release_date").take(4),
+        homeDate = (dates(4).ifEmpty { dates(5) }).minOrNull(),
+        runtime = json.optInt("runtime").takeIf { it > 0 },
+        genres = json.optJSONArray("genres")?.objects().orEmpty().map { it.text("name") },
+        rated = rated.orEmpty(),
+        imdbId = json.text("imdb_id").ifEmpty { null },
+        offers = parseOffers(json.optJSONObject("watch/providers")?.optJSONObject("results")?.optJSONObject("US")),
+    )
 }
 
 object Watchmode {

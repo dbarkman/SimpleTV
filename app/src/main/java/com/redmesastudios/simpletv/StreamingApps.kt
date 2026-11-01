@@ -23,6 +23,7 @@ data class StreamingApp(
 // The services SimpleTV knows, in home-screen order before there's any watch time. Every
 // other installed TV app gets a tile too, after these (see homeApps).
 const val YouTubePackage = "com.google.android.youtube.tv"
+const val FandangoPackage = "air.com.vudu.air.DownloaderTablet"
 
 val StreamingApps = listOf(
     StreamingApp("YouTube", YouTubePackage, tmdbProviders = setOf(192, 188)),
@@ -31,7 +32,7 @@ val StreamingApps = listOf(
     StreamingApp("Paramount+", "com.cbs.ott", tmdbProviders = setOf(2303, 2616), watchmodeSources = setOf(444)),
     StreamingApp("HBO Max", "com.wbd.stream", tmdbProviders = setOf(1899), watchmodeSources = setOf(387)),
     StreamingApp("Prime Video", "com.amazon.amazonvideo.livingroom", tmdbProviders = setOf(9, 2100), watchmodeSources = setOf(26)),
-    StreamingApp("Fandango at Home", "air.com.vudu.air.DownloaderTablet", tmdbProviders = setOf(7, 332)),
+    StreamingApp("Fandango at Home", FandangoPackage, tmdbProviders = setOf(7, 332)),
     StreamingApp("Apple TV", "com.apple.atve.androidtv.appletv", tmdbProviders = setOf(350), watchmodeSources = setOf(371)),
     StreamingApp("Peacock", "com.peacocktv.peacockandroid", tmdbProviders = setOf(386, 387), watchmodeSources = setOf(388, 389)),
     StreamingApp("PBS", "com.pbs.video", tmdbProviders = setOf(209)),

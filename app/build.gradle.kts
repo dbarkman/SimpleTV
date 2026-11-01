@@ -27,6 +27,8 @@ android {
 
         buildConfigField("String", "TMDB_TOKEN", "\"${secret(".config/tmdb/read_token")}\"")
         buildConfigField("String", "WATCHMODE_KEY", "\"${secret(".config/watchmode/api_key")}\"")
+        // Rotten Tomatoes, IMDb and Metacritic scores for the Movies page.
+        buildConfigField("String", "OMDB_KEY", "\"${credential(".config/omdb/api_key", "API_KEY").ifEmpty { secret(".config/omdb/api_key").takeIf { '=' !in it }.orEmpty() }}\"")
         buildConfigField("String", "SIGNALPOST_KEY", "\"${secret(".config/signalpost/api_key")}\"")
         // Sticks built with the same key share Continue Watching and photos (Sync.kt).
         buildConfigField("String", "SYNC_KEY", "\"${secret(".config/simpletv/sync_key")}\"")

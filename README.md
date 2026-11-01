@@ -24,6 +24,10 @@ SimpleTV opens them, or deep-links straight to a show inside them.
 - **YouTube folder.** It signs in once with a code you approve on your phone, then shows
   new videos from your subscriptions, your top channels, your liked videos and what's
   popular. Shorts are left out.
+- **Movies.** Every movie out to watch at home in the US, on any service, newest first,
+  or by popularity or score, in any genre. Each one shows its Rotten Tomatoes, IMDb and
+  Metacritic scores and where it streams; OK opens it in your app, or Fandango at Home
+  to rent or buy.
 - **Search.** Type or speak to find a show, movie or actor. Each result says where it
   streams, including services that aren't on this TV.
 - **At a glance.** Cards along the bottom show the weather, how many new news stories
@@ -75,6 +79,7 @@ where shown.
 | `~/.config/tmdb/read_token` | TMDB API read access token | [themoviedb.org](https://www.themoviedb.org/settings/api), free |
 | `~/.config/watchmode/api_key` | Watchmode API key | [watchmode.com](https://api.watchmode.com/), free plan |
 | `~/.config/youtube/credentials.txt` | `client_id=` and `client_secret=` lines | Google Cloud, see below |
+| `~/.config/omdb/api_key` | OMDb API key as an `API_KEY=` line (optional, for movie scores) | [omdbapi.com](https://www.omdbapi.com/apikey.aspx), free |
 | `~/.config/signalpost/api_key` | SignalPost API key (optional, for news) | SignalPost |
 | `~/.config/simpletv/home.txt` | Your location and local news market | You, see below |
 | `~/.config/simpletv/sync_key` | A random secret shared by your TVs (optional) | `openssl rand -hex 24` |
@@ -169,6 +174,8 @@ standby, and adb can't reach it there.
 - [TMDB](https://www.themoviedb.org/): show and movie details, artwork, search, and
   where things stream. *This product uses the TMDB API but is not endorsed or certified
   by TMDB.*
+- [OMDb](https://www.omdbapi.com/): Rotten Tomatoes, IMDb and Metacritic scores for
+  movies.
 - [Watchmode](https://www.watchmode.com/): new releases per service and the web links
   that open shows in their apps.
 - Netflix's public [Top 10](https://www.netflix.com/tudum/top10) pages.
