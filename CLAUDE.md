@@ -153,6 +153,13 @@ source of truth.
   Requests carry `BuildConfig.SYNC_KEY` (from `~/.config/simpletv/sync_key`);
   without a key, sync is off. Requests use a plain socket, since Android blocks
   cleartext `HttpURLConnection`. App order stays per stick.
+- `SharedRecords.kt` — the household's shared box for other apps on the stick
+  (Trivia Night): collections of JSON records, each with an `id` and an `at`
+  time, one file each in `files/shared`. An app POSTs a collection to
+  `127.0.0.1:8724/sync/shared/<name>` with the sync key and gets back the
+  merged copy (newest `at` per id wins); `GET /sync/shared` hands every
+  collection to the other sticks on each pull. SimpleTV never reads the
+  records themselves.
 - `PhotoDream.kt` — the same slideshow as the TV's idle screensaver (a
   DreamService hosting Compose). Chosen once over adb:
   `adb shell settings put secure screensaver_components com.redmesastudios.simpletv/.PhotoDream`;

@@ -41,7 +41,8 @@ SimpleTV opens them, or deep-links straight to a show inside them.
   The TV resizes them itself, and the same page shows what's on the TV so you can remove
   photos. Photos stay on the TV; nothing goes to the cloud.
 - **Every TV in the house shares.** TVs built with the same sync key find each other on
-  the home Wi-Fi and share Continue Watching and the family photos, including removals.
+  the home Wi-Fi and share Continue Watching and the family photos, including removals,
+  and carry other home apps' records between TVs (Trivia Night's players and scores).
   Each TV keeps its own app order.
 - **Remote buttons that work.** The onn remote's app buttons, Star, Person, Settings,
   Free TV, channel and TV buttons get their jobs back once the stock home screen is

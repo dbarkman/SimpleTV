@@ -53,7 +53,8 @@ fun planPhotos(mine: Set<String>, myRemoved: Map<String, Long>, theirs: Set<Stri
     )
 }
 
-// The household's sticks share Continue Watching and the family photos. Each runs a small
+// The household's sticks share Continue Watching, the family photos and other apps' records
+// (SharedRecords.kt). Each runs a small
 // server on the home network while SimpleTV runs, announces it (NSD), and pulls from every
 // other stick it finds: on start, every 10 minutes, when SimpleTV comes back to the front,
 // and right after another stick says something changed. Every request carries the
@@ -134,6 +135,15 @@ object Sync {
         plan.drop.forEach { PhotoStore.drop(context, it) }
         plan.fetch.forEach { name -> PhotoStore.adopt(context, name, request(peer, "/sync/photo/$name"), theirs.getValue(name)) }
         if (plan.fetch.isNotEmpty() || plan.drop.isNotEmpty()) Log.i(Tag, "From $peer: ${plan.fetch.size} new photos, ${plan.drop.size} removed")
+
+        // Other apps' records (Trivia Night's players and scores); a stick too old to have
+        // them answers 404, which leaves the rest of the sync alone.
+        runCatching {
+            val shared = JSONObject(String(request(peer, "/sync/shared")))
+            for (name in shared.keys().asSequence().filter(::isCollectionName)) {
+                SharedRecords.merge(context, name, parseShared(shared.getJSONArray(name)))
+            }
+        }.onFailure { Log.w(Tag, "Couldn't get shared records from $peer", it) }
     }
 
     // Plain HTTP over a socket: Android blocks cleartext HttpURLConnection, rightly so for
@@ -165,6 +175,8 @@ object Sync {
             val requestLine = readHttpLine(input) ?: return
             val headerLines = generateSequence { readHttpLine(input)?.takeIf { it.isNotEmpty() } }.toList()
             val request = parseRequest(requestLine, headerLines) ?: return
+            val length = request.headers["content-length"]?.toIntOrNull()?.coerceIn(0, 16 shl 20) ?: 0
+            val body = if (length > 0) input.readNBytes(length) else ByteArray(0)
             val out = client.getOutputStream()
             val key = request.headers["x-sync-key"].orEmpty()
             if (!MessageDigest.isEqual(key.toByteArray(), BuildConfig.SYNC_KEY.toByteArray())) {
@@ -175,12 +187,25 @@ object Sync {
             val callerPort = request.headers["x-sync-port"]?.toIntOrNull()
             val caller = client.inetAddress?.hostAddress
             if (callerPort != null && caller != null) peers.putIfAbsent("caller:$caller", "$caller:$callerPort")
-            route(context, request, out)
+            route(context, request, body, out)
         }.onFailure { Log.w(Tag, "Sync request failed", it) }
     }
 
-    private fun route(context: Context, request: HttpRequest, out: OutputStream) {
+    private fun route(context: Context, request: HttpRequest, body: ByteArray, out: OutputStream) {
         when {
+            request.method == "GET" && request.path == "/sync/shared" -> {
+                val json = JSONObject()
+                SharedRecords.collections(context).forEach { json.put(it, sharedToJson(SharedRecords.read(context, it))) }
+                writeHttpResponse(out, 200, "application/json", json.toString().toByteArray())
+            }
+            // An app on this stick hands over its records and gets the household's copy back.
+            request.method == "POST" && request.path.startsWith("/sync/shared/") -> {
+                val name = request.path.removePrefix("/sync/shared/")
+                if (!isCollectionName(name)) return writeHttpResponse(out, 404, "text/plain", "Not found".toByteArray())
+                val (merged, changed) = SharedRecords.merge(context, name, parseShared(JSONArray(String(body))))
+                writeHttpResponse(out, 200, "application/json", sharedToJson(merged).toString().toByteArray())
+                if (changed) changed(context)
+            }
             request.method == "GET" && request.path == "/sync/history" -> {
                 val json = JSONObject()
                 WatchHistory.all(context).forEach { (pkg, entries) ->
