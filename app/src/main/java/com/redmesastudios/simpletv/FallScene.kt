@@ -60,6 +60,7 @@ fun FallScene(modifier: Modifier = Modifier) {
             val unit = size.width / SceneWidth
             val now = seconds.floatValue
             if (holiday == Holiday.Halloween) drawHalloweenFigures(unit, now)
+            if (holiday == Holiday.ElectionDay) drawElectionFigures(unit, now)
             falling.forEach { leaf ->
                 val pose = leaf.poseAt(now)
                 drawLeaf(pose.centerX, pose.centerY, pose.rotationDegrees, pose.turnScaleX, leaf.size, leaf.colorIndex, 0.9f, unit)

@@ -1,19 +1,25 @@
 package com.redmesastudios.simpletv
 
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.Month
+import java.time.temporal.TemporalAdjusters
 import kotlin.math.PI
 import kotlin.math.sin
 
 // Holiday decorations for the scene, each shown over a stretch of days around the holiday
 // and gone again afterwards on its own. Motion is pure math in design px (1920x1080).
-enum class Holiday { Halloween }
+enum class Holiday { Halloween, ElectionDay }
 
 fun holidayOn(date: LocalDate): Holiday? = when {
     date.month == Month.OCTOBER && date.dayOfMonth >= 24 -> Holiday.Halloween
     date.month == Month.NOVEMBER && date.dayOfMonth == 1 -> Holiday.Halloween
+    date.month == Month.NOVEMBER && date.dayOfMonth >= 2 && date <= electionDay(date.year) -> Holiday.ElectionDay
     else -> null
 }
+
+// The Tuesday after the first Monday in November.
+fun electionDay(year: Int): LocalDate = LocalDate.of(year, Month.NOVEMBER, 2).with(TemporalAdjusters.nextOrSame(DayOfWeek.TUESDAY))
 
 // A bat crosses the sky now and then: each one flies for part of its cycle and is
 // off-screen the rest, so the sky is often empty.

@@ -166,11 +166,13 @@ source of truth.
   `adb shell settings put secure screensaver_components com.redmesastudios.simpletv/.PhotoDream`;
   `settings delete secure screensaver_components` restores Google TV's own.
   Dreams can't be started from adb without root, so test by letting the TV idle.
-- `Holidays.kt` / `HalloweenScene.kt` — holiday decorations over the scene, each
+- `Holidays.kt` / `HalloweenScene.kt` / `ElectionScene.kt` — holiday decorations over the scene, each
   on for a stretch of days around its holiday and gone afterwards (Halloween:
   Oct 24 – Nov 1: harvest moon, bats, a graveyard, a hay bale with a black
   cat, corn stalks, jack-o'-lanterns, a ghost, and a skeleton and a mummy
-  walking by now and then). They sit where the home screen leaves room: the
+  walking by now and then; Election Day: Nov 2 through the Tuesday after the
+  first Monday in November: bunting tied to a waving flag, a ballot box with
+  ballots dropping in, a VOTE sign, balloons, hand flags and twinkling stars). They sit where the home screen leaves room: the
   sky above the apps and the hillside between the apps and the glance cards.
 - `WatchTime.kt` — tile order: most-watched over the last 30 days first,
   re-sorted at most once a day. Needs usage access, granted once over adb:
