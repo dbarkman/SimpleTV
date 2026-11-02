@@ -136,7 +136,7 @@ object Sync {
         plan.fetch.forEach { name -> PhotoStore.adopt(context, name, request(peer, "/sync/photo/$name"), theirs.getValue(name)) }
         if (plan.fetch.isNotEmpty() || plan.drop.isNotEmpty()) Log.i(Tag, "From $peer: ${plan.fetch.size} new photos, ${plan.drop.size} removed")
 
-        // Other apps' records (Trivia Night's players and scores); a stick too old to have
+        // The games' records (the Game Bridge's players and scores); a stick too old to have
         // them answers 404, which leaves the rest of the sync alone.
         runCatching {
             val shared = JSONObject(String(request(peer, "/sync/shared")))

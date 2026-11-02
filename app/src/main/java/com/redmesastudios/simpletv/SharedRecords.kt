@@ -8,9 +8,9 @@ import java.io.File
 
 private const val Tag = "SimpleTV.Shared"
 
-// One record another app on this stick keeps in the household's shared box (Trivia Night's
-// players, games and asked questions): an id, when it last changed, and the whole record as
-// JSON, which SimpleTV passes along without reading.
+// One record a Red Mesa Studios game on this stick keeps in the household's shared box (the
+// Game Bridge: the shared players, and each game's own results): an id, when it last changed,
+// and the whole record as JSON, which SimpleTV passes along without reading.
 data class SharedRecord(val id: String, val at: Long, val json: String)
 
 // Two copies of a collection as one: each id at its newest; on a tie, mine stays.
@@ -23,8 +23,8 @@ fun mergeShared(mine: List<SharedRecord>, theirs: List<SharedRecord>): List<Shar
 
 fun isCollectionName(name: String): Boolean = name.matches(Regex("[a-z0-9-]{1,40}"))
 
-// The household's shared box: collections of records, one file each in files/shared. Apps on
-// this stick swap records with it over the sync server (POST /sync/shared/<collection>), and
+// The household's shared box, the games' side of the Game Bridge: collections of records, one
+// file each in files/shared. Games on this stick swap records with it over the sync server (POST /sync/shared/<collection>), and
 // Sync passes every collection between the sticks like Continue Watching.
 object SharedRecords {
     private val lock = Any()
