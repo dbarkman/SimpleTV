@@ -37,6 +37,26 @@ class HolidaysAndGlanceTest {
     }
 
     @Test
+    fun uncleSamMarchesInStopsToWaveThenMarchesOut() {
+        val sam = Marcher(cycleSeconds = 60f, walkSeconds = 10f, pauseSeconds = 4f, stopX = 800f, offsetSeconds = 0f, baseY = 800f, strideSeconds = 1f)
+        val start = sam.poseAt(0f)!!
+        assertTrue(start.x < 0f)
+        assertEquals(0f, start.raise)
+        val stopped = sam.poseAt(12f)!!
+        assertEquals(800f, stopped.x)
+        assertEquals(1f, stopped.raise)
+        assertEquals(0f, stopped.stride)
+        // The arm eases up and back down rather than snapping.
+        assertTrue(sam.poseAt(10.2f)!!.raise in 0.1f..0.9f)
+        assertTrue(sam.poseAt(13.8f)!!.raise in 0.1f..0.9f)
+        val leaving = sam.poseAt(19f)!!
+        assertTrue(leaving.x > 800f)
+        assertEquals(0f, leaving.raise)
+        assertTrue(sam.poseAt(23.99f)!!.x > SceneWidth)
+        assertNull(sam.poseAt(30f))
+    }
+
+    @Test
     fun batsCrossTheScreenThenRest() {
         val bat = Bat(cycleSeconds = 40f, flightSeconds = 10f, offsetSeconds = 0f, y = 100f, size = 50f, leftToRight = true)
         val start = assertNotNull(bat.poseAt(0f)).let { bat.poseAt(0f)!! }

@@ -20,8 +20,8 @@ import kotlin.math.sin
 // Election Day on the fall scene, on the hillside between the apps and the glance cards:
 // red, white and blue bunting swagged across the whole space and tied to a waving flag in
 // the middle, a ballot box with ballots dropping in now and then, a VOTE yard sign, a bunch
-// of balloons, a few little hand flags, and some twinkling stars. Drawn in design px
-// (1920x1080).
+// of balloons, a few little hand flags, some twinkling stars, and now and then Uncle Sam
+// marching by, stopping beside the flag to wave. Drawn in design px (1920x1080).
 
 private val FlagRed = Color(0xFFC9483F)
 private val FlagBlue = Color(0xFF3A5A92)
@@ -56,6 +56,7 @@ fun DrawScope.drawElectionFigures(unit: Float, seconds: Float) {
         listOf(1585f to 0f, 1625f to 1.3f, 1665f to 2.6f).forEach { (x, phase) -> drawHandFlag(x, 802f, seconds, phase) }
         drawBunting(seconds)
         drawFlagpole(seconds)
+        UncleSam.poseAt(seconds)?.let { drawUncleSam(it, seconds) }
     }
 }
 
@@ -264,3 +265,77 @@ private fun DrawScope.drawHandFlag(x: Float, baseY: Float, seconds: Float, phase
     }
     drawCircle(StarGold, 2.5f, Offset(x, top))
 }
+
+private const val SamScale = 1.35f
+private val SamCoat = Color(0xFF34508A)
+private val SamCoatBack = Color(0xFF2A4170)
+private val SamSkin = Color(0xFFF1C9A5)
+private val SamHair = Color(0xFFF7F4EE)
+private val SamShoe = Color(0xFF2A211B)
+
+// Upright and unhurried, facing the way he marches. Feet at the pose's x, y.
+private fun DrawScope.drawUncleSam(pose: MarcherPose, seconds: Float) {
+    withTransform({
+        translate(pose.x, pose.y)
+        scale(SamScale, SamScale, pivot = Offset.Zero)
+    }) {
+        val hip = Offset(0f, -56f)
+        val shoulder = Offset(2f, -94f)
+        val legSwing = pose.stride * 0.3f
+        val armSwing = -pose.stride * 0.3f
+        drawOval(Color.Black, Offset(-16f, -3f), Size(32f, 6f), alpha = 0.08f)
+
+        // Back arm and leg first.
+        sleeve(shoulder, limb(shoulder, 36f, -armSwing), SamCoatBack)
+        trouserLeg(hip, limb(hip, 54f, -legSwing))
+
+        // The coat's tails, then the coat.
+        drawPath(Path().apply {
+            moveTo(-11f, -66f); lineTo(-19f, -34f); lineTo(-6f, -40f); lineTo(2f, -60f); close()
+        }, SamCoatBack)
+        drawRoundRect(SamCoat, Offset(-12f, -100f), Size(25f, 46f), CornerRadius(8f))
+        drawPath(Path().apply { moveTo(3f, -100f); lineTo(13f, -100f); lineTo(9f, -80f); close() }, FlagWhite)
+        drawCircle(StarGold, 1.6f, Offset(9f, -74f))
+        drawCircle(StarGold, 1.6f, Offset(9f, -66f))
+
+        trouserLeg(hip, limb(hip, 54f, legSwing))
+
+        // Head: white hair at the back, a goatee, and a bow tie under the chin.
+        drawCircle(SamHair, 7f, Offset(-5f, -110f))
+        drawCircle(SamSkin, 10.5f, Offset(4f, -112f))
+        drawCircle(SamSkin, 2.6f, Offset(14f, -111f))
+        drawCircle(SamShoe, 1.5f, Offset(9f, -114f))
+        drawPath(Path().apply { moveTo(3f, -105f); lineTo(14f, -105f); lineTo(9f, -93f); close() }, SamHair)
+        drawPath(Path().apply {
+            moveTo(-1f, -101f); lineTo(-1f, -95f); lineTo(4f, -98f); lineTo(9f, -95f); lineTo(9f, -101f); lineTo(4f, -98f); close()
+        }, FlagRed)
+
+        // The tall striped hat with a starred band.
+        drawRect(FlagWhite, Offset(-7f, -156f), Size(22f, 36f))
+        listOf(-3f, 4f, 11f).forEach { x -> drawRect(FlagRed, Offset(x, -156f), Size(3.5f, 28f)) }
+        drawRect(SamCoat, Offset(-7f, -130f), Size(22f, 9f))
+        drawPath(starPath(Offset(4f, -125.5f), 3.6f), FlagWhite)
+        drawRoundRect(SamCoat, Offset(-12f, -123f), Size(32f, 5f), CornerRadius(2.5f))
+
+        // The front arm, over everything: it swings while he marches; stopped, it rises
+        // out past his face and the hand waves.
+        val waving = PI.toFloat() * 0.68f + 0.25f * sin(seconds * 7f)
+        val armAngle = armSwing + (waving - armSwing) * pose.raise
+        sleeve(shoulder, limb(shoulder, 36f, armAngle), SamCoat)
+    }
+}
+
+private fun DrawScope.sleeve(from: Offset, hand: Offset, color: Color) {
+    drawLine(color, from, hand, strokeWidth = 8f, cap = StrokeCap.Round)
+    drawCircle(FlagWhite, 4.5f, hand)
+}
+
+// Red and white striped trousers ending in a black shoe pointing forward.
+private fun DrawScope.trouserLeg(from: Offset, foot: Offset) {
+    drawLine(FlagWhite, from, foot, strokeWidth = 9f, cap = StrokeCap.Round)
+    drawLine(FlagRed, from, foot, strokeWidth = 3.2f)
+    drawOval(SamShoe, Offset(foot.x - 4f, foot.y - 3f), Size(15f, 7f))
+}
+
+private fun limb(from: Offset, length: Float, angle: Float) =
+    Offset(from.x + length * sin(angle), from.y + length * cos(angle))

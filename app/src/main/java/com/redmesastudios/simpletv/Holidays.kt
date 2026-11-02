@@ -96,3 +96,46 @@ fun Walker.poseAt(seconds: Float): WalkerPose? {
         leftToRight = leftToRight,
     )
 }
+
+// Uncle Sam marches along the hill now and then, stopping by the flag to wave: in from
+// the left to stopX for walkSeconds, a wave for pauseSeconds, out to the right for
+// walkSeconds, then off-screen the rest of the cycle.
+data class Marcher(
+    val cycleSeconds: Float,
+    val walkSeconds: Float,
+    val pauseSeconds: Float,
+    val stopX: Float,
+    val offsetSeconds: Float,
+    val baseY: Float,
+    val strideSeconds: Float,
+)
+
+// raise is how far the waving arm is up: 0 while marching, easing to 1 during the stop.
+data class MarcherPose(val x: Float, val y: Float, val stride: Float, val raise: Float)
+
+private const val MarcherMargin = 160f
+private const val RaiseSeconds = 0.6f
+
+val UncleSam = Marcher(cycleSeconds = 75f, walkSeconds = 18f, pauseSeconds = 5f, stopX = 850f, offsetSeconds = 3f, baseY = 878f, strideSeconds = 1.25f)
+
+// Null while he's off-screen.
+fun Marcher.poseAt(seconds: Float): MarcherPose? {
+    val t = (seconds + offsetSeconds) % cycleSeconds
+    if (t > 2 * walkSeconds + pauseSeconds) return null
+    val inward = stopX + MarcherMargin
+    val outward = SceneWidth - stopX + MarcherMargin
+    val (x, stride, raise) = when {
+        t < walkSeconds -> Triple(-MarcherMargin + t / walkSeconds * inward, sin(2 * PI * t / strideSeconds).toFloat(), 0f)
+        t < walkSeconds + pauseSeconds -> {
+            val stopped = t - walkSeconds
+            val raise = minOf(stopped, pauseSeconds - stopped, RaiseSeconds) / RaiseSeconds
+            Triple(stopX, 0f, raise)
+        }
+        else -> {
+            val walked = t - pauseSeconds
+            Triple(stopX + (walked - walkSeconds) / walkSeconds * outward, sin(2 * PI * walked / strideSeconds).toFloat(), 0f)
+        }
+    }
+    // A steady march: the body rises only a little as the legs pass under it.
+    return MarcherPose(x, baseY - 2f * (1f - kotlin.math.abs(stride)), stride, raise)
+}
