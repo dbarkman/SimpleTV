@@ -7,7 +7,7 @@ something. It replaces the stock Google TV home screen with big app tiles, a gen
 seasonal backdrop, and nothing else: no ads, no autoplaying trailers, no
 recommendation rows. It runs on the **Walmart onn 4K Streaming Device (2026)**.
 
-![SimpleTV's home screen on Halloween: app tiles, a graveyard with a walking skeleton and mummy, and weather, news and market cards](docs/screenshots/home.png)
+![SimpleTV's home screen on Election Day: app tiles, red-white-and-blue bunting with Uncle Sam waving beside the flag, and weather, news and market cards](docs/screenshots/home.png)
 
 SimpleTV never plays video itself. Streaming apps are DRM-protected and have no APIs, so
 SimpleTV opens them, or deep-links straight to a show inside them.
