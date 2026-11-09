@@ -212,11 +212,13 @@ fun HomeScreen(
         gridFocus = MoreTile
     }
 
+    val sceneDay = rememberSceneDay()
     Box(Modifier.fillMaxSize().background(Ground).onPreviewKeyEvent { answerRemove(it.nativeKeyEvent) }) {
-        FallScene(Modifier.fillMaxSize())
+        HomeScene(sceneDay, Modifier.fillMaxSize())
         Column(Modifier.fillMaxSize().padding(start = 60.dp, end = 60.dp, top = 32.dp, bottom = 28.dp)) {
             Header(
                 now = now,
+                greeting = celebrationGreeting(familyDaysOn(sceneDay, FamilyDays)) ?: greetingFor(now.hour),
                 searchButton = searchButton,
                 moviesButton = moviesButton,
                 onOpenApps = { context.openAppStore() },
@@ -273,6 +275,7 @@ fun HomeScreen(
 @Composable
 private fun Header(
     now: LocalDateTime,
+    greeting: String,
     searchButton: FocusRequester,
     moviesButton: FocusRequester,
     onOpenApps: () -> Unit,
@@ -283,7 +286,7 @@ private fun Header(
 ) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            BasicText(greetingFor(now.hour), style = SimpleTVType.greeting)
+            BasicText(greeting, style = SimpleTVType.greeting)
             BasicText(now.format(DateFormat), style = SimpleTVType.date)
         }
         Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(5.dp)) {

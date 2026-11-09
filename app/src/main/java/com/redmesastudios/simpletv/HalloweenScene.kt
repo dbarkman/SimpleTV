@@ -284,7 +284,7 @@ private fun DrawScope.drawTombstone(t: Tombstone) {
     }
 }
 
-private fun DrawScope.drawHayBale(x: Float, baseY: Float) {
+internal fun DrawScope.drawHayBale(x: Float, baseY: Float) {
     val w = 120f
     val h = 54f
     drawRoundRect(Hay, Offset(x - w / 2, baseY - h), androidx.compose.ui.geometry.Size(w, h), CornerRadius(10f))
@@ -314,7 +314,7 @@ private fun DrawScope.drawCat(x: Float, baseY: Float, seconds: Float) {
 }
 
 // A tied bundle of dried corn stalks.
-private fun DrawScope.drawCornStalks(x: Float, baseY: Float) {
+internal fun DrawScope.drawCornStalks(x: Float, baseY: Float) {
     val tops = listOf(-30f to -150f, -14f to -170f, 0f to -178f, 14f to -166f, 30f to -148f)
     tops.forEachIndexed { i, (dx, dy) ->
         drawLine(if (i % 2 == 0) Stalk else StalkShade, Offset(x + dx * 0.3f, baseY), Offset(x + dx, baseY + dy), strokeWidth = 5f, cap = StrokeCap.Round)

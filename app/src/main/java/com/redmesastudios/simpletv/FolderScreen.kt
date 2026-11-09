@@ -137,7 +137,7 @@ fun FolderScreen(app: StreamingApp, onClose: () -> Unit) {
     }
 
     Box(Modifier.fillMaxSize().background(Ground)) {
-        FallScene(Modifier.fillMaxSize())
+        HomeScene(modifier = Modifier.fillMaxSize())
         Backdrop(shown, Modifier.align(Alignment.TopEnd))
         // Rows run to the screen's edges so they read as scrolling; everything else keeps the margin.
         Column(Modifier.fillMaxSize().padding(top = 32.dp)) {

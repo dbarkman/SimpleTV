@@ -11,15 +11,16 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 class HolidaysAndGlanceTest {
+    private val OldScenes = setOf(Holiday.Halloween, Holiday.ElectionDay)
     private val zone = ZoneId.of("America/Phoenix")
 
     @Test
     fun halloweenRunsFromTheTwentyFourthThroughNovemberFirst() {
-        assertNull(holidayOn(LocalDate.of(2026, 10, 23)))
-        assertEquals(Holiday.Halloween, holidayOn(LocalDate.of(2026, 10, 24)))
-        assertEquals(Holiday.Halloween, holidayOn(LocalDate.of(2026, 10, 31)))
-        assertEquals(Holiday.Halloween, holidayOn(LocalDate.of(2026, 11, 1)))
-        assertEquals(Holiday.Halloween, holidayOn(LocalDate.of(2027, 10, 30)))
+        assertNull(holidayOn(drawn = OldScenes, date = LocalDate.of(2026, 10, 23)))
+        assertEquals(Holiday.Halloween, holidayOn(drawn = OldScenes, date = LocalDate.of(2026, 10, 24)))
+        assertEquals(Holiday.Halloween, holidayOn(drawn = OldScenes, date = LocalDate.of(2026, 10, 31)))
+        assertEquals(Holiday.Halloween, holidayOn(drawn = OldScenes, date = LocalDate.of(2026, 11, 1)))
+        assertEquals(Holiday.Halloween, holidayOn(drawn = OldScenes, date = LocalDate.of(2027, 10, 30)))
     }
 
     @Test
@@ -29,11 +30,11 @@ class HolidaysAndGlanceTest {
         assertEquals(LocalDate.of(2028, 11, 7), electionDay(2028))
         // November 1st is a Tuesday: the first Monday is the 7th, so it's the 8th.
         assertEquals(LocalDate.of(2033, 11, 8), electionDay(2033))
-        assertEquals(Holiday.ElectionDay, holidayOn(LocalDate.of(2026, 11, 2)))
-        assertEquals(Holiday.ElectionDay, holidayOn(LocalDate.of(2026, 11, 3)))
-        assertNull(holidayOn(LocalDate.of(2026, 11, 4)))
-        assertEquals(Holiday.ElectionDay, holidayOn(LocalDate.of(2028, 11, 7)))
-        assertNull(holidayOn(LocalDate.of(2028, 11, 8)))
+        assertEquals(Holiday.ElectionDay, holidayOn(drawn = OldScenes, date = LocalDate.of(2026, 11, 2)))
+        assertEquals(Holiday.ElectionDay, holidayOn(drawn = OldScenes, date = LocalDate.of(2026, 11, 3)))
+        assertNull(holidayOn(drawn = OldScenes, date = LocalDate.of(2026, 11, 4)))
+        assertEquals(Holiday.ElectionDay, holidayOn(drawn = OldScenes, date = LocalDate.of(2028, 11, 7)))
+        assertNull(holidayOn(drawn = OldScenes, date = LocalDate.of(2028, 11, 8)))
     }
 
     @Test

@@ -97,6 +97,17 @@ weather_point=40.7128,-74.0060
 # A SignalPost market id and the name to show for it (optional)
 local_news_market=new-york
 local_news_name=New York
+# Holiday decorations to show (optional): us, christian, world, fun, seasons, jewish,
+# muslim, indian. Leave it out for all but the last three.
+holiday_packs=us,christian,world,fun,seasons
+```
+
+**`birthdays.txt`** (optional, next to `home.txt`) lists family birthdays and anniversaries.
+On the day, the greeting wishes them well and balloons go up:
+
+```
+01-27 birthday Alex
+07-15 anniversary Sam & Jo
 ```
 
 **YouTube.** In the [Google Cloud console](https://console.cloud.google.com/):
@@ -189,8 +200,9 @@ TVs share with each other, never with yours.
   apps follow by name.
 - **Remote buttons.** `buttonAction()` in `RemoteButtons.kt` maps key codes to jobs. Other
   remotes send different codes for their extra buttons.
-- **Holidays.** `Holidays.kt` decides which decorations show on which dates, and each
-  holiday draws its own scene (see `HalloweenScene.kt`).
+- **Holidays.** `HolidayCalendar.kt` decides which decorations show on which dates, and
+  each holiday draws its own scene (see `HalloweenScene.kt`). Add a new scene's holiday
+  to `DrawnHolidays` in `HomeScene.kt`.
 
 `CLAUDE.md` has a fuller map of the code.
 

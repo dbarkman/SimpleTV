@@ -12,6 +12,9 @@ fun secret(path: String): String = providers
 fun credential(path: String, name: String): String = secret(path).lines()
     .firstOrNull { it.startsWith("$name=") }?.substringAfter('=')?.trim().orEmpty()
 
+// Text made safe inside a Java string literal in BuildConfig.
+fun String.javaString(): String = replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n")
+
 // The household this build is for (-Phousehold=mom): its location and sync key come from
 // ~/.config/simpletv/<household>/. Without it, the build is for our own home and reads
 // ~/.config/simpletv/ itself.
@@ -47,6 +50,10 @@ android {
         buildConfigField("String", "WEATHER_POINT", "\"${credential("$householdDir/home.txt", "weather_point")}\"")
         buildConfigField("String", "LOCAL_NEWS_MARKET", "\"${credential("$householdDir/home.txt", "local_news_market")}\"")
         buildConfigField("String", "LOCAL_NEWS_NAME", "\"${credential("$householdDir/home.txt", "local_news_name")}\"")
+        // Which holiday packs to decorate for (HolidayCalendar.kt); blank means the defaults.
+        buildConfigField("String", "HOLIDAY_PACKS", "\"${credential("$householdDir/home.txt", "holiday_packs").javaString()}\"")
+        // Birthdays and anniversaries (FamilyDays.kt), kept out of the repo.
+        buildConfigField("String", "FAMILY_DAYS", "\"${secret("$householdDir/birthdays.txt").javaString()}\"")
         buildConfigField("String", "YOUTUBE_CLIENT_ID", "\"${credential(".config/youtube/credentials.txt", "client_id")}\"")
         buildConfigField("String", "YOUTUBE_CLIENT_SECRET", "\"${credential(".config/youtube/credentials.txt", "client_secret")}\"")
         // Updates: which household's build to fetch, and a read-only token for the private

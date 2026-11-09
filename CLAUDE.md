@@ -196,58 +196,42 @@ source of truth.
   `adb shell settings put secure screensaver_components com.redmesastudios.simpletv/.PhotoDream`;
   `settings delete secure screensaver_components` restores Google TV's own.
   Dreams can't be started from adb without root, so test by letting the TV idle.
-- `Holidays.kt` / `HalloweenScene.kt` / `ElectionScene.kt` — holiday decorations over the scene, each
-  on for a stretch of days around its holiday and gone afterwards (Halloween:
-  Oct 24 – Nov 1: harvest moon, bats, a graveyard, a hay bale with a black
-  cat, corn stalks, jack-o'-lanterns, a ghost, and a skeleton and a mummy
-  walking by now and then; Election Day: Nov 2 through the Tuesday after the
-  first Monday in November: bunting tied to a waving flag, a ballot box with
-  ballots dropping in, a VOTE sign, balloons, hand flags, twinkling stars,
-  and Uncle Sam marching by now and then, stopping beside the flag to wave).
-  They sit where the home screen leaves room: the sky above the apps and the
-  hillside between the apps and the glance cards.
-- `WatchTime.kt` — tile order: most-watched over the last 30 days first,
-  re-sorted at most once a day. Needs usage access, granted once over adb:
-  `adb shell appops set com.redmesastudios.simpletv GET_USAGE_STATS allow`.
-  Without it the curated order stays.
-- `FolderScreen.kt` — a service's folder: a large "Open <app>" button with the
-  app's logo at top left, focused when the folder opens (it bounces once), the
-  focused show's artwork and details below it; rows below: Continue Watching, Just Added, New Season, New
-  Season Coming, Top 10 Shows and Movies ("Popular" outside Netflix). YouTube's
-  folder has Continue Watching, New From Your Subscriptions and Popular on
-  YouTube, with a sign-in code in place of the details until the TV is signed in.
-- `YouTube.kt` — YouTube sign-in (Google's TV device-code flow, refresh token
-  kept on the box), the Data API client, and the hourly cached rows
-  (`files/youtube.json`). Shorts are left out.
-- `SearchScreen.kt` — search by typing or voice: shows, movies and people, each
-  title marked with where it streams (including services not on this TV).
-- `Movies.kt` / `MoviesScreen.kt` — the Movies page (header button): every
-  movie with a US digital or disc release by today, from TMDB's discover
-  (`region=US`, release types 4|5, so each date is the US home release), sorted
-  Newest, Popular or Top rated (300+ votes; the others need 10, which keeps out
-  titles TMDB knows nothing about), with genre buttons. The grid loads a page
-  at a time as it scrolls. Each movie's runtime, rating, genres and US offers
-  come from one TMDB call, and its scores from OMDb (`BuildConfig.OMDB_KEY`,
-  1,000 lookups a day), cached in `files/movies.json` (offers 3 days, scores
-  2 weeks, dropped after a month). OK streams in your own app first;
-  otherwise Fandango at Home, which rents nearly everything out at home. Its
-  TV app takes no web links and its search intent drops the query, so it opens
-  on its own home page.
-- `ContinueWatchingScreen.kt` — everything started from SimpleTV, one row per
-  app in home-screen order.
-- `RemoteButtons.kt` — the remote's extra buttons (see Remote buttons).
-- `Catalog.kt` / `ShowGuides.kt` / `CatalogStore.kt` — row building, the
-  TMDB / Watchmode / Netflix Top 10 clients, and the once-a-day cached guide
-  (`files/catalog.json`).
-- `ShowLinks.kt` — opens a show in its app (Netflix Top 10 by Netflix ID,
-  YouTube by video link, everything else by Watchmode's web link, cached per
-  show), falling back to the app itself; records Continue Watching.
+- `HolidayCalendar.kt` — which holiday shows on a date. Holidays come in packs
+  (US National, Christian, World, Fun days, Seasons, Jewish, Muslim, Indian);
+  `holiday_packs=` in home.txt picks them (blank: all but the last three).
+  Each holiday has its stretch of days; where two overlap the shorter wins its
+  days, and the Seasons pack's first-day-of-a-season days show only when
+  nothing else does. Only holidays in `DrawnHolidays` (HomeScene.kt) count, so
+  a holiday without a scene never blanks out one with a scene. Easter is
+  computed, Hebrew dates use Calendrical Calculations arithmetic, Islamic
+  dates java.time's Umm al-Qura `HijrahDate`, seasons Meeus's equinox
+  formulas; Lunar New Year and the Hindu dates are tables, to extend as years
+  are published. Tests check them against the macOS calendars.
+- `FamilyDays.kt` — birthdays and anniversaries from the household's
+  `birthdays.txt` (never in the repo). On the day the greeting becomes "Happy
+  birthday, <name>!" and the scene celebrates instead of any holiday.
+- `Holidays.kt` — the decorations' motion, pure math in design px.
+- `HalloweenScene.kt` / `ElectionScene.kt` / `ThanksgivingScene.kt` /
+  `CelebrationScene.kt` — the drawn scenes. Halloween (Oct 24 – Nov 1):
+  harvest moon, bats, graveyard, hay bale with a black cat, corn stalks,
+  jack-o'-lanterns, a ghost, a skeleton and a mummy walking by. Election Day
+  (Nov 2 through Election Day): bunting, a waving flag, a ballot box, a VOTE
+  sign, balloons and Uncle Sam marching by. Thanksgiving (day after Election
+  Day through Thanksgiving): corn stalks, a hay bale with pumpkins and
+  gourds, a cornucopia, and a turkey strutting by that stops to fan its
+  tail. Celebration: bunting, rising balloons (hearts for an anniversary),
+  a cake with flickering candles and presents.
 - `AppArt.kt` — each app's own TV banner (its logo artwork), decoded at tile
   size; apps without one get their icon and name on a warm color.
-- `FallScene.kt` / `FallingLeaves.kt` — the backdrop (hills, edge trees, leaf
-  pile) and the falling leaves. Leaf motion is pure math in design px
-  (1920×1080). The leaves step about 30 times a second and stop while another
-  app is in front; that keeps SimpleTV near 40% of one core on the stick.
+- `HomeScene.kt` / `FallingLeaves.kt` — the backdrop behind every screen
+  (hills, edge trees, something drifting down) in the season's colors:
+  winter snow with snow on the trees, spring blossoms and petals, summer
+  greens and dandelion seeds, fall leaves with a leaf pile. Motion is pure math
+  in design px (1920×1080). It steps about 30 times a second and stops while
+  another app is in front; that keeps SimpleTV near 40% of one core on the
+  stick. To see a date's scene ahead of time:
+  `adb shell am start -n com.redmesastudios.simpletv/.MainActivity --es scene_date 2026-12-25`
+  (Home goes back to today).
 - `ServiceDirectory.kt` — TMDB's and Watchmode's US service lists (cached a
   week in `files/services.json`). An app SimpleTV wasn't told about is matched
   to its service by name (`matchService`: "ESPN" takes ESPN and ESPN Plus,

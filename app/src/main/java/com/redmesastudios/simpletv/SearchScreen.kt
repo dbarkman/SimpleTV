@@ -201,7 +201,7 @@ fun SearchScreen(onClose: () -> Unit) {
     val people = if (person == null) results?.people.orEmpty() else emptyList()
 
     Box(Modifier.fillMaxSize().background(Ground)) {
-        FallScene(Modifier.fillMaxSize())
+        HomeScene(modifier = Modifier.fillMaxSize())
         Column(Modifier.fillMaxSize().padding(top = 36.dp)) {
             Row(
                 Modifier.fillMaxWidth().padding(horizontal = ScreenMargin),

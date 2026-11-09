@@ -166,7 +166,7 @@ fun MoviesScreen(onClose: () -> Unit) {
     val shown = list.movies.firstOrNull { it.title.tmdbId == focusedId } ?: list.movies.firstOrNull()
 
     Box(Modifier.fillMaxSize().background(Ground)) {
-        FallScene(Modifier.fillMaxSize())
+        HomeScene(modifier = Modifier.fillMaxSize())
         Backdrop(shown?.title, Modifier.align(Alignment.TopEnd))
         Column(Modifier.fillMaxSize().padding(top = 30.dp)) {
             Row(

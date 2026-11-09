@@ -61,6 +61,7 @@ class MainActivity : ComponentActivity() {
         // A newer SimpleTV installs itself while the home screen is up (Updater.kt).
         lifecycleScope.launch { repeatOnLifecycle(Lifecycle.State.RESUMED) { Updater.run(applicationContext) } }
         requestedScreen(intent?.action)?.let(::request)
+        previewScene(intent)
         setContent {
             var screen by remember { mutableStateOf<Screen>(Screen.Home) }
             // Which tile or button to land on when coming back home.
@@ -129,9 +130,19 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         val requested = requestedScreen(intent.action)
+        previewScene(intent)
         when {
             requested != null -> request(requested)
             intent.hasCategory(Intent.CATEGORY_HOME) -> homePresses.intValue++
+        }
+    }
+
+    // A scene_date extra shows the scene for that date (HomeScene.kt); Home goes back to today.
+    private fun previewScene(intent: Intent?) {
+        val date = intent?.getStringExtra("scene_date")?.let { runCatching { java.time.LocalDate.parse(it) }.getOrNull() }
+        when {
+            date != null -> ScenePreview.date.value = date
+            intent?.hasCategory(Intent.CATEGORY_HOME) == true -> ScenePreview.date.value = null
         }
     }
 }

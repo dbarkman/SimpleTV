@@ -230,7 +230,7 @@ private fun AddPhotos(count: Int, onChange: () -> Unit) {
         onDispose { server.stop() }
     }
     Box(Modifier.fillMaxSize().background(Ground), contentAlignment = Alignment.Center) {
-        FallScene(Modifier.fillMaxSize())
+        HomeScene(modifier = Modifier.fillMaxSize())
         Row(
             Modifier.background(Ground, RoundedCornerShape(20.dp)).border(1.dp, Outline, RoundedCornerShape(20.dp)).padding(36.dp),
             horizontalArrangement = Arrangement.spacedBy(36.dp),

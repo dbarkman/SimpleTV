@@ -131,7 +131,7 @@ private fun <T> rememberChannelData(key: Any? = Unit, load: suspend () -> T): T?
 private fun ChannelPage(title: String, subtitle: String, backTo: String = "Home", content: @Composable () -> Unit) {
     val now by rememberMinuteClock()
     Box(Modifier.fillMaxSize().background(Ground)) {
-        FallScene(Modifier.fillMaxSize())
+        HomeScene(modifier = Modifier.fillMaxSize())
         Column(Modifier.fillMaxSize().padding(start = 60.dp, end = 60.dp, top = 40.dp, bottom = 28.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {

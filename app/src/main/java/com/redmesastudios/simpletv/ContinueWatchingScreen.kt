@@ -55,7 +55,7 @@ fun ContinueWatchingScreen(onClose: () -> Unit) {
     }
 
     Box(Modifier.fillMaxSize().background(Ground)) {
-        FallScene(Modifier.fillMaxSize())
+        HomeScene(modifier = Modifier.fillMaxSize())
         Backdrop(shown?.second, Modifier.align(Alignment.TopEnd))
         Column(Modifier.fillMaxSize().padding(top = 32.dp)) {
             BasicText("Continue Watching", style = SimpleTVType.serviceName, modifier = Modifier.padding(horizontal = ScreenMargin))
