@@ -15,7 +15,9 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
 
 // Ask SimpleTV to open a screen, from inside or outside the app (the remote's Star, Person and Free TV buttons).
@@ -56,6 +58,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // Continue Watching and the family photos, shared with the household's other sticks.
         Sync.start(applicationContext)
+        // A newer SimpleTV installs itself while the home screen is up (Updater.kt).
+        lifecycleScope.launch { repeatOnLifecycle(Lifecycle.State.RESUMED) { Updater.run(applicationContext) } }
         requestedScreen(intent?.action)?.let(::request)
         setContent {
             var screen by remember { mutableStateOf<Screen>(Screen.Home) }
@@ -71,6 +75,7 @@ class MainActivity : ComponentActivity() {
             }
             val requested = screenRequest
             LaunchedEffect(requested) { requested?.let { screen = it.screen } }
+            LaunchedEffect(screen) { Updater.homeShowing.value = screen == Screen.Home }
 
             AnimatedContent(
                 targetState = screen,

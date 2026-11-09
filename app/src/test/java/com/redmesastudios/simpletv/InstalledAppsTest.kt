@@ -34,11 +34,12 @@ class InstalledAppsTest {
     }
 
     @Test
-    fun appsWithTheirOwnButtonAndSimpleTvItselfGetNoTile() {
+    fun appsWithTheirOwnButtonSimpleTvItselfAndTailscaleGetNoTile() {
         val installed = mapOf(
             "com.android.vending" to "Google Play Store",
             "com.android.tv.settings" to "Settings",
             BuildConfig.APPLICATION_ID to "SimpleTV",
+            "com.tailscale.ipn" to "Tailscale",
             "com.tubitv" to "Tubi",
         )
 

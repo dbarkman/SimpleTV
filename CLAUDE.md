@@ -22,8 +22,9 @@ recommendation feeds, no clutter. Every visual state change animates.
 adb runs over Wi-Fi: `adb connect <stick-ip>:5555`. The stick's sleep timer
 is set to Never; in standby it drops off Wi-Fi and adb can't reach it.
 
-There are two sticks, one per TV. `scripts/setup-stick.sh <stick-ip>` sets
-one up (install, extras, home screen; safe to repeat), and
+There are two sticks here, one per TV, and one in another household.
+`scripts/setup-stick.sh <stick-ip>` sets one up (install, extras, home screen;
+safe to repeat), and
 `scripts/copy-photos.sh <from-ip> <to-ip>` copies the family photos between
 them. Disabling the stock home can knock the stick off Wi-Fi until someone
 wakes it, so the script does that last.
@@ -40,7 +41,30 @@ adb shell pm disable-user --user 0 com.google.android.tungsten.setupwraith
 
 `pm enable <package>` on the same two packages restores the stock home. An
 OTA update may re-enable them. Back on the home screen does nothing, and the
-Settings button opens Android settings.
+Settings button opens Android settings; holding OK on it for 1.5 s opens
+Tailscale, which has no tile so nobody removes it by mistake.
+
+## Households and updates
+
+The household's settings live in `~/.config/simpletv/`: `home.txt` (location,
+local news) and `sync_key`. Another household's are in a subfolder
+(`~/.config/simpletv/<household>/`), built with `-Phousehold=<household>`;
+`BuildConfig.HOUSEHOLD` is the folder name, or `home` for ours. Each
+household has its own sync key, so its sticks share only with each other.
+
+`scripts/release.sh` runs the tests, builds every household (ours last, so
+`app/build` holds ours) with one `versionCode` (minutes since 1970; a plain
+build stamps the current minute) and posts them with a `latest.txt` as a
+release on the private repo `dbarkman/SimpleTV-builds`. `Updater.kt` checks
+it every 6 hours while the home screen is up, reading it with
+`BuildConfig.UPDATE_TOKEN` (a read-only token in
+`~/.config/simpletv/update_token`), and installs a newer build of its own
+household over itself once the APK's SHA-256 matches. Installing needs
+`appops set com.redmesastudios.simpletv REQUEST_INSTALL_PACKAGES allow`
+(`setup-stick.sh` does it). Builds are signed with this Mac's debug
+keystore, `~/.android/debug.keystore`; losing it means a fresh install on
+every stick. The other household's stick is reached over Tailscale when it
+needs hands-on fixing.
 
 ## Remote buttons
 
@@ -104,6 +128,8 @@ source of truth.
   Watching and a folder; the Home button always returns to the home screen,
   the remote's Star and Person buttons arrive as intents, and the show guide
   refreshes on resume.
+- `Updater.kt` — the self-updater (see Households and updates) and
+  `UpdateResult`, which shows Android's install prompt if it asks.
 - `HomeScreen.kt` — header (greeting, date, clock, Get Apps (the Play Store), Movies, Search, Settings), app banner
   tiles in pages of ten (two rows of five), and the At a glance cards along the
   bottom, all over the fall scene. A page with more apps after it shows nine

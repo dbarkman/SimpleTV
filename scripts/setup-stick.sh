@@ -42,12 +42,13 @@ echo "Stick: $(on getprop ro.product.model), Android $(on getprop ro.build.versi
 echo "Installing SimpleTV"
 adb -s "$serial" install -r "$apk" < /dev/null
 
-echo "Turning on the remote buttons, usage access, voice search and the photo screensaver"
+echo "Turning on the remote buttons, usage access, voice search, the photo screensaver and updates"
 on settings put secure enabled_accessibility_services "$app/.RemoteButtons"
 on settings put secure accessibility_enabled 1
 on appops set "$app" GET_USAGE_STATS allow
 on pm grant "$app" android.permission.RECORD_AUDIO
 on settings put secure screensaver_components "$app/.PhotoDream"
+on appops set "$app" REQUEST_INSTALL_PACKAGES allow
 
 # Last, because the stick can drop off Wi-Fi when its home screen changes. If it does,
 # wake it and run this script again; every step is safe to repeat.

@@ -12,6 +12,17 @@ fun secret(path: String): String = providers
 fun credential(path: String, name: String): String = secret(path).lines()
     .firstOrNull { it.startsWith("$name=") }?.substringAfter('=')?.trim().orEmpty()
 
+// The household this build is for (-Phousehold=mom): its location and sync key come from
+// ~/.config/simpletv/<household>/. Without it, the build is for our own home and reads
+// ~/.config/simpletv/ itself.
+val household = providers.gradleProperty("household").orNull.orEmpty()
+val householdDir = ".config/simpletv" + if (household.isEmpty()) "" else "/$household"
+
+// Each build is newer than the last, so sticks know to update (Updater.kt); scripts/release.sh
+// passes one version for every household in a release.
+val buildVersion = providers.gradleProperty("versionCode").orNull?.toInt()
+    ?: (System.currentTimeMillis() / 60_000).toInt()
+
 android {
     namespace = "com.redmesastudios.simpletv"
     compileSdk {
@@ -22,7 +33,7 @@ android {
         applicationId = "com.redmesastudios.simpletv"
         minSdk = 34
         targetSdk = 37
-        versionCode = 1
+        versionCode = buildVersion
         versionName = "1.0"
 
         buildConfigField("String", "TMDB_TOKEN", "\"${secret(".config/tmdb/read_token")}\"")
@@ -31,13 +42,17 @@ android {
         buildConfigField("String", "OMDB_KEY", "\"${credential(".config/omdb/api_key", "API_KEY").ifEmpty { secret(".config/omdb/api_key").takeIf { '=' !in it }.orEmpty() }}\"")
         buildConfigField("String", "SIGNALPOST_KEY", "\"${secret(".config/signalpost/api_key")}\"")
         // Sticks built with the same key share Continue Watching and photos (Sync.kt).
-        buildConfigField("String", "SYNC_KEY", "\"${secret(".config/simpletv/sync_key")}\"")
+        buildConfigField("String", "SYNC_KEY", "\"${secret("$householdDir/sync_key")}\"")
         // Where the TV is, for weather and local news; see README.
-        buildConfigField("String", "WEATHER_POINT", "\"${credential(".config/simpletv/home.txt", "weather_point")}\"")
-        buildConfigField("String", "LOCAL_NEWS_MARKET", "\"${credential(".config/simpletv/home.txt", "local_news_market")}\"")
-        buildConfigField("String", "LOCAL_NEWS_NAME", "\"${credential(".config/simpletv/home.txt", "local_news_name")}\"")
+        buildConfigField("String", "WEATHER_POINT", "\"${credential("$householdDir/home.txt", "weather_point")}\"")
+        buildConfigField("String", "LOCAL_NEWS_MARKET", "\"${credential("$householdDir/home.txt", "local_news_market")}\"")
+        buildConfigField("String", "LOCAL_NEWS_NAME", "\"${credential("$householdDir/home.txt", "local_news_name")}\"")
         buildConfigField("String", "YOUTUBE_CLIENT_ID", "\"${credential(".config/youtube/credentials.txt", "client_id")}\"")
         buildConfigField("String", "YOUTUBE_CLIENT_SECRET", "\"${credential(".config/youtube/credentials.txt", "client_secret")}\"")
+        // Updates: which household's build to fetch, and a read-only token for the private
+        // builds repo. Without the token, SimpleTV doesn't update itself.
+        buildConfigField("String", "HOUSEHOLD", "\"${household.ifEmpty { "home" }}\"")
+        buildConfigField("String", "UPDATE_TOKEN", "\"${secret(".config/simpletv/update_token")}\"")
     }
 
     buildTypes {

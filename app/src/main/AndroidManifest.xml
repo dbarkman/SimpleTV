@@ -18,6 +18,10 @@
     <!-- Holding OK on an app tile hands its removal to Android's own uninstall prompt. -->
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
 
+    <!-- SimpleTV updates itself (Updater.kt). Allowed once over adb:
+         appops set com.redmesastudios.simpletv REQUEST_INSTALL_PACKAGES allow -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
     <!-- Voice search, through the remote's microphone. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
@@ -72,6 +76,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
+
+        <!-- How an update install went, or Android's prompt for it. See Updater.kt. -->
+        <receiver
+            android:name=".UpdateResult"
+            android:exported="false" />
 
         <!-- The remote's extra buttons, system-wide. See RemoteButtons.kt. It runs in its own
              process: every remote press waits on it, so it must never queue behind SimpleTV's

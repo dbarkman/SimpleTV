@@ -223,6 +223,7 @@ fun HomeScreen(
                 onOpenMovies = onOpenMovies,
                 onOpenSearch = onOpenSearch,
                 onOpenSettings = { context.openSystemSettings() },
+                onHoldSettings = { context.openTailscale() },
             )
             Spacer(Modifier.height(20.dp))
             // More slides the next page in from the right, Back slides it out again; when the
@@ -278,6 +279,7 @@ private fun Header(
     onOpenMovies: () -> Unit,
     onOpenSearch: () -> Unit,
     onOpenSettings: () -> Unit,
+    onHoldSettings: () -> Unit,
 ) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
@@ -290,7 +292,7 @@ private fun Header(
                 HeaderButton("Get Apps", Modifier, onOpenApps)
                 HeaderButton("Movies", Modifier.focusRequester(moviesButton), onOpenMovies)
                 HeaderButton("Search", Modifier.focusRequester(searchButton), onOpenSearch)
-                HeaderButton("Settings", Modifier, onOpenSettings)
+                HeaderButton("Settings", Modifier, onOpenSettings, onHold = onHoldSettings)
             }
         }
     }
@@ -298,8 +300,10 @@ private fun Header(
 
 // Quiet by default so they don't compete with the apps; reached by pressing Up.
 @Composable
-private fun HeaderButton(label: String, modifier: Modifier, onClick: () -> Unit) {
+private fun HeaderButton(label: String, modifier: Modifier, onClick: () -> Unit, onHold: (() -> Unit)? = null) {
     var focused by remember { mutableStateOf(false) }
+    // A hold answers once; its repeats and its release are swallowed so the press isn't a click.
+    var held by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(if (focused) 1.07f else 1f, tween(200), label = "headerScale")
     val container by animateColorAsState(if (focused) Ink else Color.Transparent, tween(200), label = "headerColor")
     val content by animateColorAsState(if (focused) OnInk else InkSoft, tween(200), label = "headerText")
@@ -311,6 +315,22 @@ private fun HeaderButton(label: String, modifier: Modifier, onClick: () -> Unit)
             .background(container, CircleShape)
             .border(1.dp, border, CircleShape)
             .onFocusChanged { focused = it.isFocused }
+            .onPreviewKeyEvent { event ->
+                val key = event.nativeKeyEvent
+                when {
+                    onHold == null || key.keyCode !in SelectKeys -> false
+                    held -> {
+                        if (key.action == KeyEvent.ACTION_UP) held = false
+                        true
+                    }
+                    isHoldToRemove(key) -> {
+                        held = true
+                        onHold()
+                        true
+                    }
+                    else -> false
+                }
+            }
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,

@@ -84,6 +84,7 @@ where shown.
 | `~/.config/signalpost/api_key` | SignalPost API key (optional, for news) | SignalPost |
 | `~/.config/simpletv/home.txt` | Your location and local news market | You, see below |
 | `~/.config/simpletv/sync_key` | A random secret shared by your TVs (optional) | `openssl rand -hex 24` |
+| `~/.config/simpletv/update_token` | A read-only GitHub token for your builds repo (optional, for updates) | GitHub, see below |
 
 Keep them private, for example with `chmod 600`. Any feature whose key or setting is
 missing turns itself off and says so on screen.
@@ -153,10 +154,30 @@ adb shell pm grant com.redmesastudios.simpletv android.permission.RECORD_AUDIO
 
 # Your family photos as the TV's screensaver (undo with: settings delete secure screensaver_components)
 adb shell settings put secure screensaver_components com.redmesastudios.simpletv/.PhotoDream
+
+# Updates that install themselves (see Updates below)
+adb shell appops set com.redmesastudios.simpletv REQUEST_INSTALL_PACKAGES allow
 ```
 
 It also helps to set the TV's sleep timer to **Never**. The onn drops off Wi-Fi in
 standby, and adb can't reach it there.
+
+## Updates
+
+SimpleTV can keep itself up to date, even on a TV in another house. `scripts/release.sh`
+builds the app and posts it as a release on a **private** GitHub repo (the APK carries your
+API keys, so never a public one; set `Repo` in `Updater.kt` to yours). Every TV checks
+every 6 hours, downloads a newer build, checks its SHA-256 and installs it over itself
+while the home screen is showing, never in the middle of a show.
+
+The TV reads the repo with a fine-grained GitHub token that can only read that repo's
+contents: put it in `~/.config/simpletv/update_token`. Builds are signed with your
+machine's debug key; a TV only accepts an update signed with the same key.
+
+**Other households.** A TV in another home gets its own build: make a folder such as
+`~/.config/simpletv/grandma/` with its own `home.txt` and `sync_key`, and the release
+builds it too (`./gradlew assembleDebug -Phousehold=grandma` builds just that one). Its
+TVs share with each other, never with yours.
 
 ## Making it yours
 

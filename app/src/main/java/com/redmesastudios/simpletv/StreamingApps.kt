@@ -44,8 +44,9 @@ val StreamingApps = listOf(
 fun installedApps(apps: List<StreamingApp>, isInstalled: (String) -> Boolean): List<StreamingApp> =
     apps.filter { isInstalled(it.packageName) }
 
-// Apps with a place of their own on the home screen (Get Apps, Settings), and SimpleTV itself.
-val NoTile = setOf(BuildConfig.APPLICATION_ID, PlayStorePackage, "com.android.tv.settings")
+// Apps with a place of their own on the home screen (Get Apps, Settings), SimpleTV itself, and
+// Tailscale, our remote way in, kept out of sight so nobody removes it by mistake.
+val NoTile = setOf(BuildConfig.APPLICATION_ID, PlayStorePackage, "com.android.tv.settings", TailscalePackage)
 
 // Every installed TV app (package to label): the known services first in their curated
 // order, then the rest by name.
@@ -83,6 +84,14 @@ fun PackageManager.tvLaunchIntent(packageName: String): Intent? =
 
 fun Context.openSystemSettings() {
     startActivity(Intent(Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+}
+
+const val TailscalePackage = "com.tailscale.ipn"
+
+// Holding OK on Settings opens Tailscale, when it's installed.
+fun Context.openTailscale() {
+    val intent = packageManager.tvLaunchIntent(TailscalePackage) ?: return
+    startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
 }
 
 const val PlayStorePackage = "com.android.vending"
