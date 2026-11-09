@@ -40,7 +40,8 @@ on() { adb -s "$serial" shell "$@" < /dev/null; }
 echo "Stick: $(on getprop ro.product.model), Android $(on getprop ro.build.version.release)"
 
 echo "Installing SimpleTV"
-adb -s "$serial" install -r "$apk" < /dev/null
+# SimpleTV as its own installer: Android then lets it update itself without a prompt.
+adb -s "$serial" install -r -i "$app" "$apk" < /dev/null
 
 echo "Turning on the remote buttons, usage access, voice search, the photo screensaver and updates"
 on settings put secure enabled_accessibility_services "$app/.RemoteButtons"

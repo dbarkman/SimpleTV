@@ -61,7 +61,11 @@ it every 6 hours while the home screen is up, reading it with
 `~/.config/simpletv/update_token`), and installs a newer build of its own
 household over itself once the APK's SHA-256 matches. Installing needs
 `appops set com.redmesastudios.simpletv REQUEST_INSTALL_PACKAGES allow`
-(`setup-stick.sh` does it). Builds are signed with this Mac's debug
+(`setup-stick.sh` does it). Android installs without a prompt only when
+SimpleTV is its own installer of record, so every hand install uses
+`adb install -r -i com.redmesastudios.simpletv`; a plain `adb install`
+leaves no installer and the next update shows an Update prompt once (after
+that SimpleTV is the installer). Builds are signed with this Mac's debug
 keystore, `~/.android/debug.keystore`; losing it means a fresh install on
 every stick. The other household's stick is reached over Tailscale when it
 needs hands-on fixing.
@@ -115,7 +119,7 @@ first use.
 ```bash
 export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 ./gradlew testDebugUnitTest assembleDebug
-adb -s <stick-ip>:5555 install -r app/build/outputs/apk/debug/app-debug.apk
+adb -s <stick-ip>:5555 install -r -i com.redmesastudios.simpletv app/build/outputs/apk/debug/app-debug.apk
 ```
 
 The emulator `SimpleTV_GoogleTV_API36` (Google TV image, 2 GB RAM) is for

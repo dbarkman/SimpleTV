@@ -115,7 +115,7 @@ local_news_name=New York
 ```bash
 export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 ./gradlew testDebugUnitTest assembleDebug
-adb install -r app/build/outputs/apk/debug/app-debug.apk
+adb install -r -i com.redmesastudios.simpletv app/build/outputs/apk/debug/app-debug.apk
 ```
 
 The `JAVA_HOME` path above is for macOS; on Windows or Linux, point it at Android Studio's
@@ -173,6 +173,9 @@ while the home screen is showing, never in the middle of a show.
 The TV reads the repo with a fine-grained GitHub token that can only read that repo's
 contents: put it in `~/.config/simpletv/update_token`. Builds are signed with your
 machine's debug key; a TV only accepts an update signed with the same key.
+Android installs an update without asking only when SimpleTV is its own installer, so
+install it by hand with `-i com.redmesastudios.simpletv` (as above and in
+`scripts/setup-stick.sh`); otherwise the TV shows an Update prompt once.
 
 **Other households.** A TV in another home gets its own build: make a folder such as
 `~/.config/simpletv/grandma/` with its own `home.txt` and `sync_key`, and the release
