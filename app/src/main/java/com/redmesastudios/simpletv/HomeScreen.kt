@@ -109,6 +109,7 @@ fun HomeScreen(
     onOpenSearch: () -> Unit,
     onOpenMovies: () -> Unit,
     onOpenChannel: (Channel) -> Unit,
+    onOpenSettings: () -> Unit,
 ) {
     val context = LocalContext.current
     var installed by remember { mutableStateOf(emptyList<StreamingApp>()) }
@@ -213,18 +214,19 @@ fun HomeScreen(
     }
 
     val sceneDay = rememberSceneDay()
+    val house by HouseSettings.state.collectAsState()
     Box(Modifier.fillMaxSize().background(Ground).onPreviewKeyEvent { answerRemove(it.nativeKeyEvent) }) {
         HomeScene(sceneDay, Modifier.fillMaxSize())
         Column(Modifier.fillMaxSize().padding(start = 60.dp, end = 60.dp, top = 32.dp, bottom = 28.dp)) {
             Header(
                 now = now,
-                greeting = celebrationGreeting(familyDaysOn(sceneDay, FamilyDays)) ?: greetingFor(now.hour),
+                greeting = celebrationGreeting(familyDaysOn(sceneDay, house.familyDays.map { it.day })) ?: greetingFor(now.hour),
                 searchButton = searchButton,
                 moviesButton = moviesButton,
                 onOpenApps = { context.openAppStore() },
                 onOpenMovies = onOpenMovies,
                 onOpenSearch = onOpenSearch,
-                onOpenSettings = { context.openSystemSettings() },
+                onOpenSettings = onOpenSettings,
                 onHoldSettings = { context.openTailscale() },
             )
             Spacer(Modifier.height(20.dp))
@@ -266,7 +268,7 @@ fun HomeScreen(
                 )
             }
             Spacer(Modifier.weight(1f))
-            GlanceCards(glance, glanceCards, onOpenChannel)
+            GlanceCards(glance, glanceCards, onOpenChannel, hidden = house.hiddenCards)
         }
         RemoveAppPrompt(removing, builtIn, removeChoice)
     }

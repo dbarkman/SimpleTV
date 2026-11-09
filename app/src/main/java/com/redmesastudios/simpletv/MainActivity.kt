@@ -31,6 +31,7 @@ private sealed interface Screen {
     data object Movies : Screen
     data object ContinueWatching : Screen
     data object Screensaver : Screen
+    data object Settings : Screen
     data class Info(val channel: Channel) : Screen
     data class Folder(val app: StreamingApp) : Screen
 }
@@ -56,6 +57,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Birthdays, cards and holiday packs, as the household last set them.
+        HouseSettings.load(applicationContext)
         // Continue Watching and the family photos, shared with the household's other sticks.
         Sync.start(applicationContext)
         // A newer SimpleTV installs itself while the home screen is up (Updater.kt).
@@ -103,11 +106,13 @@ class MainActivity : ComponentActivity() {
                             returnFocusTo = glanceFocus(it)
                             screen = Screen.Info(it)
                         },
+                        onOpenSettings = { screen = Screen.Settings },
                     )
                     Screen.Search -> SearchScreen(onClose = { screen = Screen.Home })
                     Screen.Movies -> MoviesScreen(onClose = { screen = Screen.Home })
                     Screen.ContinueWatching -> ContinueWatchingScreen(onClose = { screen = Screen.Home })
                     Screen.Screensaver -> ScreensaverScreen(onClose = { screen = Screen.Home })
+                    Screen.Settings -> SettingsScreen(onClose = { screen = Screen.Home })
                     is Screen.Info -> ChannelScreen(shown.channel, onClose = { screen = Screen.Home })
                     is Screen.Folder -> FolderScreen(shown.app, onClose = { screen = Screen.Home })
                 }

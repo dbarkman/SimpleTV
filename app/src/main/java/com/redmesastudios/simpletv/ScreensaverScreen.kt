@@ -263,7 +263,7 @@ private fun AddPhotos(count: Int, onChange: () -> Unit) {
 }
 
 @Composable
-private fun QrCode(text: String, modifier: Modifier) {
+internal fun QrCode(text: String, modifier: Modifier) {
     val matrix = remember(text) {
         QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, 0, 0, mapOf(EncodeHintType.MARGIN to 1))
     }

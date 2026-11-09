@@ -92,6 +92,8 @@ dependencies {
     // QR codes for the photo upload page.
     implementation(libs.zxing.core)
     testImplementation(libs.junit)
+    // Android's org.json is a stub off the device; the real one lets tests read records.
+    testImplementation("org.json:json:20240303")
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.test.manifest)

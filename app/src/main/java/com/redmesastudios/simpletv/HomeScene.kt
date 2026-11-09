@@ -57,19 +57,21 @@ fun rememberSceneDay(): LocalDate {
 }
 
 // The holidays with a scene so far; the others leave their days to these.
-val DrawnHolidays = setOf(Holiday.Halloween, Holiday.ElectionDay, Holiday.Thanksgiving)
+val DrawnHolidays = setOf(Holiday.Halloween, Holiday.ElectionDay, Holiday.Thanksgiving, Holiday.Christmas)
 
 // The backdrop: hills, trees at the edges and something drifting down, all in the season's
 // colors, dressed up for a family birthday or anniversary or whichever holiday is on.
 @Composable
 fun HomeScene(day: LocalDate = rememberSceneDay(), modifier: Modifier = Modifier) {
-    val season = seasonOn(day)
+    val house by HouseSettings.state.collectAsState()
+    val family = familyDaysOn(day, house.familyDays.map { it.day })
+    val holiday = if (family.isEmpty()) holidayOn(day, house.packs, DrawnHolidays) else null
+    // Christmas brings the snow, even in the weeks before winter starts.
+    val season = if (holiday == Holiday.Christmas) Season.Winter else seasonOn(day)
     val look = SeasonLooks.getValue(season)
     val drifting = remember(season) { fallingLeaves(look.driftingCount) }
     val resting = remember { restingLeaves(RestingLeafCount) }
     val seconds = rememberSceneClock()
-    val family = familyDaysOn(day, FamilyDays)
-    val holiday = if (family.isEmpty()) holidayOn(day, HolidayPacks, DrawnHolidays) else null
     val anniversary = family.isNotEmpty() && family.none { it.kind == FamilyDayKind.Birthday }
 
     Box(modifier) {
@@ -89,6 +91,7 @@ fun HomeScene(day: LocalDate = rememberSceneDay(), modifier: Modifier = Modifier
                 Holiday.Halloween -> drawHalloweenFigures(unit, now)
                 Holiday.ElectionDay -> drawElectionFigures(unit, now)
                 Holiday.Thanksgiving -> drawThanksgivingFigures(unit, now)
+                Holiday.Christmas -> drawChristmasFigures(unit, now)
                 else -> {}
             }
             if (family.isNotEmpty()) drawCelebration(unit, now, anniversary)

@@ -102,8 +102,11 @@ local_news_name=New York
 holiday_packs=us,christian,world,fun,seasons
 ```
 
-**`birthdays.txt`** (optional, next to `home.txt`) lists family birthdays and anniversaries.
-On the day, the greeting wishes them well and balloons go up:
+**`birthdays.txt`** (optional, next to `home.txt`) starts the list of family birthdays and
+anniversaries. On the day, the greeting wishes them well and balloons go up. After that,
+the TV's **Settings** button shows a QR code for a page on your phone where you add or
+remove birthdays, hide At a glance cards and pick holiday decorations; the TVs in a home
+share those settings.
 
 ```
 01-27 birthday Alex

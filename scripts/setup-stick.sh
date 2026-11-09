@@ -50,6 +50,20 @@ on appops set "$app" GET_USAGE_STATS allow
 on pm grant "$app" android.permission.RECORD_AUDIO
 on settings put secure screensaver_components "$app/.PhotoDream"
 on appops set "$app" REQUEST_INSTALL_PACKAGES allow
+# The screensaver needs Developer options' "Stay awake" off; sleep stays off so the slideshow
+# keeps running until the TV goes off.
+on settings put global stay_on_while_plugged_in 0
+on settings put secure sleep_timeout -1
+
+# Tailscale, if it's installed for remote help: it starts its tunnel at every boot (always-on
+# VPN; lockdown stays off, so the internet works without it), and Android never stops it
+# for sitting idle. Neither touches the home network's own traffic.
+if on pm list packages com.tailscale.ipn | grep -q tailscale; then
+  echo "Keeping Tailscale connected"
+  on settings put secure always_on_vpn_app com.tailscale.ipn
+  on settings put secure always_on_vpn_lockdown 0
+  on dumpsys deviceidle whitelist +com.tailscale.ipn > /dev/null
+fi
 
 # Last, because the stick can drop off Wi-Fi when its home screen changes. If it does,
 # wake it and run this script again; every step is safe to repeat.

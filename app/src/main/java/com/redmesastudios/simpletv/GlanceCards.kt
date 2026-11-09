@@ -57,28 +57,28 @@ private val CardShape = RoundedCornerShape(10.dp)
 private val LabelStyle = SimpleTVType.hint.copy(fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
 private val MainStyle = SimpleTVType.serviceName.copy(fontSize = 14.sp, lineHeight = 17.sp)
 
-// At a glance: weather, news and markets along the bottom of the home screen. Each
-// card fades to its new reading when it changes, and opens its channel page.
+// At a glance: weather, news and markets along the bottom of the home screen, less any the
+// household hid from its settings page. Each card fades to its new reading when it changes, and opens its channel page.
 @Composable
-fun GlanceCards(glance: Glance, focus: Map<Channel, FocusRequester>, onOpen: (Channel) -> Unit) {
+fun GlanceCards(glance: Glance, focus: Map<Channel, FocusRequester>, onOpen: (Channel) -> Unit, hidden: Set<Channel> = emptySet()) {
     Column {
         Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
             val weather = glance.weather
-            GlanceCard(
+            if (Channel.Weather !in hidden) GlanceCard(
                 focus = focus.getValue(Channel.Weather),
                 onOpen = { onOpen(Channel.Weather) },
                 label = weather?.let { "Weather · ${it.place}" } ?: "Weather",
                 main = weather?.let { "${it.temperature}° · ${it.summary}" } ?: if (Home.hasWeather) "Checking the forecast…" else "Set your location to see the weather",
                 icon = { if (weather != null && isClear(weather.summary)) drawSun() else drawCloud() },
             )
-            GlanceCard(
+            if (Channel.News !in hidden) GlanceCard(
                 focus = focus.getValue(Channel.News),
                 onOpen = { onOpen(Channel.News) },
                 label = "News",
                 main = glance.news ?: if (Home.hasNews) "Checking the news…" else "Add a SignalPost key to see the news",
                 icon = { drawNewspaper() },
             )
-            GlanceCard(
+            if (Channel.Markets !in hidden) GlanceCard(
                 focus = focus.getValue(Channel.Markets),
                 onOpen = { onOpen(Channel.Markets) },
                 label = "Markets",

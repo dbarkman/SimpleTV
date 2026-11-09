@@ -41,8 +41,18 @@ adb shell pm disable-user --user 0 com.google.android.tungsten.setupwraith
 
 `pm enable <package>` on the same two packages restores the stock home. An
 OTA update may re-enable them. Back on the home screen does nothing, and the
-Settings button opens Android settings; holding OK on it for 1.5 s opens
-Tailscale, which has no tile so nobody removes it by mistake.
+Settings button opens SimpleTV's Settings screen (the phone settings page's QR
+code, and a TV settings button for Android's); holding OK on it for 1.5 s opens
+Tailscale, which has no tile so nobody removes it by mistake. The remote's own
+settings button still opens Android settings.
+
+On a stick with Tailscale, `setup-stick.sh` sets it as the always-on VPN (lockdown
+off) and adds it to the device-idle allowlist; without both, a reboot leaves the
+tunnel down (Android starts it, then stops it for being idle). Anything that shows
+a phone address uses `localAddress()`, which skips VPNs: with Tailscale up, the
+active network is the tunnel, whose 100.x address phones on the Wi-Fi can't reach.
+Ports: 8723 photo upload, 8724 sync, 8725 Trivia Night, 8726 Imposter, 8727
+settings.
 
 ## Households and updates
 
@@ -147,7 +157,17 @@ source of truth.
   settings page instead, where they can be turned off.
 - `Glance.kt` / `GlanceCards.kt` — the At a glance cards: weather, news count and
   markets, refreshed at most every 15 minutes while the home screen is up.
-  Each card opens its channel page.
+  Each card opens its channel page; the household can hide any of them.
+- `HouseSettings.kt` / `SettingsServer.kt` / `SettingsScreen.kt` — the
+  household's settings: birthdays and anniversaries, hidden At a glance cards
+  and holiday packs. They're records in the shared box (collection `house`),
+  so they spread between the household's sticks with Sync, newest change per
+  record winning; a removal is a record too. `birthdays.txt` seeds the list:
+  each line becomes a record with a fixed id dated 0, added only where that id
+  is new, so phone edits stick and lines added later still arrive. The
+  Settings screen runs a small web server (only while it shows) with a QR code
+  and a four-digit code; the phone page edits everything and each change
+  saves at once.
 - `ChannelData.kt` / `ChannelScreens.kt` — the channel pages: Weather (now, NWS
   alerts, 6 days; Down selects a day and OK opens it: the forecaster's words for
   the day and night, rain chance, wind and every third hour's temperature,
@@ -207,20 +227,24 @@ source of truth.
   dates java.time's Umm al-Qura `HijrahDate`, seasons Meeus's equinox
   formulas; Lunar New Year and the Hindu dates are tables, to extend as years
   are published. Tests check them against the macOS calendars.
-- `FamilyDays.kt` — birthdays and anniversaries from the household's
-  `birthdays.txt` (never in the repo). On the day the greeting becomes "Happy
-  birthday, <name>!" and the scene celebrates instead of any holiday.
+- `FamilyDays.kt` — birthdays and anniversaries (from `HouseSettings`; the
+  household's `birthdays.txt`, never in the repo, seeds them). On the day the
+  greeting becomes "Happy birthday, <name>!" and the scene celebrates instead of
+  any holiday.
 - `Holidays.kt` — the decorations' motion, pure math in design px.
 - `HalloweenScene.kt` / `ElectionScene.kt` / `ThanksgivingScene.kt` /
-  `CelebrationScene.kt` — the drawn scenes. Halloween (Oct 24 – Nov 1):
+  `ChristmasScene.kt` / `CelebrationScene.kt` — the drawn scenes. Halloween (Oct 24 – Nov 1):
   harvest moon, bats, graveyard, hay bale with a black cat, corn stalks,
   jack-o'-lanterns, a ghost, a skeleton and a mummy walking by. Election Day
   (Nov 2 through Election Day): bunting, a waving flag, a ballot box, a VOTE
   sign, balloons and Uncle Sam marching by. Thanksgiving (day after Election
   Day through Thanksgiving): corn stalks, a hay bale with pumpkins and
   gourds, a cornucopia, and a turkey strutting by that stops to fan its
-  tail. Celebration: bunting, rising balloons (hearts for an anniversary),
-  a cake with flickering candles and presents.
+  tail. Christmas (Saturday after Thanksgiving through Dec 30, always on the
+  winter backdrop): twinkling string lights, a decorated tree with a glowing
+  star and presents, a waving snowman, and Santa's sleigh crossing under the
+  lights now and then. Celebration: bunting, rising balloons (hearts for an
+  anniversary), a cake with flickering candles and presents.
 - `AppArt.kt` — each app's own TV banner (its logo artwork), decoded at tile
   size; apps without one get their icon and name on a warm color.
 - `HomeScene.kt` / `FallingLeaves.kt` — the backdrop behind every screen

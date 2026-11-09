@@ -3,8 +3,9 @@ package com.redmesastudios.simpletv
 import java.time.LocalDate
 import java.time.MonthDay
 
-// The household's birthdays and anniversaries, from birthdays.txt in its settings folder
-// (BuildConfig.FAMILY_DAYS). On the day, the greeting wishes them well and the scene
+// The household's birthdays and anniversaries: birthdays.txt in its settings folder
+// (BuildConfig.FAMILY_DAYS) seeds them, and the phone settings page changes them
+// (HouseSettings.kt). On the day, the greeting wishes them well and the scene
 // celebrates, whatever holiday is on. Lines are "MM-DD birthday Name" or
 // "MM-DD anniversary Name & Name"; # starts a comment.
 
@@ -47,6 +48,3 @@ private fun joinNames(names: List<String>): String = when (names.size) {
     2 -> "${names[0]} and ${names[1]}"
     else -> names.dropLast(1).joinToString(", ") + " and " + names.last()
 }
-
-val FamilyDays: List<FamilyDay> by lazy { parseFamilyDays(BuildConfig.FAMILY_DAYS) }
-val HolidayPacks: Set<Pack> by lazy { parsePacks(BuildConfig.HOLIDAY_PACKS) }

@@ -50,6 +50,7 @@ object SharedRecords {
             val temp = File(file.parentFile, "$name.json.tmp")
             temp.writeText(sharedToJson(merged).toString())
             temp.renameTo(file)
+            if (name == HouseCollection) HouseSettings.refresh(context)
         }
         merged to changed
     }
