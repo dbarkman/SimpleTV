@@ -278,8 +278,11 @@ the previous close.
 
 ## Rules
 
-- Debloating uses `pm uninstall --user 0` (reversible with
-  `cmd package install-existing <pkg>`). Never remove Google services, the
+- Debloating uses `pm uninstall --user 0`. For apps that came with the stick
+  it's reversible with `cmd package install-existing <pkg>`; apps in
+  `pm list packages -3` (Play-installed, such as Philo or Tubi) are removed
+  outright and come back only from the Play Store, so ask before removing one.
+  Never remove Google services, the
   Play Store, `com.google.android.katniss` (voice remote),
   `com.netflix.tokenmanager`, or `com.google.android.tungsten.setupwraith`
   (it stays installed, only disabled).
