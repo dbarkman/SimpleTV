@@ -57,7 +57,7 @@ fun rememberSceneDay(): LocalDate {
 }
 
 // The holidays with a scene so far; the others leave their days to these.
-val DrawnHolidays = setOf(Holiday.Halloween, Holiday.ElectionDay, Holiday.Thanksgiving, Holiday.Christmas)
+val DrawnHolidays = setOf(Holiday.Halloween, Holiday.ElectionDay, Holiday.VeteransDay, Holiday.Thanksgiving, Holiday.Christmas)
 
 // The backdrop: hills, trees at the edges and something drifting down, all in the season's
 // colors, dressed up for a family birthday or anniversary or whichever holiday is on.
@@ -90,6 +90,7 @@ fun HomeScene(day: LocalDate = rememberSceneDay(), modifier: Modifier = Modifier
             when (holiday) {
                 Holiday.Halloween -> drawHalloweenFigures(unit, now)
                 Holiday.ElectionDay -> drawElectionFigures(unit, now)
+                Holiday.VeteransDay -> drawVeteransDayFigures(unit, now)
                 Holiday.Thanksgiving -> drawThanksgivingFigures(unit, now)
                 Holiday.Christmas -> drawChristmasFigures(unit, now)
                 else -> {}

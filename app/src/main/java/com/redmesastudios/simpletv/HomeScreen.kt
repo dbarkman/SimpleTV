@@ -220,7 +220,9 @@ fun HomeScreen(
         Column(Modifier.fillMaxSize().padding(start = 60.dp, end = 60.dp, top = 32.dp, bottom = 28.dp)) {
             Header(
                 now = now,
-                greeting = celebrationGreeting(familyDaysOn(sceneDay, house.familyDays.map { it.day })) ?: greetingFor(now.hour),
+                greeting = celebrationGreeting(familyDaysOn(sceneDay, house.familyDays.map { it.day }))
+                    ?: holidayGreeting(holidayOn(sceneDay, house.packs, DrawnHolidays))
+                    ?: greetingFor(now.hour),
                 searchButton = searchButton,
                 moviesButton = moviesButton,
                 onOpenApps = { context.openAppStore() },

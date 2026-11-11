@@ -232,15 +232,18 @@ source of truth.
   greeting becomes "Happy birthday, <name>!" and the scene celebrates instead of
   any holiday.
 - `Holidays.kt` — the decorations' motion, pure math in design px.
-- `HalloweenScene.kt` / `ElectionScene.kt` / `ThanksgivingScene.kt` /
-  `ChristmasScene.kt` / `CelebrationScene.kt` — the drawn scenes. Halloween (Oct 24 – Nov 1):
+- `HalloweenScene.kt` / `ElectionScene.kt` / `VeteransDayScene.kt` /
+  `ThanksgivingScene.kt` / `ChristmasScene.kt` / `CelebrationScene.kt` — the drawn scenes. Halloween (Oct 24 – Nov 1):
   harvest moon, bats, graveyard, hay bale with a black cat, corn stalks,
   jack-o'-lanterns, a ghost, a skeleton and a mummy walking by. Election Day
   (Nov 2 through Election Day): bunting, a waving flag, a ballot box, a VOTE
   sign, balloons and Uncle Sam marching by. Thanksgiving (day after Election
   Day through Thanksgiving): corn stalks, a hay bale with pumpkins and
   gourds, a cornucopia, and a turkey strutting by that stops to fan its
-  tail. Christmas (Saturday after Thanksgiving through Dec 30, always on the
+  tail. Veterans Day (Nov 11, inside Thanksgiving's stretch; the greeting
+  says "Thank you, veterans"): a tall waving flag, rows of small flags along the
+  hill, a wreath on an easel, twinkling stars, and a bald eagle gliding across
+  now and then. Christmas (Saturday after Thanksgiving through Dec 30, always on the
   winter backdrop): twinkling string lights, a decorated tree with a glowing
   star and presents, a waving snowman, and Santa's sleigh crossing under the
   lights now and then. Celebration: bunting, rising balloons (hearts for an

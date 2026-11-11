@@ -73,7 +73,7 @@ private fun starPath(center: Offset, radius: Float, rotation: Float = 0f) = Path
 }
 
 // A small gold star that slowly swells and fades.
-private fun DrawScope.drawTwinkle(x: Float, y: Float, seconds: Float, index: Int) {
+internal fun DrawScope.drawTwinkle(x: Float, y: Float, seconds: Float, index: Int) {
     val pulse = 0.5f + 0.5f * sin(seconds * 1.6f + index * 1.7f)
     drawPath(starPath(Offset(x, y), 7f + 3f * pulse, rotation = 0.15f * sin(seconds * 0.7f + index)), StarGold, alpha = 0.45f + 0.5f * pulse)
 }
@@ -124,17 +124,18 @@ private fun DrawScope.drawRosette(center: Offset) {
     drawCircle(FlagRed, 5f, center)
 }
 
-// A flag on a pole, rippling: drawn in narrow strips, each lifted by a wave that grows
-// toward the loose end, with a little shading in the folds.
-private fun DrawScope.drawFlagpole(seconds: Float) {
-    val top = 664f
-    drawLine(PoleColor, Offset(FlagX, FlagBaseY), Offset(FlagX, top), strokeWidth = 5f, cap = StrokeCap.Round)
-    drawOval(PoleColor, Offset(FlagX - 12f, FlagBaseY - 4f), Size(24f, 8f), alpha = 0.6f)
+private fun DrawScope.drawFlagpole(seconds: Float) = drawWavingFlag(FlagX, FlagBaseY, 664f, FlagWidth, seconds)
 
-    val left = FlagX + 3f
+// A flag on a pole, rippling: drawn in narrow strips, each lifted by a wave that grows
+// toward the loose end, with a little shading in the folds. The flag is width wide and
+// about 0.6 of that tall; the pole runs from baseY up to top, with a gold ball.
+internal fun DrawScope.drawWavingFlag(poleX: Float, baseY: Float, top: Float, width: Float, seconds: Float) {
+    drawLine(PoleColor, Offset(poleX, baseY), Offset(poleX, top), strokeWidth = 5f * width / FlagWidth, cap = StrokeCap.Round)
+    drawOval(PoleColor, Offset(poleX - 12f, baseY - 4f), Size(24f, 8f), alpha = 0.6f)
+
+    val left = poleX + 3f
     val flagTop = top + 10f
-    val width = FlagWidth
-    val height = 58f
+    val height = width * 58f / FlagWidth
     val strips = 24
     val stripWidth = width / strips
     val stripes = 13
@@ -156,15 +157,16 @@ private fun DrawScope.drawFlagpole(seconds: Float) {
         drawRect(Color.Black, Offset(x, flagTop + lift), Size(stripWidth + 0.6f, height), alpha = 0.07f * (1f + cos(phase)))
     }
     // Stars in the canton, riding the same wave.
+    val k = width / FlagWidth
     repeat(3) { row ->
         repeat(4) { col ->
-            val x = left + 5f + col * 9.5f
+            val x = left + (5f + col * 9.5f) * k
             val along = (x - left) / width
             val lift = 5f * along * sin(along * 5f - seconds * 3.2f)
-            drawCircle(FlagWhite, 1.6f, Offset(x, flagTop + 5f + row * 9.5f + lift))
+            drawCircle(FlagWhite, 1.6f * k, Offset(x, flagTop + (5f + row * 9.5f) * k + lift))
         }
     }
-    drawCircle(StarGold, 7f, Offset(FlagX, top - 2f))
+    drawCircle(StarGold, 7f * k, Offset(poleX, top - 2f))
 }
 
 // A ballot box; every so often a ballot with a check mark slides down into the slot.
@@ -249,7 +251,7 @@ private fun DrawScope.drawBalloons(x: Float, baseY: Float, seconds: Float) {
 }
 
 // A little hand flag stuck in the grass.
-private fun DrawScope.drawHandFlag(x: Float, baseY: Float, seconds: Float, phase: Float) {
+internal fun DrawScope.drawHandFlag(x: Float, baseY: Float, seconds: Float, phase: Float) {
     val top = baseY - 62f
     drawLine(StakeColor, Offset(x, baseY), Offset(x, top), strokeWidth = 3f, cap = StrokeCap.Round)
     val w = 34f
