@@ -233,8 +233,10 @@ source of truth.
   any holiday.
 - `Holidays.kt` — the decorations' motion, pure math in design px.
 - `NewYearScene.kt` / `EpiphanyScene.kt` / `MlkDayScene.kt` / `PopcornDayScene.kt` /
-  `GroundhogDayScene.kt` / `LunarNewYearScene.kt` / `ValentinesScene.kt` /
-  `GameDayScene.kt` / `PresidentsDayScene.kt` / `HalloweenScene.kt` /
+  `GroundhogDayScene.kt` / `LunarNewYearScene.kt` / `PizzaDayScene.kt` /
+  `AshWednesdayScene.kt` / `ValentinesScene.kt` / `GameDayScene.kt` /
+  `PresidentsDayScene.kt` / `PiDayScene.kt` / `StPatricksScene.kt` /
+  `SpringDayScene.kt` / `AprilFoolsScene.kt` / `HalloweenScene.kt` /
   `ElectionScene.kt` / `VeteransDayScene.kt` / `ThanksgivingScene.kt` /
   `ChristmasScene.kt` / `CelebrationScene.kt` — the drawn scenes. New Year's (Dec 31 –
   Jan 1; "Happy New Year!"): a marquee sign with the coming year in chasing lights,
@@ -252,7 +254,18 @@ source of truth.
   hearts rising off the hill, a mailbox with a letter, roses, a "BE MINE" candy heart
   and two lovebirds leaning in. Presidents' Day ("Happy Presidents' Day"): a log cabin
   with chimney smoke, a cherry tree, a waving flag with small flags, and a tricorn and a
-  stovepipe hat on a bench. Game day (the second Sunday of February,
+  stovepipe hat on a bench. Pizza Day (Feb 9; "Happy Pizza Day!"): a steaming pepperoni
+  pizza on a board whose slice lifts out with stretching cheese, pizza boxes and a
+  parmesan shaker. Ash Wednesday (no greeting): a quiet white chapel with lit windows and
+  a swinging bell, bare shrubs and candles. Pi Day (Mar 14; "Happy Pi Day!"): a pie with a
+  π in its crust, the digits of pi scrolling along a ribbon, and a compass drawing circles
+  on a chalkboard. St. Patrick's (Mar 14–17; "Happy St. Patrick's Day!" on the 17th only;
+  its own all-green backdrop with nothing drifting, whatever the season): a rainbow down
+  to a pot of gold, a shamrock garland, shamrocks in the grass and a green hat on a stump.
+  First day of spring ("Hello, spring!"): tulips and daffodils, a birdhouse with a robin
+  popping out, and butterflies. April Fools ("Happy April Fools' Day!"): a jack-in-the-box
+  that cranks and pops, an upside-down APRIL FOOLS! sign, a banana peel and a whoopee
+  cushion. Game day (the second Sunday of February,
   `Holiday.SuperBowl`; "Happy game day!"; no team or league marks): a football kicked
   from its tee through goalposts now and then, a scoreboard whose home score goes up 3
   per kick, a "GO TEAM!" pennant and a bowl of chips. Halloween (Oct 24 – Nov 1):
@@ -292,7 +305,7 @@ source of truth.
   rest by name. Settings, the Play Store (Get Apps) and SimpleTV itself get no
   tile. Launches via the leanback launch intent.
 - `Greeting.kt` — greeting by hour, and the words some holidays use instead
-  (`holidayGreeting`, which takes the date for Valentine's).
+  (`holidayGreeting`, which takes the date for Valentine's and St. Patrick's).
 - `ui/theme/` — Fall palette and Manrope type (bundled variable font in
   `res/font`, OFL licence in `FONT-LICENSE-OFL.txt`). Text sizes are the design's
   px values halved.

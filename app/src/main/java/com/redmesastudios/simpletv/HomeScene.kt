@@ -65,8 +65,9 @@ fun HomeScene(day: LocalDate = rememberSceneDay(), modifier: Modifier = Modifier
     val holiday = if (family.isEmpty()) holidayOn(day, house.packs, DrawnHolidays) else null
     // Christmas brings the snow, even in the weeks before winter starts.
     val season = if (holiday == Holiday.Christmas) Season.Winter else seasonOn(day)
-    val look = SeasonLooks.getValue(season)
-    val drifting = remember(season) { fallingLeaves(look.driftingCount) }
+    // St. Patrick's gets its own all-green backdrop with nothing drifting, whatever the season.
+    val look = if (holiday == Holiday.StPatricks) EmeraldLook else SeasonLooks.getValue(season)
+    val drifting = remember(look) { fallingLeaves(look.driftingCount) }
     val resting = remember { restingLeaves(RestingLeafCount) }
     val seconds = rememberSceneClock()
     val anniversary = family.isNotEmpty() && family.none { it.kind == FamilyDayKind.Birthday }
@@ -100,6 +101,12 @@ fun HomeScene(day: LocalDate = rememberSceneDay(), modifier: Modifier = Modifier
                 Holiday.LunarNewYear -> drawLunarNewYearFigures(unit, now)
                 Holiday.PopcornDay -> drawPopcornDayFigures(unit, now)
                 Holiday.GroundhogDay -> drawGroundhogDayFigures(unit, now)
+                Holiday.PizzaDay -> drawPizzaDayFigures(unit, now)
+                Holiday.AshWednesday -> drawAshWednesdayFigures(unit, now)
+                Holiday.PiDay -> drawPiDayFigures(unit, now)
+                Holiday.StPatricks -> drawStPatricksFigures(unit, now)
+                Holiday.FirstDayOfSpring -> drawSpringDayFigures(unit, now)
+                Holiday.AprilFools -> drawAprilFoolsFigures(unit, now)
                 else -> {}
             }
             if (family.isNotEmpty()) drawCelebration(unit, now, anniversary)
@@ -135,6 +142,13 @@ private class SeasonLook(
     val veins: Boolean,
     // Snow on the tree crowns.
     val snowCaps: Boolean = false,
+)
+
+private val EmeraldLook = SeasonLook(
+    hillFar = Color(0xFFDCE8C8), hillNear = Color(0xFFC9DDAE), trunk = Color(0xFFA48A72),
+    crowns = listOf(Color(0xFF9CC98A), Color(0xFFB1D69C), Color(0xFF86B977)),
+    drifting = Drifting.Leaves, driftingCount = 0, driftingScale = 1f,
+    driftingColors = listOf(Color(0xFF86B977)), restingColors = null, veins = false,
 )
 
 private val SeasonLooks = mapOf(

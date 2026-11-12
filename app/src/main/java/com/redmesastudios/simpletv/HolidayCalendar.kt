@@ -111,6 +111,7 @@ enum class Holiday(val pack: Pack) {
 val DrawnHolidays = setOf(
     Holiday.NewYear, Holiday.MlkDay, Holiday.SuperBowl, Holiday.Valentines, Holiday.PresidentsDay,
     Holiday.Epiphany, Holiday.LunarNewYear, Holiday.PopcornDay, Holiday.GroundhogDay,
+    Holiday.StPatricks, Holiday.AshWednesday, Holiday.PizzaDay, Holiday.PiDay, Holiday.AprilFools, Holiday.FirstDayOfSpring,
     Holiday.Halloween, Holiday.ElectionDay, Holiday.VeteransDay, Holiday.Thanksgiving, Holiday.Christmas,
 )
 

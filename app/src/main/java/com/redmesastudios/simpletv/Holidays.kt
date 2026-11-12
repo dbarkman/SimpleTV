@@ -325,3 +325,76 @@ fun RisingHeart.poseAt(seconds: Float): HeartPose {
     }
     return HeartPose(x + 14f * sin(2 * PI * p * 2 + colorIndex).toFloat(), HeartStartY - p * HeartRise, alpha)
 }
+
+// Pizza Day: a slice is lifted out of the pie and set back, its cheese stretching as it
+// goes. 0 is in the pie, 1 is lifted all the way; it eases out, holds, and eases back.
+const val SliceCycleSeconds = 9f
+
+fun sliceLift(seconds: Float): Float {
+    val t = seconds % SliceCycleSeconds
+    fun ease(p: Float) = p * p * (3f - 2f * p)
+    return when {
+        t < 3f -> 0f
+        t < 4.6f -> ease((t - 3f) / 1.6f)
+        t < 6.4f -> 1f
+        t < 8f -> 1f - ease((t - 6.4f) / 1.6f)
+        else -> 0f
+    }
+}
+
+// Pi Day: the digits of pi running along a ribbon. How far they've scrolled, in px.
+const val PiDigits = "3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196"
+const val PiScrollSpeed = 40f
+
+fun piScroll(seconds: Float, length: Float): Float = (seconds * PiScrollSpeed) % length
+
+// A butterfly fluttering across for the first day of spring: drifting along a loose wave,
+// its wings opening and closing. Null while it's off-screen.
+data class Butterfly(val cycleSeconds: Float, val flightSeconds: Float, val offsetSeconds: Float, val y: Float, val leftToRight: Boolean, val colorIndex: Int)
+
+// open: how far the wings are spread, 0.15 (nearly shut) to 1.
+data class ButterflyPose(val x: Float, val y: Float, val open: Float, val leftToRight: Boolean)
+
+fun Butterfly.poseAt(seconds: Float): ButterflyPose? {
+    val t = (seconds + offsetSeconds) % cycleSeconds
+    if (t > flightSeconds) return null
+    val p = t / flightSeconds
+    val across = -BatMargin + p * (SceneWidth + 2 * BatMargin)
+    return ButterflyPose(
+        x = if (leftToRight) across else SceneWidth - across,
+        y = y + 34f * sin(2 * PI * p * 2.5).toFloat() + 10f * sin(2 * PI * t * 0.9).toFloat(),
+        open = 0.15f + 0.85f * kotlin.math.abs(sin(2 * PI * t * 2.2).toFloat()),
+        leftToRight = leftToRight,
+    )
+}
+
+val Butterflies = listOf(
+    Butterfly(cycleSeconds = 30f, flightSeconds = 22f, offsetSeconds = 0f, y = 760f, leftToRight = true, colorIndex = 0),
+    Butterfly(cycleSeconds = 36f, flightSeconds = 26f, offsetSeconds = 14f, y = 720f, leftToRight = false, colorIndex = 1),
+    Butterfly(cycleSeconds = 42f, flightSeconds = 24f, offsetSeconds = 25f, y = 790f, leftToRight = true, colorIndex = 2),
+)
+
+// April Fools: a jack-in-the-box. The crank turns, the lid flies open and the clown springs
+// up, bobbing on its spring as it settles, then sinks back and the lid closes. pop is how
+// far the clown is up (overshooting a little past 1 on the way), lid how far open (0 to 1).
+data class JackPose(val crankDegrees: Float, val lid: Float, val pop: Float)
+
+const val JackCycleSeconds = 12f
+
+fun jackAt(seconds: Float): JackPose {
+    val t = seconds % JackCycleSeconds
+    return when {
+        t < 4f -> JackPose(crankDegrees = t * 180f, lid = 0f, pop = 0f)
+        t < 8f -> {
+            val u = t - 4f
+            // A damped bounce settling at 1.
+            val pop = 1f - kotlin.math.exp(-3.5f * u) * kotlin.math.cos(9f * u)
+            JackPose(crankDegrees = 720f, lid = minOf(1f, u / 0.15f), pop = pop)
+        }
+        t < 9.5f -> {
+            val u = (t - 8f) / 1.5f
+            JackPose(crankDegrees = 720f, lid = 1f - maxOf(0f, (u - 0.6f) / 0.4f), pop = 1f - u)
+        }
+        else -> JackPose(crankDegrees = 720f, lid = 0f, pop = 0f)
+    }
+}

@@ -99,7 +99,7 @@ class HolidaysAndGlanceTest {
         // Lunar New Year (Feb 6-8, 2027) wins its days inside Valentine's week.
         assertEquals(Holiday.LunarNewYear, on("2027-02-06"))
         assertEquals(Holiday.LunarNewYear, on("2027-02-08"))
-        assertEquals(Holiday.Valentines, on("2027-02-09"))
+        assertEquals(Holiday.Valentines, on("2027-02-12"))
         assertEquals(Holiday.Valentines, on("2027-02-13"))
         assertEquals(Holiday.PresidentsDay, on("2027-02-15"))
         assertEquals(Holiday.Valentines, on("2028-02-14"))
@@ -107,6 +107,68 @@ class HolidaysAndGlanceTest {
         assertNull(greeting("2027-02-10"))
         assertEquals("Happy Groundhog Day!", greeting("2027-02-02"))
         assertEquals("Happy Lunar New Year!", greeting("2027-02-07"))
+    }
+
+    @Test
+    fun februaryToAprilScenesShowOnTheirDays() {
+        fun on(text: String) = holidayOn(LocalDate.parse(text), DefaultPacks, DrawnHolidays, zone)
+        fun greeting(text: String) = holidayGreeting(on(text), LocalDate.parse(text))
+        assertEquals(Holiday.PizzaDay, on("2027-02-09"))
+        assertEquals("Happy Pizza Day!", greeting("2027-02-09"))
+        // Easter 2027 is March 28th, so Lent starts February 10th, inside Valentine's week.
+        assertEquals(Holiday.AshWednesday, on("2027-02-10"))
+        assertNull(greeting("2027-02-10"))
+        assertEquals(Holiday.Valentines, on("2027-02-11"))
+        // Pi Day takes the first day of St. Patrick's stretch.
+        assertEquals(Holiday.PiDay, on("2027-03-14"))
+        assertEquals(Holiday.StPatricks, on("2027-03-15"))
+        assertNull(greeting("2027-03-16"))
+        assertEquals("Happy St. Patrick's Day!", greeting("2027-03-17"))
+        assertEquals(Holiday.FirstDayOfSpring, on(seasonStart(2027, Season.Spring, zone).toString()))
+        assertEquals("Hello, spring!", greeting(seasonStart(2027, Season.Spring, zone).toString()))
+        assertEquals(Holiday.AprilFools, on("2027-04-01"))
+    }
+
+    @Test
+    fun sliceLiftsHoldsAndSettlesBack() {
+        assertEquals(0f, sliceLift(1f))
+        assertTrue(sliceLift(3.8f) in 0.1f..0.9f)
+        assertEquals(1f, sliceLift(5f))
+        assertTrue(sliceLift(7.2f) in 0.1f..0.9f)
+        assertEquals(0f, sliceLift(8.5f))
+        assertEquals(1f, sliceLift(SliceCycleSeconds + 5f))
+    }
+
+    @Test
+    fun piDigitsStartRightAndScrollAround() {
+        assertTrue(PiDigits.startsWith("3.14159265358979"))
+        assertEquals(0f, piScroll(0f, 1000f))
+        assertEquals(400f, piScroll(10f, 1000f), 0.01f)
+        assertEquals(200f, piScroll(30f, 1000f), 0.01f)
+    }
+
+    @Test
+    fun butterflyFlutterCrossesAndRests() {
+        val b = Butterfly(cycleSeconds = 30f, flightSeconds = 20f, offsetSeconds = 0f, y = 760f, leftToRight = true, colorIndex = 0)
+        assertTrue(b.poseAt(0f)!!.x < 0f)
+        assertTrue(b.poseAt(19.99f)!!.x > SceneWidth)
+        assertNull(b.poseAt(25f))
+        (0 until 200).mapNotNull { b.poseAt(it * 0.1f) }.forEach { assertTrue(it.open in 0.15f..1f) }
+    }
+
+    @Test
+    fun jackInTheBoxCranksPopsAndSettles() {
+        val cranking = jackAt(2f)
+        assertEquals(0f, cranking.pop)
+        assertEquals(0f, cranking.lid)
+        assertTrue(cranking.crankDegrees > 0f)
+        assertEquals(1f, jackAt(4.5f).lid)
+        // The clown overshoots on the way up, then settles near the top.
+        assertTrue((0 until 40).map { jackAt(4f + it * 0.05f).pop }.max() > 1f)
+        assertEquals(1f, jackAt(7.9f).pop, 0.05f)
+        assertTrue(jackAt(9f).pop in 0.1f..0.9f)
+        assertEquals(0f, jackAt(10f).pop)
+        assertEquals(0f, jackAt(10f).lid)
     }
 
     @Test
