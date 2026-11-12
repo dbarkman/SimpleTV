@@ -56,9 +56,6 @@ fun rememberSceneDay(): LocalDate {
     return preview ?: today
 }
 
-// The holidays with a scene so far; the others leave their days to these.
-val DrawnHolidays = setOf(Holiday.Halloween, Holiday.ElectionDay, Holiday.VeteransDay, Holiday.Thanksgiving, Holiday.Christmas)
-
 // The backdrop: hills, trees at the edges and something drifting down, all in the season's
 // colors, dressed up for a family birthday or anniversary or whichever holiday is on.
 @Composable
@@ -78,6 +75,7 @@ fun HomeScene(day: LocalDate = rememberSceneDay(), modifier: Modifier = Modifier
         Canvas(Modifier.fillMaxSize()) {
             val unit = size.width / SceneWidth
             if (holiday == Holiday.Halloween) drawHarvestMoon(unit)
+            if (holiday == Holiday.MlkDay) drawRisingSun(unit)
             drawHillsAndTrees(look, unit)
             if (look.restingColors != null) {
                 resting.forEach { drawLeaf(it.x + it.size / 2, it.y + it.size / 2, it.rotationDegrees, 1f, it.size * look.driftingScale, look.restingColors[it.colorIndex % look.restingColors.size], look.veins, 0.85f, unit) }
@@ -93,6 +91,9 @@ fun HomeScene(day: LocalDate = rememberSceneDay(), modifier: Modifier = Modifier
                 Holiday.VeteransDay -> drawVeteransDayFigures(unit, now)
                 Holiday.Thanksgiving -> drawThanksgivingFigures(unit, now)
                 Holiday.Christmas -> drawChristmasFigures(unit, now)
+                Holiday.NewYear -> drawNewYearFigures(unit, now, newYearShown(day))
+                Holiday.MlkDay -> drawMlkDayFigures(unit, now)
+                Holiday.SuperBowl -> drawGameDayFigures(unit, now)
                 else -> {}
             }
             if (family.isNotEmpty()) drawCelebration(unit, now, anniversary)

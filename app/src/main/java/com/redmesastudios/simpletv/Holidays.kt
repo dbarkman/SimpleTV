@@ -153,3 +153,91 @@ fun RisingBalloon.poseAt(seconds: Float): BalloonPose {
         tilt = 6f * sway,
     )
 }
+
+// A firework now and then: the shell climbs from the hill to its peak over riseSeconds,
+// bursts, and its sparks spread out and sink as they fade over burstSeconds; the rest of the
+// cycle that patch of sky is clear.
+data class Firework(
+    val x: Float,
+    val peakY: Float,
+    val radius: Float,
+    val cycleSeconds: Float,
+    val offsetSeconds: Float,
+    val colorIndex: Int,
+    val launchY: Float = 880f,
+    val riseSeconds: Float = 1.3f,
+    val burstSeconds: Float = 2.6f,
+)
+
+// Rising: x, y is the shell. Bursting: x, y is the burst's center, spread (0..1) how far the
+// sparks have flown and fade (1..0) how bright they still are.
+data class FireworkPose(val x: Float, val y: Float, val rising: Boolean, val spread: Float, val fade: Float)
+
+// Null while the sky is clear.
+fun Firework.poseAt(seconds: Float): FireworkPose? {
+    val t = (seconds + offsetSeconds) % cycleSeconds
+    if (t < riseSeconds) {
+        // Slowing as it climbs.
+        val p = t / riseSeconds
+        val eased = 1f - (1f - p) * (1f - p)
+        return FireworkPose(x, launchY + (peakY - launchY) * eased, rising = true, spread = 0f, fade = 1f)
+    }
+    val a = (t - riseSeconds) / burstSeconds
+    if (a >= 1f) return null
+    return FireworkPose(
+        x = x,
+        y = peakY + 22f * a * a,
+        rising = false,
+        spread = 1f - (1f - a) * (1f - a) * (1f - a),
+        fade = 1f - a * a,
+    )
+}
+
+// The year a New Year's scene celebrates: the coming one on New Year's Eve.
+fun newYearShown(day: java.time.LocalDate): Int = if (day.monthValue == 12) day.year + 1 else day.year
+
+// A football kicked now and then from its tee along a high arc, end over end, through the
+// uprights and away. Between kicks it's gone for gapSeconds, then sits back on the tee.
+data class Kick(
+    val cycleSeconds: Float,
+    val flightSeconds: Float,
+    val gapSeconds: Float,
+    val offsetSeconds: Float,
+    val fromX: Float,
+    val toX: Float,
+    val groundY: Float,
+    val apexHeight: Float,
+)
+
+// flying: the ball is in the air at x, y turned spinDegrees; otherwise it's on the tee, shown
+// at teeAlpha (0 while it's gone). kicks counts the kicks that have cleared the posts.
+data class KickPose(val flying: Boolean, val x: Float, val y: Float, val spinDegrees: Float, val teeAlpha: Float, val kicks: Int)
+
+private const val TeeFadeSeconds = 0.6f
+
+// The part of the flight where the ball passes the posts, for counting the score.
+private const val KickClearsAt = 0.85f
+
+fun Kick.poseAt(seconds: Float): KickPose {
+    val total = seconds + offsetSeconds
+    val cycle = kotlin.math.floor(total / cycleSeconds).toInt()
+    val t = total - cycle * cycleSeconds
+    val cleared = cycle + if (t >= flightSeconds * KickClearsAt) 1 else 0
+    if (t < flightSeconds) {
+        val p = t / flightSeconds
+        return KickPose(
+            flying = true,
+            x = fromX + (toX - fromX) * p,
+            y = groundY - 4f * apexHeight * p * (1f - p),
+            spinDegrees = 540f * p,
+            teeAlpha = 0f,
+            kicks = cleared,
+        )
+    }
+    val waited = t - flightSeconds - gapSeconds
+    val alpha = if (waited < 0f) 0f else minOf(1f, waited / TeeFadeSeconds)
+    return KickPose(flying = false, x = fromX, y = groundY, spinDegrees = 0f, teeAlpha = alpha, kicks = cleared)
+}
+
+// The home side starts at 14 and gets 3 for every kick, the guests sit at 17.
+fun homeScore(kicks: Int): Int = 14 + 3 * (kicks % 8)

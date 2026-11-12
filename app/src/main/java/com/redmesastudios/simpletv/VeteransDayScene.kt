@@ -97,9 +97,3 @@ private fun DrawScope.drawEagle(pose: BatPose, seconds: Float) {
         withTransform({ scale(1f, lift, pivot = Offset(0f, -4f)) }) { drawPath(wing, EagleBody) }
     }
 }
-
-// What the greeting says on a holiday that has its own words, instead of "Good morning".
-fun holidayGreeting(holiday: Holiday?): String? = when (holiday) {
-    Holiday.VeteransDay -> "Thank you, veterans"
-    else -> null
-}

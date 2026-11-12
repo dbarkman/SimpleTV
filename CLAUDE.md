@@ -221,7 +221,7 @@ source of truth.
   `holiday_packs=` in home.txt picks them (blank: all but the last three).
   Each holiday has its stretch of days; where two overlap the shorter wins its
   days, and the Seasons pack's first-day-of-a-season days show only when
-  nothing else does. Only holidays in `DrawnHolidays` (HomeScene.kt) count, so
+  nothing else does. Only holidays in `DrawnHolidays` count, so
   a holiday without a scene never blanks out one with a scene. Easter is
   computed, Hebrew dates use Calendrical Calculations arithmetic, Islamic
   dates java.time's Umm al-Qura `HijrahDate`, seasons Meeus's equinox
@@ -232,8 +232,17 @@ source of truth.
   greeting becomes "Happy birthday, <name>!" and the scene celebrates instead of
   any holiday.
 - `Holidays.kt` — the decorations' motion, pure math in design px.
-- `HalloweenScene.kt` / `ElectionScene.kt` / `VeteransDayScene.kt` /
-  `ThanksgivingScene.kt` / `ChristmasScene.kt` / `CelebrationScene.kt` — the drawn scenes. Halloween (Oct 24 – Nov 1):
+- `NewYearScene.kt` / `MlkDayScene.kt` / `GameDayScene.kt` / `HalloweenScene.kt` /
+  `ElectionScene.kt` / `VeteransDayScene.kt` / `ThanksgivingScene.kt` /
+  `ChristmasScene.kt` / `CelebrationScene.kt` — the drawn scenes. New Year's (Dec 31 –
+  Jan 1; "Happy New Year!"): a marquee sign with the coming year in chasing lights,
+  fireworks over the hill and up between the greeting and the clock, and balloon
+  bunches. MLK Day ("Honoring Dr. King"): a sun rising behind the hill, two lines of
+  people of every color holding hands with a ripple through their hands, and a dove
+  with an olive sprig crossing now and then. Game day (the second Sunday of February,
+  `Holiday.SuperBowl`; "Happy game day!"; no team or league marks): a football kicked
+  from its tee through goalposts now and then, a scoreboard whose home score goes up 3
+  per kick, a foam finger and a bowl of chips. Halloween (Oct 24 – Nov 1):
   harvest moon, bats, graveyard, hay bale with a black cat, corn stalks,
   jack-o'-lanterns, a ghost, a skeleton and a mummy walking by. Election Day
   (Nov 2 through Election Day): bunting, a waving flag, a ballot box, a VOTE
@@ -269,7 +278,8 @@ source of truth.
   known services first, in their curated order with their guide IDs, then the
   rest by name. Settings, the Play Store (Get Apps) and SimpleTV itself get no
   tile. Launches via the leanback launch intent.
-- `Greeting.kt` — greeting by hour.
+- `Greeting.kt` — greeting by hour, and the words some holidays use instead
+  (`holidayGreeting`).
 - `ui/theme/` — Fall palette and Manrope type (bundled variable font in
   `res/font`, OFL licence in `FONT-LICENSE-OFL.txt`). Text sizes are the design's
   px values halved.

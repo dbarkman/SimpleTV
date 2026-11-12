@@ -107,6 +107,12 @@ enum class Holiday(val pack: Pack) {
     Diwali(Pack.Indian),
 }
 
+// The holidays with a drawn scene so far (HomeScene.kt); the others leave their days to these.
+val DrawnHolidays = setOf(
+    Holiday.NewYear, Holiday.MlkDay, Holiday.SuperBowl,
+    Holiday.Halloween, Holiday.ElectionDay, Holiday.VeteransDay, Holiday.Thanksgiving, Holiday.Christmas,
+)
+
 // The holiday to show on a date: among the packs' holidays that have a scene (drawn), the
 // shortest stretch covering the date. Ties go to the one listed first.
 fun holidayOn(
