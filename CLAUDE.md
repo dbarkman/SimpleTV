@@ -232,14 +232,27 @@ source of truth.
   greeting becomes "Happy birthday, <name>!" and the scene celebrates instead of
   any holiday.
 - `Holidays.kt` — the decorations' motion, pure math in design px.
-- `NewYearScene.kt` / `MlkDayScene.kt` / `GameDayScene.kt` / `HalloweenScene.kt` /
+- `NewYearScene.kt` / `EpiphanyScene.kt` / `MlkDayScene.kt` / `PopcornDayScene.kt` /
+  `GroundhogDayScene.kt` / `LunarNewYearScene.kt` / `ValentinesScene.kt` /
+  `GameDayScene.kt` / `PresidentsDayScene.kt` / `HalloweenScene.kt` /
   `ElectionScene.kt` / `VeteransDayScene.kt` / `ThanksgivingScene.kt` /
   `ChristmasScene.kt` / `CelebrationScene.kt` — the drawn scenes. New Year's (Dec 31 –
   Jan 1; "Happy New Year!"): a marquee sign with the coming year in chasing lights,
   fireworks over the hill and up between the greeting and the clock, and balloon
   bunches. MLK Day ("Honoring Dr. King"): a sun rising behind the hill, two lines of
   people of every color holding hands with a ripple through their hands, and a dove
-  with an olive sprig crossing now and then. Game day (the second Sunday of February,
+  with an olive sprig crossing now and then. Epiphany (Jan 6; "Happy Epiphany"): a
+  guiding star with a beam of light and three wise men on camels walking across. Popcorn
+  Day (Jan 19; "Happy Popcorn Day!"): a striped bucket with kernels popping out, smaller
+  buckets and ADMIT ONE tickets. Groundhog Day ("Happy Groundhog Day!"): a low sun, a
+  groundhog that pops out, looks around, sees its shadow and ducks back, and a "6 MORE
+  WEEKS?" sign. Lunar New Year ("Happy Lunar New Year!"): red lanterns, an upside-down
+  福 on a red diamond, plum branches and a paper dragon weaving across the sky.
+  Valentine's (Feb 7–14; "Happy Valentine's Day!" on the 14th only): a heart garland,
+  hearts rising off the hill, a mailbox with a letter, roses, a "BE MINE" candy heart
+  and two lovebirds leaning in. Presidents' Day ("Happy Presidents' Day"): a log cabin
+  with chimney smoke, a cherry tree, a waving flag with small flags, and a tricorn and a
+  stovepipe hat on a bench. Game day (the second Sunday of February,
   `Holiday.SuperBowl`; "Happy game day!"; no team or league marks): a football kicked
   from its tee through goalposts now and then, a scoreboard whose home score goes up 3
   per kick, a "GO TEAM!" pennant and a bowl of chips. Halloween (Oct 24 – Nov 1):
@@ -279,7 +292,7 @@ source of truth.
   rest by name. Settings, the Play Store (Get Apps) and SimpleTV itself get no
   tile. Launches via the leanback launch intent.
 - `Greeting.kt` — greeting by hour, and the words some holidays use instead
-  (`holidayGreeting`).
+  (`holidayGreeting`, which takes the date for Valentine's).
 - `ui/theme/` — Fall palette and Manrope type (bundled variable font in
   `res/font`, OFL licence in `FONT-LICENSE-OFL.txt`). Text sizes are the design's
   px values halved.

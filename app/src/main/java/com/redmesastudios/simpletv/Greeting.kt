@@ -7,7 +7,14 @@ fun greetingFor(hour: Int): String = when (hour) {
 }
 
 // What the greeting says on a holiday that has its own words, instead of "Good morning".
-fun holidayGreeting(holiday: Holiday?): String? = when (holiday) {
+// Valentine's week says it only on the 14th itself.
+fun holidayGreeting(holiday: Holiday?, day: java.time.LocalDate): String? = when (holiday) {
+    Holiday.Valentines -> if (day.monthValue == 2 && day.dayOfMonth == 14) "Happy Valentine's Day!" else null
+    Holiday.PresidentsDay -> "Happy Presidents' Day"
+    Holiday.Epiphany -> "Happy Epiphany"
+    Holiday.LunarNewYear -> "Happy Lunar New Year!"
+    Holiday.PopcornDay -> "Happy Popcorn Day!"
+    Holiday.GroundhogDay -> "Happy Groundhog Day!"
     Holiday.NewYear -> "Happy New Year!"
     Holiday.MlkDay -> "Honoring Dr. King"
     Holiday.SuperBowl -> "Happy game day!"

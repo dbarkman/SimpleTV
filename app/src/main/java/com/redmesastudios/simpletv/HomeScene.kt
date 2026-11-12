@@ -94,6 +94,12 @@ fun HomeScene(day: LocalDate = rememberSceneDay(), modifier: Modifier = Modifier
                 Holiday.NewYear -> drawNewYearFigures(unit, now, newYearShown(day))
                 Holiday.MlkDay -> drawMlkDayFigures(unit, now)
                 Holiday.SuperBowl -> drawGameDayFigures(unit, now)
+                Holiday.Valentines -> drawValentinesFigures(unit, now)
+                Holiday.PresidentsDay -> drawPresidentsDayFigures(unit, now)
+                Holiday.Epiphany -> drawEpiphanyFigures(unit, now)
+                Holiday.LunarNewYear -> drawLunarNewYearFigures(unit, now)
+                Holiday.PopcornDay -> drawPopcornDayFigures(unit, now)
+                Holiday.GroundhogDay -> drawGroundhogDayFigures(unit, now)
                 else -> {}
             }
             if (family.isNotEmpty()) drawCelebration(unit, now, anniversary)

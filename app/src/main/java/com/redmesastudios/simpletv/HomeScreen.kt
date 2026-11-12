@@ -221,7 +221,7 @@ fun HomeScreen(
             Header(
                 now = now,
                 greeting = celebrationGreeting(familyDaysOn(sceneDay, house.familyDays.map { it.day }))
-                    ?: holidayGreeting(holidayOn(sceneDay, house.packs, DrawnHolidays))
+                    ?: holidayGreeting(holidayOn(sceneDay, house.packs, DrawnHolidays), sceneDay)
                     ?: greetingFor(now.hour),
                 searchButton = searchButton,
                 moviesButton = moviesButton,

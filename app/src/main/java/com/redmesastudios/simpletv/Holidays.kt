@@ -241,3 +241,87 @@ fun Kick.poseAt(seconds: Float): KickPose {
 
 // The home side starts at 14 and gets 3 for every kick, the guests sit at 17.
 fun homeScore(kicks: Int): Int = 14 + 3 * (kicks % 8)
+
+// The Epiphany caravan: three wise men on camels walking right to left, one behind another,
+// each its own walker a few seconds apart so each one enters and leaves the screen on its own.
+val Caravan = listOf(10f, 6.1f, 2.2f).map { offset ->
+    Walker(cycleSeconds = 72f, walkSeconds = 46f, offsetSeconds = offset, baseY = 872f, leftToRight = false, strideSeconds = 1.6f)
+}
+
+// A popcorn kernel popping out of the bucket: up and out along an arc, turning, then
+// dropping back below the rim. dx, dy are from the middle of the bucket's mouth.
+data class KernelPose(val dx: Float, val dy: Float, val spinDegrees: Float)
+
+private const val KernelFlightSeconds = 1.1f
+
+// Null while that kernel is resting in the bucket.
+fun poppedKernel(seconds: Float, index: Int): KernelPose? {
+    val cycle = 1.9f + (index % 5) * 0.27f
+    val t = (seconds + index * 0.61f) % cycle
+    if (t > KernelFlightSeconds) return null
+    val p = t / KernelFlightSeconds
+    val reach = listOf(-58f, 34f, -22f, 64f, -40f, 12f, 48f, -66f)[index % 8]
+    val height = 70f + (index * 37) % 50
+    return KernelPose(dx = reach * p, dy = -4f * height * p * (1f - p) + 30f * p * p, spinDegrees = 400f * p * if (index % 2 == 0) 1f else -1f)
+}
+
+// The groundhog's day, over and over: hidden in its burrow, up it comes, looks left and right,
+// sees its shadow, gives a start, and ducks back down. rise is how far out it is (0 to 1),
+// look which way it's turned (-1 left to 1 right).
+data class GroundhogPose(val rise: Float, val look: Float, val startled: Boolean)
+
+const val GroundhogCycleSeconds = 14f
+
+fun groundhogAt(seconds: Float): GroundhogPose {
+    val t = seconds % GroundhogCycleSeconds
+    fun ease(p: Float) = p * p * (3f - 2f * p)
+    return when {
+        t < 3f -> GroundhogPose(0f, 0f, false)
+        t < 4f -> GroundhogPose(ease(t - 3f), 0f, false)
+        t < 9f -> GroundhogPose(1f, sin(2 * PI * (t - 4f) / 5f).toFloat(), false)
+        t < 9.6f -> GroundhogPose(1f, 0f, true)
+        t < 10f -> GroundhogPose(1f - ease((t - 9.6f) / 0.4f), 0f, true)
+        else -> GroundhogPose(0f, 0f, false)
+    }
+}
+
+// A paper dragon weaving across the sky for Lunar New Year: its head crosses like a bat and
+// each body segment follows a step behind on the same wave. Null while it's all off-screen.
+val Dragon = Bat(cycleSeconds = 42f, flightSeconds = 22f, offsetSeconds = 6f, y = 118f, size = 30f, leftToRight = false)
+
+const val DragonSegments = 12
+const val DragonSpacing = 30f
+
+fun dragonSegments(seconds: Float): List<Pair<Float, Float>>? {
+    val t = (seconds + Dragon.offsetSeconds) % Dragon.cycleSeconds
+    if (t > Dragon.flightSeconds) return null
+    val travel = SceneWidth + 2 * BatMargin + DragonSegments * DragonSpacing
+    val head = -BatMargin + t / Dragon.flightSeconds * travel
+    val headX = if (Dragon.leftToRight) head else SceneWidth - head
+    val behind = if (Dragon.leftToRight) -DragonSpacing else DragonSpacing
+    return List(DragonSegments) { k ->
+        (headX + k * behind) to (Dragon.y + 20f * sin(t * 2.4f - k * 0.55f))
+    }
+}
+
+// A small heart rising off the hill for Valentine's and fading before it reaches the apps.
+data class RisingHeart(val x: Float, val riseSeconds: Float, val offsetSeconds: Float, val size: Float, val colorIndex: Int)
+
+data class HeartPose(val x: Float, val y: Float, val alpha: Float)
+
+const val HeartStartY = 880f
+const val HeartRise = 250f
+
+val RisingHearts = List(10) { i ->
+    RisingHeart(x = 200f + ((i * 433) % 1520), riseSeconds = 9f + (i * 5) % 6, offsetSeconds = i * 1.9f, size = 18f + (i * 7) % 14, colorIndex = i)
+}
+
+fun RisingHeart.poseAt(seconds: Float): HeartPose {
+    val p = ((seconds + offsetSeconds) % riseSeconds) / riseSeconds
+    val alpha = when {
+        p < 0.15f -> p / 0.15f
+        p > 0.65f -> (1f - p) / 0.35f
+        else -> 1f
+    }
+    return HeartPose(x + 14f * sin(2 * PI * p * 2 + colorIndex).toFloat(), HeartStartY - p * HeartRise, alpha)
+}

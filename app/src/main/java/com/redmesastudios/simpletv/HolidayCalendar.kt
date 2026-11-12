@@ -109,7 +109,8 @@ enum class Holiday(val pack: Pack) {
 
 // The holidays with a drawn scene so far (HomeScene.kt); the others leave their days to these.
 val DrawnHolidays = setOf(
-    Holiday.NewYear, Holiday.MlkDay, Holiday.SuperBowl,
+    Holiday.NewYear, Holiday.MlkDay, Holiday.SuperBowl, Holiday.Valentines, Holiday.PresidentsDay,
+    Holiday.Epiphany, Holiday.LunarNewYear, Holiday.PopcornDay, Holiday.GroundhogDay,
     Holiday.Halloween, Holiday.ElectionDay, Holiday.VeteransDay, Holiday.Thanksgiving, Holiday.Christmas,
 )
 

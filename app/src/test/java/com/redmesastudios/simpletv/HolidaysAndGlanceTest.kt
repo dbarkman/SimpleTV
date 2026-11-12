@@ -79,12 +79,79 @@ class HolidaysAndGlanceTest {
         assertEquals(Holiday.MlkDay, on("2027-01-18"))
         assertEquals(Holiday.MlkDay, on("2028-01-17"))
         assertEquals(Holiday.SuperBowl, on("2027-02-14"))
-        assertEquals("Happy New Year!", holidayGreeting(on("2026-12-31")))
-        assertEquals("Honoring Dr. King", holidayGreeting(on("2027-01-18")))
-        assertEquals("Happy game day!", holidayGreeting(on("2027-02-14")))
+        assertEquals("Happy New Year!", holidayGreeting(on("2026-12-31"), LocalDate.parse("2026-12-31")))
+        assertEquals("Honoring Dr. King", holidayGreeting(on("2027-01-18"), LocalDate.parse("2027-01-18")))
+        assertEquals("Happy game day!", holidayGreeting(on("2027-02-14"), LocalDate.parse("2027-02-14")))
         // New Year's Eve already shows the coming year.
         assertEquals(2027, newYearShown(LocalDate.parse("2026-12-31")))
         assertEquals(2027, newYearShown(LocalDate.parse("2027-01-01")))
+    }
+
+    @Test
+    fun januaryAndFebruaryScenesShowOnTheirDays() {
+        fun on(text: String) = holidayOn(LocalDate.parse(text), DefaultPacks, DrawnHolidays, zone)
+        fun greeting(text: String) = holidayGreeting(on(text), LocalDate.parse(text))
+        assertEquals(Holiday.Epiphany, on("2027-01-06"))
+        assertEquals(Holiday.PopcornDay, on("2027-01-19"))
+        // MLK Day and Popcorn Day share January 19th some years; MLK Day keeps it.
+        assertEquals(Holiday.MlkDay, on("2032-01-19"))
+        assertEquals(Holiday.GroundhogDay, on("2027-02-02"))
+        // Lunar New Year (Feb 6-8, 2027) wins its days inside Valentine's week.
+        assertEquals(Holiday.LunarNewYear, on("2027-02-06"))
+        assertEquals(Holiday.LunarNewYear, on("2027-02-08"))
+        assertEquals(Holiday.Valentines, on("2027-02-09"))
+        assertEquals(Holiday.Valentines, on("2027-02-13"))
+        assertEquals(Holiday.PresidentsDay, on("2027-02-15"))
+        assertEquals(Holiday.Valentines, on("2028-02-14"))
+        assertEquals("Happy Valentine's Day!", greeting("2028-02-14"))
+        assertNull(greeting("2027-02-10"))
+        assertEquals("Happy Groundhog Day!", greeting("2027-02-02"))
+        assertEquals("Happy Lunar New Year!", greeting("2027-02-07"))
+    }
+
+    @Test
+    fun kernelsPopOutAndFallBack() {
+        val popped = (0 until 400).mapNotNull { poppedKernel(it * 0.05f, 3) }
+        assertTrue(popped.isNotEmpty())
+        // Up above the rim at the top of the arc, and every kernel rests between pops.
+        assertTrue(popped.any { it.dy < -60f })
+        assertTrue((0 until 400).any { poppedKernel(it * 0.05f, 3) == null })
+        assertEquals(0f, poppedKernel(0f, 0)!!.dx, 0.001f)
+    }
+
+    @Test
+    fun groundhogRisesLooksAndDucks() {
+        assertEquals(0f, groundhogAt(1f).rise)
+        assertTrue(groundhogAt(3.5f).rise in 0.1f..0.9f)
+        val looking = groundhogAt(5f)
+        assertEquals(1f, looking.rise)
+        assertTrue(looking.look > 0.5f)
+        assertTrue(groundhogAt(9.2f).startled)
+        assertTrue(groundhogAt(9.8f).rise < 1f)
+        assertEquals(0f, groundhogAt(12f).rise)
+        assertEquals(0f, groundhogAt(GroundhogCycleSeconds + 1f).rise)
+    }
+
+    @Test
+    fun dragonWeavesAcrossAndLeaves() {
+        val start = dragonSegments(Dragon.cycleSeconds - Dragon.offsetSeconds)!!
+        assertEquals(DragonSegments, start.size)
+        // Right to left: the head starts off the right edge with the body trailing behind it.
+        assertTrue(start.first().first > SceneWidth)
+        assertTrue(start.last().first > start.first().first)
+        val end = dragonSegments(Dragon.cycleSeconds - Dragon.offsetSeconds + Dragon.flightSeconds - 0.01f)!!
+        assertTrue(end.all { it.first < 0f })
+        assertNull(dragonSegments(Dragon.cycleSeconds - Dragon.offsetSeconds + Dragon.flightSeconds + 1f))
+    }
+
+    @Test
+    fun heartsRiseAndFadeBelowTheApps() {
+        val heart = RisingHeart(x = 500f, riseSeconds = 10f, offsetSeconds = 0f, size = 20f, colorIndex = 0)
+        assertEquals(HeartStartY, heart.poseAt(0f).y)
+        assertEquals(0f, heart.poseAt(0f).alpha)
+        assertEquals(1f, heart.poseAt(4f).alpha)
+        val late = heart.poseAt(9.9f)
+        assertTrue(late.alpha < 0.05f && late.y > HeartStartY - HeartRise)
     }
 
     @Test
