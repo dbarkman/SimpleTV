@@ -242,7 +242,7 @@ source of truth.
   with an olive sprig crossing now and then. Game day (the second Sunday of February,
   `Holiday.SuperBowl`; "Happy game day!"; no team or league marks): a football kicked
   from its tee through goalposts now and then, a scoreboard whose home score goes up 3
-  per kick, a foam finger and a bowl of chips. Halloween (Oct 24 – Nov 1):
+  per kick, a "GO TEAM!" pennant and a bowl of chips. Halloween (Oct 24 – Nov 1):
   harvest moon, bats, graveyard, hay bale with a black cat, corn stalks,
   jack-o'-lanterns, a ghost, a skeleton and a mummy walking by. Election Day
   (Nov 2 through Election Day): bunting, a waving flag, a ballot box, a VOTE

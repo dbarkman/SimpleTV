@@ -16,7 +16,7 @@ import kotlin.math.sin
 
 // The big game's Sunday on the winter scene: a football on its tee at the left, kicked now
 // and then end over end through the goalposts at the right, a scoreboard whose home score
-// goes up 3 with every kick that's good, a foam finger and a bowl of chips. No team or league
+// goes up 3 with every kick that's good, a GO TEAM! pennant and a bowl of chips. No team or league
 // marks anywhere. The greeting says "Happy game day!". Drawn in design px (1920x1080).
 
 private val Leather = Color(0xFF8A4B2A)
@@ -29,7 +29,7 @@ private val TeeOrange = Color(0xFFE8793A)
 private val Board = Color(0xFF2E2A28)
 private val BoardEdge = Color(0xFF4A4440)
 private val BoardPost = Color(0xFF8C8478)
-private val Foam = Color(0xFF3A5A92)
+private val Felt = Color(0xFF3A5A92)
 private val Bowl = Color(0xFFC0503A)
 private val BowlRim = Color(0xFFD9774F)
 private val Chip = listOf(Color(0xFFF2C14E), Color(0xFFE9B949), Color(0xFFF5D27E))
@@ -61,9 +61,9 @@ private val ScoreDigits = android.graphics.Paint(android.graphics.Paint.ANTI_ALI
     typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
 }
 
-private val FingerText = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+private val PennantText = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
     color = android.graphics.Color.WHITE
-    textSize = 22f
+    textSize = 17f
     textAlign = android.graphics.Paint.Align.CENTER
     typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
 }
@@ -72,7 +72,7 @@ fun DrawScope.drawGameDayFigures(unit: Float, seconds: Float) {
     val kick = FieldGoal.poseAt(seconds)
     withTransform({ scale(unit, unit, pivot = Offset.Zero) }) {
         drawScoreboard(240f, homeScore(kick.kicks))
-        drawFoamFinger(1010f, seconds)
+        drawPennant(960f, seconds)
         drawChipBowl(1200f)
         // The ball passes in front of the far upright and behind the near one's streamer.
         drawGoalpost(seconds)
@@ -145,15 +145,31 @@ private fun DrawScope.drawScoreboard(x: Float, home: Int) {
     }
 }
 
-// A big foam "#1" finger stuck in the snow, rocking a little.
-private fun DrawScope.drawFoamFinger(x: Float, seconds: Float) {
-    drawLine(BoardPost, Offset(x, GroundY), Offset(x, GroundY - 50f), strokeWidth = 4f, cap = StrokeCap.Round)
-    withTransform({ rotate(4f * sin(seconds * 1.1f), pivot = Offset(x, GroundY - 40f)) }) {
-        drawRoundRect(Foam, Offset(x - 30f, GroundY - 104f), Size(60f, 62f), CornerRadius(16f))
-        drawRoundRect(Foam, Offset(x - 8f, GroundY - 160f), Size(22f, 66f), CornerRadius(11f))
-        // The thumb, tucked across.
-        drawRoundRect(Foam, Offset(x - 40f, GroundY - 92f), Size(24f, 16f), CornerRadius(8f))
-        drawIntoCanvas { it.nativeCanvas.drawText("#1", x, GroundY - 64f, FingerText) }
+// A felt "GO TEAM!" pennant on a stick in the snow, rippling.
+private fun DrawScope.drawPennant(x: Float, seconds: Float) {
+    val top = GroundY - 168f
+    drawLine(BoardPost, Offset(x, GroundY), Offset(x, top - 6f), strokeWidth = 5f, cap = StrokeCap.Round)
+    drawCircle(PostYellow, 6f, Offset(x, top - 8f))
+    val length = 150f
+    val height = 58f
+    fun ripple(along: Float) = 7f * along * sin(along * 5f - seconds * 3f)
+    val steps = 12
+    val pennant = Path().apply {
+        moveTo(x + 2f, top)
+        for (i in 1..steps) {
+            val along = i.toFloat() / steps
+            lineTo(x + 2f + along * length, top + along * height / 2 + ripple(along))
+        }
+        for (i in steps - 1 downTo 0) {
+            val along = i.toFloat() / steps
+            lineTo(x + 2f + along * length, top + height - along * height / 2 + ripple(along))
+        }
+        close()
+    }
+    drawPath(pennant, Felt)
+    drawRect(PostYellow, Offset(x + 2f, top + 1f), Size(10f, height - 2f))
+    withTransform({ rotate(Math.toDegrees(kotlin.math.atan2(ripple(0.45f) - ripple(0.25f), length * 0.2f).toDouble()).toFloat(), pivot = Offset(x + 66f, top + height / 2)) }) {
+        drawIntoCanvas { it.nativeCanvas.drawText("GO TEAM!", x + 58f, top + height / 2 + 7f, PennantText) }
     }
 }
 
