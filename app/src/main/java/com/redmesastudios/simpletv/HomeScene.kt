@@ -36,19 +36,14 @@ import com.redmesastudios.simpletv.ui.theme.LeafVein
 import com.redmesastudios.simpletv.ui.theme.TreeCrowns
 import com.redmesastudios.simpletv.ui.theme.Trunk
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-// A date to show the scene for instead of today, to see a holiday ahead of time:
+// The day the home screen decorates for: today (moving on at midnight), or a scene_date
+// sent over adb to see a holiday ahead of time:
 //   adb shell am start -n com.redmesastudios.simpletv/.MainActivity --es scene_date 2026-12-25
 // Pressing Home goes back to today.
-object ScenePreview {
-    val date = MutableStateFlow<LocalDate?>(null)
-}
-
-// The day the home screen decorates for: today (moving on at midnight) or a preview date.
 @Composable
 fun rememberSceneDay(): LocalDate {
     val preview by ScenePreview.date.collectAsState()
@@ -56,18 +51,44 @@ fun rememberSceneDay(): LocalDate {
     return preview ?: today
 }
 
-// The backdrop: hills, trees at the edges and something drifting down, all in the season's
-// colors, dressed up for a family birthday or anniversary or whichever holiday is on.
+// What the scene shows: the day, its holiday or family celebration, and which of the
+// holiday's backdrops. The holiday preview (Settings) overrides all of it.
+data class ShownScene(val day: LocalDate, val holiday: Holiday?, val family: List<FamilyDay>, val variant: Int, val preview: PreviewState?)
+
 @Composable
-fun HomeScene(day: LocalDate = rememberSceneDay(), modifier: Modifier = Modifier) {
+fun rememberShownScene(): ShownScene {
+    val day = rememberSceneDay()
     val house by HouseSettings.state.collectAsState()
+    val preview by ScenePreview.state.collectAsState()
+    preview?.let { state ->
+        val entry = state.entry
+        val family = entry.family?.let { kind ->
+            val name = house.familyDays.firstOrNull { it.day.kind == kind }?.day?.name ?: "Sam"
+            listOf(FamilyDay(java.time.MonthDay.from(entry.day), kind, name))
+        }.orEmpty()
+        return ShownScene(entry.day, entry.holiday, family, state.variant, state)
+    }
     val family = familyDaysOn(day, house.familyDays.map { it.day })
     val holiday = if (family.isEmpty()) holidayOn(day, house.packs, DrawnHolidays) else null
-    // Christmas brings the snow, even in the weeks before winter starts.
-    val season = if (holiday == Holiday.Christmas) Season.Winter else seasonOn(day)
-    // St. Patrick's gets its own all-green backdrop with nothing drifting, whatever the season.
-    val look = if (holiday == Holiday.StPatricks) EmeraldLook else SeasonLooks.getValue(season)
-    val drifting = remember(look) { fallingLeaves(look.driftingCount) }
+    return ShownScene(day, holiday, family, 0, null)
+}
+
+// The backdrop, dressed up for a family birthday or anniversary or whichever holiday is on:
+// outdoors, hills, trees at the edges and something drifting down in the season's colors;
+// or, for a holiday with a room of its own, that room.
+@Composable
+fun HomeScene(scene: ShownScene = rememberShownScene(), modifier: Modifier = Modifier) {
+    val day = scene.day
+    val family = scene.family
+    val holiday = scene.holiday
+    val backdrop = backdropFor(holiday, day, scene.variant)
+    val room = (backdrop as? BackdropKind.Indoors)?.room
+    val look = when (backdrop) {
+        is BackdropKind.Outdoors -> SeasonLooks.getValue(backdrop.season)
+        BackdropKind.Emerald -> EmeraldLook
+        is BackdropKind.Indoors -> NoDriftLook
+    }
+    val drifting = remember(look) { fallingLeaves(if (room != null) 0 else look.driftingCount) }
     val resting = remember { restingLeaves(RestingLeafCount) }
     val seconds = rememberSceneClock()
     val anniversary = family.isNotEmpty() && family.none { it.kind == FamilyDayKind.Birthday }
@@ -75,6 +96,10 @@ fun HomeScene(day: LocalDate = rememberSceneDay(), modifier: Modifier = Modifier
     Box(modifier) {
         Canvas(Modifier.fillMaxSize()) {
             val unit = size.width / SceneWidth
+            if (room != null) {
+                drawRoom(room, unit)
+                return@Canvas
+            }
             if (holiday == Holiday.Halloween) drawHarvestMoon(unit)
             if (holiday == Holiday.MlkDay) drawRisingSun(unit)
             drawHillsAndTrees(look, unit)
@@ -86,6 +111,7 @@ fun HomeScene(day: LocalDate = rememberSceneDay(), modifier: Modifier = Modifier
         Canvas(Modifier.fillMaxSize().graphicsLayer()) {
             val unit = size.width / SceneWidth
             val now = seconds.floatValue
+            room?.let { drawRoomMotion(it, unit, now) }
             when (holiday) {
                 Holiday.Halloween -> drawHalloweenFigures(unit, now)
                 Holiday.ElectionDay -> drawElectionFigures(unit, now)
@@ -103,13 +129,13 @@ fun HomeScene(day: LocalDate = rememberSceneDay(), modifier: Modifier = Modifier
                 Holiday.GroundhogDay -> drawGroundhogDayFigures(unit, now)
                 Holiday.PizzaDay -> drawPizzaDayFigures(unit, now)
                 Holiday.AshWednesday -> drawAshWednesdayFigures(unit, now)
-                Holiday.PiDay -> drawPiDayFigures(unit, now)
+                Holiday.PiDay -> drawPiDayFigures(unit, now, room)
                 Holiday.StPatricks -> drawStPatricksFigures(unit, now)
                 Holiday.FirstDayOfSpring -> drawSpringDayFigures(unit, now)
                 Holiday.AprilFools -> drawAprilFoolsFigures(unit, now)
                 else -> {}
             }
-            if (family.isNotEmpty()) drawCelebration(unit, now, anniversary)
+            if (family.isNotEmpty()) drawCelebration(unit, now, anniversary, celebrationNames(family))
             drifting.forEach { item ->
                 val pose = item.poseAt(now)
                 val color = look.driftingColors[item.colorIndex % look.driftingColors.size]
@@ -150,6 +176,9 @@ private val EmeraldLook = SeasonLook(
     drifting = Drifting.Leaves, driftingCount = 0, driftingScale = 1f,
     driftingColors = listOf(Color(0xFF86B977)), restingColors = null, veins = false,
 )
+
+// Indoors nothing drifts and nothing rests on the ground; the room draws itself.
+private val NoDriftLook = EmeraldLook
 
 private val SeasonLooks = mapOf(
     Season.Fall to SeasonLook(HillFar, HillNear, Trunk, TreeCrowns, Drifting.Leaves, 16, 1f, LeafColors, LeafColors, veins = true),

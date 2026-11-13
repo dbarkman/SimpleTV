@@ -112,7 +112,7 @@ class MainActivity : ComponentActivity() {
                     Screen.Movies -> MoviesScreen(onClose = { screen = Screen.Home })
                     Screen.ContinueWatching -> ContinueWatchingScreen(onClose = { screen = Screen.Home })
                     Screen.Screensaver -> ScreensaverScreen(onClose = { screen = Screen.Home })
-                    Screen.Settings -> SettingsScreen(onClose = { screen = Screen.Home })
+                    Screen.Settings -> SettingsScreen(onClose = { screen = Screen.Home }, onPreview = { screen = Screen.Home })
                     is Screen.Info -> ChannelScreen(shown.channel, onClose = { screen = Screen.Home })
                     is Screen.Folder -> FolderScreen(shown.app, onClose = { screen = Screen.Home })
                 }
@@ -142,12 +142,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // A scene_date extra shows the scene for that date (HomeScene.kt); Home goes back to today.
+    // A scene_date extra shows the scene for that date (HomeScene.kt); Home goes back to today,
+    // and ends a holiday preview too.
     private fun previewScene(intent: Intent?) {
         val date = intent?.getStringExtra("scene_date")?.let { runCatching { java.time.LocalDate.parse(it) }.getOrNull() }
         when {
             date != null -> ScenePreview.date.value = date
-            intent?.hasCategory(Intent.CATEGORY_HOME) == true -> ScenePreview.date.value = null
+            intent?.hasCategory(Intent.CATEGORY_HOME) == true -> ScenePreview.stop()
         }
     }
 }

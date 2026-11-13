@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -213,15 +214,28 @@ fun HomeScreen(
         gridFocus = MoreTile
     }
 
-    val sceneDay = rememberSceneDay()
+    val scene = rememberShownScene()
     val house by HouseSettings.state.collectAsState()
-    Box(Modifier.fillMaxSize().background(Ground).onPreviewKeyEvent { answerRemove(it.nativeKeyEvent) }) {
-        HomeScene(sceneDay, Modifier.fillMaxSize())
+    // While previewing holidays (Settings), the arrows step through them and Back leaves.
+    fun answerPreview(event: KeyEvent): Boolean {
+        val state = scene.preview ?: return false
+        if (event.action != KeyEvent.ACTION_DOWN) return true
+        when (event.keyCode) {
+            KeyEvent.KEYCODE_DPAD_RIGHT -> ScenePreview.state.value = state.step(1)
+            KeyEvent.KEYCODE_DPAD_LEFT -> ScenePreview.state.value = state.step(-1)
+            KeyEvent.KEYCODE_DPAD_UP -> ScenePreview.state.value = state.turn(-1)
+            KeyEvent.KEYCODE_DPAD_DOWN -> ScenePreview.state.value = state.turn(1)
+            KeyEvent.KEYCODE_BACK -> ScenePreview.stop()
+        }
+        return true
+    }
+    Box(Modifier.fillMaxSize().background(Ground).onPreviewKeyEvent { answerPreview(it.nativeKeyEvent) || answerRemove(it.nativeKeyEvent) }) {
+        HomeScene(scene, Modifier.fillMaxSize())
         Column(Modifier.fillMaxSize().padding(start = 60.dp, end = 60.dp, top = 32.dp, bottom = 28.dp)) {
             Header(
-                now = now,
-                greeting = celebrationGreeting(familyDaysOn(sceneDay, house.familyDays.map { it.day }))
-                    ?: holidayGreeting(holidayOn(sceneDay, house.packs, DrawnHolidays), sceneDay)
+                now = if (scene.preview != null) scene.day.atTime(now.toLocalTime()) else now,
+                greeting = celebrationGreeting(scene.family)
+                    ?: holidayGreeting(scene.holiday, scene.day)
                     ?: greetingFor(now.hour),
                 searchButton = searchButton,
                 moviesButton = moviesButton,
@@ -273,6 +287,19 @@ fun HomeScreen(
             GlanceCards(glance, glanceCards, onOpenChannel, hidden = house.hiddenCards)
         }
         RemoveAppPrompt(removing, builtIn, removeChoice)
+        scene.preview?.let { PreviewStrip(previewCaption(it), Modifier.align(Alignment.BottomCenter)) }
+    }
+}
+
+// The holiday preview's caption, in the strip below the cards.
+@Composable
+private fun PreviewStrip(caption: String, modifier: Modifier) {
+    AnimatedContent(targetState = caption, transitionSpec = { fadeIn(tween(200)) togetherWith fadeOut(tween(200)) }, label = "previewCaption", modifier = modifier) { text ->
+        BasicText(
+            text,
+            style = SimpleTVType.hint.copy(color = OnInk),
+            modifier = Modifier.padding(bottom = 2.dp).background(Ink.copy(alpha = 0.85f), RoundedCornerShape(50)).padding(horizontal = 16.dp, vertical = 3.dp),
+        )
     }
 }
 
@@ -289,8 +316,9 @@ private fun Header(
     onHoldSettings: () -> Unit,
 ) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            BasicText(greeting, style = SimpleTVType.greeting)
+        // A long greeting (two names, say) shrinks to fit beside the buttons rather than crowd them.
+        Column(Modifier.weight(1f).padding(end = 24.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+            BasicText(greeting, style = SimpleTVType.greeting, maxLines = 1, autoSize = TextAutoSize.StepBased(minFontSize = 18.sp, maxFontSize = SimpleTVType.greeting.fontSize))
             BasicText(now.format(DateFormat), style = SimpleTVType.date)
         }
         Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(5.dp)) {
@@ -345,7 +373,7 @@ private fun HeaderButton(label: String, modifier: Modifier, onClick: () -> Unit,
             )
             .padding(horizontal = 14.dp, vertical = 5.dp),
     ) {
-        BasicText(label, style = SimpleTVType.hint, color = { content })
+        BasicText(label, style = SimpleTVType.hint, color = { content }, softWrap = false, maxLines = 1)
     }
 }
 

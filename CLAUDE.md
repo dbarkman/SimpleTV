@@ -42,7 +42,7 @@ adb shell pm disable-user --user 0 com.google.android.tungsten.setupwraith
 `pm enable <package>` on the same two packages restores the stock home. An
 OTA update may re-enable them. Back on the home screen does nothing, and the
 Settings button opens SimpleTV's Settings screen (the phone settings page's QR
-code, and a TV settings button for Android's); holding OK on it for 1.5 s opens
+code, a TV settings button for Android's, and Preview holidays); holding OK on it for 1.5 s opens
 Tailscale, which has no tile so nobody removes it by mistake. The remote's own
 settings button still opens Android settings.
 
@@ -229,8 +229,23 @@ source of truth.
   are published. Tests check them against the macOS calendars.
 - `FamilyDays.kt` — birthdays and anniversaries (from `HouseSettings`; the
   household's `birthdays.txt`, never in the repo, seeds them). On the day the
-  greeting becomes "Happy birthday, <name>!" and the scene celebrates instead of
-  any holiday.
+  greeting becomes "Happy birthday, <name>!" (shrinking to fit beside the header
+  buttons when it's long) and the scene celebrates instead of any holiday, with the
+  name spelled in letter pennants across the band (`celebrationNames`).
+- `SceneChoice.kt` — the backdrop for a day (`backdropFor`): the season's hills and
+  trees on ordinary days, the first day of a season, Thanksgiving (fall) and
+  Christmas (winter); its own backdrop for any other holiday that has one
+  (`backdropOptions`, chosen one first: Pizza Day the pizzeria; Pi Day the classroom,
+  bakery or computer room; St. Patrick's all-green hills), the season's until it does.
+  Also the holiday preview: Settings → Preview holidays shows the home screen dressed
+  for each drawn holiday in the household's packs over the next year, its next
+  birthday and anniversary, and an ordinary day in each season (`previewEntries`, on
+  the day that shows each best), with a caption strip at the bottom. Left/Right step,
+  Up/Down switch between a holiday's backdrops, Back (or Home) leaves. Nothing about
+  the household changes.
+- `Rooms.kt` — the indoor backdrops: a pale wall behind the header and apps, the
+  room along the band, a counter or desk at y 868 for the holiday's things, a
+  feature at each edge, and what moves (the oven's fire, server lights).
 - `Holidays.kt` — the decorations' motion, pure math in design px.
 - `NewYearScene.kt` / `EpiphanyScene.kt` / `MlkDayScene.kt` / `PopcornDayScene.kt` /
   `GroundhogDayScene.kt` / `LunarNewYearScene.kt` / `PizzaDayScene.kt` /
@@ -254,10 +269,10 @@ source of truth.
   hearts rising off the hill, a mailbox with a letter, roses, a "BE MINE" candy heart
   and two lovebirds leaning in. Presidents' Day ("Happy Presidents' Day"): a log cabin
   with chimney smoke, a cherry tree, a waving flag with small flags, and a tricorn and a
-  stovepipe hat on a bench. Pizza Day (Feb 9; "Happy Pizza Day!"): a steaming pepperoni
-  pizza on a board whose slice lifts out with stretching cheese, pizza boxes and a
+  stovepipe hat on a bench. Pizza Day (Feb 9; "Happy Pizza Day!"; in the pizzeria): a steaming
+  pepperoni pizza on a board whose slice lifts out with stretching cheese, pizza boxes and a
   parmesan shaker. Ash Wednesday (no greeting): a quiet white chapel with lit windows and
-  a swinging bell, bare shrubs and candles. Pi Day (Mar 14; "Happy Pi Day!"): a pie with a
+  a swinging bell, bare shrubs and candles. Pi Day (Mar 14; "Happy Pi Day!"; in one of three rooms): a pie with a
   π in its crust, the digits of pi scrolling along a ribbon, and a compass drawing circles
   on a chalkboard. St. Patrick's (Mar 14–17; "Happy St. Patrick's Day!" on the 17th only;
   its own all-green backdrop with nothing drifting, whatever the season): a rainbow down
@@ -281,8 +296,8 @@ source of truth.
   now and then. Christmas (Saturday after Thanksgiving through Dec 30, always on the
   winter backdrop): twinkling string lights, a decorated tree with a glowing
   star and presents, a waving snowman, and Santa's sleigh crossing under the
-  lights now and then. Celebration: bunting, rising balloons (hearts for an
-  anniversary), a cake with flickering candles and presents.
+  lights now and then. Celebration: the name in letter pennants, rising balloons (hearts
+  for an anniversary), a cake with flickering candles and presents.
 - `AppArt.kt` — each app's own TV banner (its logo artwork), decoded at tile
   size; apps without one get their icon and name on a warm color.
 - `HomeScene.kt` / `FallingLeaves.kt` — the backdrop behind every screen
@@ -293,7 +308,7 @@ source of truth.
   another app is in front; that keeps SimpleTV near 40% of one core on the
   stick. To see a date's scene ahead of time:
   `adb shell am start -n com.redmesastudios.simpletv/.MainActivity --es scene_date 2026-12-25`
-  (Home goes back to today).
+  (Home goes back to today), or use Preview holidays in Settings.
 - `ServiceDirectory.kt` — TMDB's and Watchmode's US service lists (cached a
   week in `files/services.json`). An app SimpleTV wasn't told about is matched
   to its service by name (`matchService`: "ESPN" takes ESPN and ESPN Plus,

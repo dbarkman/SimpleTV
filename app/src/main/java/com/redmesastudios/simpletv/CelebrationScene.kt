@@ -8,11 +8,14 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.graphics.nativeCanvas
 import kotlin.math.sin
 
-// The birthday or anniversary scene: bunting along the top, balloons rising past, and a cake
-// with flickering candles between presents on the hill. Anniversaries get heart balloons.
+// The birthday or anniversary scene: a banner of letter pennants spelling the name (or
+// names) across the hill, balloons rising past, and a cake with flickering candles between
+// presents. Anniversaries get heart balloons.
 private val BirthdayBalloons = listOf(
     Color(0xFFE8796B), Color(0xFFF2C14E), Color(0xFF7FB7D9), Color(0xFF9BCB8C), Color(0xFFC99BD9), Color(0xFFF4A6B8),
 )
@@ -26,14 +29,23 @@ private val Flame = Color(0xFFF7C55A)
 private val FlameCore = Color(0xFFFFF3D6)
 private val Ribbon = Color(0xFFFBF1E4)
 
-private const val CelebrationBuntingY = -8f
-private const val CelebrationBuntingDip = 26f
-private val CelebrationAnchors = listOf(0f, 480f, 960f, 1440f, 1920f)
+private const val BannerLeft = 300f
+private const val BannerRight = 1620f
+private const val BannerY = 640f
+private const val BannerDip = 10f
+private const val MaxPennant = 62f
 
-fun DrawScope.drawCelebration(unit: Float, seconds: Float, anniversary: Boolean) {
+private val PennantText = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+    color = android.graphics.Color.WHITE
+    textAlign = android.graphics.Paint.Align.CENTER
+    typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD)
+    setShadowLayer(3f, 0f, 1.5f, android.graphics.Color.argb(0x55, 0x2A, 0x21, 0x1B))
+}
+
+fun DrawScope.drawCelebration(unit: Float, seconds: Float, anniversary: Boolean, names: String) {
     val colors = if (anniversary) AnniversaryBalloons else BirthdayBalloons
     withTransform({ scale(unit, unit, pivot = Offset.Zero) }) {
-        drawCelebrationBunting(seconds, colors)
+        drawNameBanner(names, seconds, colors)
         drawPresent(820f, 868f, 66f, 54f, colors[2 % colors.size], colors[0])
         drawPresent(1104f, 868f, 54f, 66f, colors[1], colors[3 % colors.size])
         drawCake(960f, 868f, seconds, candles = if (anniversary) 2 else 5)
@@ -44,28 +56,36 @@ fun DrawScope.drawCelebration(unit: Float, seconds: Float, anniversary: Boolean)
     }
 }
 
-private fun DrawScope.drawCelebrationBunting(seconds: Float, colors: List<Color>) {
-    var count = 0
-    CelebrationAnchors.zipWithNext().forEach { (from, to) ->
-        fun pointAt(t: Float) = Offset(from + (to - from) * t, CelebrationBuntingY + 4f * CelebrationBuntingDip * t * (1f - t))
-        drawPath(Path().apply {
-            moveTo(from, CelebrationBuntingY)
-            quadraticTo((from + to) / 2, CelebrationBuntingY + 2f * CelebrationBuntingDip, to, CelebrationBuntingY)
-        }, BalloonString, style = Stroke(2f))
-        val pennants = 9
-        repeat(pennants) { i ->
-            val t = (i + 0.5f) / pennants
-            val top = pointAt(t)
-            if (top.y < 0f) return@repeat
-            val slope = Math.toDegrees(kotlin.math.atan2((4f * CelebrationBuntingDip * (1f - 2f * t)).toDouble(), (to - from).toDouble())).toFloat()
-            val sway = 4f * sin(seconds * 1.3f + count * 0.8f)
-            withTransform({ rotate(slope + sway, pivot = top) }) {
-                drawPath(Path().apply {
-                    moveTo(top.x - 13f, top.y); lineTo(top.x + 13f, top.y); lineTo(top.x, top.y + 30f); close()
-                }, colors[count % colors.size])
-            }
-            count++
+// One pennant per letter, strung across the band and sized so any name fits: as big as 62 px
+// a letter, smaller for long names. Spaces leave a gap. Each pennant sways on its own.
+private fun DrawScope.drawNameBanner(names: String, seconds: Float, colors: List<Color>) {
+    val letters = names.uppercase()
+    val slot = minOf(MaxPennant, (BannerRight - BannerLeft) / letters.length.coerceAtLeast(1))
+    val width = slot * 0.88f
+    val height = width * 1.12f
+    val start = (BannerLeft + BannerRight) / 2 - slot * letters.length / 2
+    val end = start + slot * letters.length
+    drawPath(Path().apply {
+        moveTo(start - 30f, BannerY); quadraticTo((start + end) / 2, BannerY + 2f * BannerDip, end + 30f, BannerY)
+    }, BalloonString, style = Stroke(2f))
+    drawCircle(colors[0], 6f, Offset(start - 30f, BannerY))
+    drawCircle(colors[0], 6f, Offset(end + 30f, BannerY))
+    PennantText.textSize = width * 0.62f
+    var colorIndex = 0
+    letters.forEachIndexed { i, letter ->
+        if (letter == ' ') return@forEachIndexed
+        val t = (i + 0.5f) / letters.length
+        val top = Offset(start + slot * (i + 0.5f), BannerY + 4f * BannerDip * t * (1f - t))
+        val sway = 3.5f * sin(seconds * 1.3f + i * 0.8f)
+        withTransform({ rotate(sway, pivot = top) }) {
+            drawPath(Path().apply {
+                moveTo(top.x - width / 2, top.y); lineTo(top.x + width / 2, top.y)
+                lineTo(top.x + width / 2, top.y + height); lineTo(top.x, top.y + height * 0.8f); lineTo(top.x - width / 2, top.y + height)
+                close()
+            }, colors[colorIndex % colors.size])
+            drawIntoCanvas { it.nativeCanvas.drawText(letter.toString(), top.x, top.y + height * 0.55f, PennantText) }
         }
+        colorIndex++
     }
 }
 

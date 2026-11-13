@@ -43,6 +43,12 @@ fun celebrationGreeting(days: List<FamilyDay>): String? {
     }
 }
 
+// The names the celebration's banner spells: the birthdays, or else the anniversaries.
+fun celebrationNames(days: List<FamilyDay>): String {
+    val birthdays = days.filter { it.kind == FamilyDayKind.Birthday }.map { it.name }
+    return joinNames(birthdays.ifEmpty { days.map { it.name } }).replace(" and ", " & ")
+}
+
 private fun joinNames(names: List<String>): String = when (names.size) {
     1 -> names[0]
     2 -> "${names[0]} and ${names[1]}"

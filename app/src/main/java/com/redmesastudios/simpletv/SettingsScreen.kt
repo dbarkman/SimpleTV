@@ -44,9 +44,9 @@ import com.redmesastudios.simpletv.ui.theme.SimpleTVType
 
 // The home screen's Settings button: a QR code for the household's settings page on a
 // phone (SettingsServer.kt), which runs only while this shows, and a way on to the TV's own
-// settings.
+// settings, and the holiday preview: the home screen dressed for each holiday in turn.
 @Composable
-fun SettingsScreen(onClose: () -> Unit) {
+fun SettingsScreen(onClose: () -> Unit, onPreview: () -> Unit) {
     val context = LocalContext.current
     val pin = remember { newUploadPin() }
     var address by remember { mutableStateOf<String?>(null) }
@@ -84,7 +84,14 @@ fun SettingsScreen(onClose: () -> Unit) {
                 }
                 BasicText(summary(house), style = SimpleTVType.serviceName.copy(fontSize = 15.sp))
                 Spacer(Modifier.height(4.dp))
-                SettingsButton("TV settings", Modifier.focusRequester(tvSettings)) { context.openSystemSettings() }
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    SettingsButton("TV settings", Modifier.focusRequester(tvSettings)) { context.openSystemSettings() }
+                    SettingsButton("Preview holidays", Modifier) {
+                        val today = java.time.LocalDate.now()
+                        ScenePreview.state.value = PreviewState(previewEntries(today, house.packs, house.familyDays.map { it.day }))
+                        onPreview()
+                    }
+                }
                 BasicText("Back to leave", style = SimpleTVType.hint.copy(color = InkSoft))
             }
         }
