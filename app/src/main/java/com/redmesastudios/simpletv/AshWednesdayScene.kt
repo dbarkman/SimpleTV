@@ -79,7 +79,7 @@ private fun DrawScope.drawBareShrub(x: Float, baseY: Float) {
     }
 }
 
-private fun DrawScope.drawCandle(x: Float, baseY: Float, seconds: Float, index: Int) {
+internal fun DrawScope.drawCandle(x: Float, baseY: Float, seconds: Float, index: Int) {
     val height = 34f + (index % 2) * 10f
     drawRoundRect(CandleWax, Offset(x - 6f, baseY - height), Size(12f, height), CornerRadius(3f))
     val glow = candleGlow(seconds, index * 1.9f)

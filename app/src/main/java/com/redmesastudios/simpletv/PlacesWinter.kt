@@ -269,7 +269,7 @@ fun DrawScope.drawWinterPlace(room: Room) {
         Room.CapitolLawn -> drawCapitolLawn()
         Room.Churchyard -> drawChurchyard()
         Room.BigTop -> drawBigTop()
-        else -> {}
+        else -> drawSpringPlace(room)
     }
 }
 
@@ -277,6 +277,6 @@ fun DrawScope.drawWinterPlaceMotion(room: Room, seconds: Float) {
     when (room) {
         Room.Stadium -> drawCrowdFlashes(seconds)
         Room.BigTop -> drawPoleFlags(seconds)
-        else -> {}
+        else -> drawSpringPlaceMotion(room, seconds)
     }
 }

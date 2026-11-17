@@ -133,6 +133,12 @@ fun HomeScene(scene: ShownScene = rememberShownScene(), modifier: Modifier = Mod
                 Holiday.StPatricks -> drawStPatricksFigures(unit, now)
                 Holiday.FirstDayOfSpring -> drawSpringDayFigures(unit, now)
                 Holiday.AprilFools -> drawAprilFoolsFigures(unit, now)
+                Holiday.GoodFriday -> drawGoodFridayFigures(unit, now)
+                Holiday.Easter -> drawEasterFigures(unit, now)
+                Holiday.EarthDay -> drawEarthDayFigures(unit, now)
+                Holiday.CincoDeMayo -> drawCincoDeMayoFigures(unit, now)
+                Holiday.MothersDay -> drawMothersDayFigures(unit, now)
+                Holiday.MemorialDay -> drawMemorialDayFigures(unit, now)
                 else -> {}
             }
             if (family.isNotEmpty()) drawCelebration(unit, now, anniversary, celebrationNames(family))

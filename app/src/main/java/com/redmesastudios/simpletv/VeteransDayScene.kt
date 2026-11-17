@@ -47,7 +47,7 @@ fun DrawScope.drawVeteransDayFigures(unit: Float, seconds: Float) {
 }
 
 // A round wreath on a small easel, its ribbon tails stirring.
-private fun DrawScope.drawWreath(x: Float, baseY: Float, seconds: Float) {
+internal fun DrawScope.drawWreath(x: Float, baseY: Float, seconds: Float) {
     val center = Offset(x, baseY - 74f)
     drawLine(Easel, Offset(x - 22f, baseY), Offset(x, center.y - 30f), strokeWidth = 4f, cap = StrokeCap.Round)
     drawLine(Easel, Offset(x + 22f, baseY), Offset(x, center.y - 30f), strokeWidth = 4f, cap = StrokeCap.Round)

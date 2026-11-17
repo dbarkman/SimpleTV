@@ -130,6 +130,28 @@ class HolidaysAndGlanceTest {
     }
 
     @Test
+    fun aprilAndMayScenesShowOnTheirDays() {
+        fun on(text: String) = holidayOn(LocalDate.parse(text), DefaultPacks, DrawnHolidays, zone)
+        fun greeting(text: String) = holidayGreeting(on(text), LocalDate.parse(text))
+        // Easter 2027 is March 28th: the week before it, with Good Friday taking its day.
+        assertEquals(Holiday.Easter, on("2027-03-21"))
+        assertEquals(Holiday.GoodFriday, on("2027-03-26"))
+        assertNull(greeting("2027-03-26"))
+        assertNull(greeting("2027-03-27"))
+        assertEquals("Happy Easter!", greeting("2027-03-28"))
+        assertEquals(Holiday.EarthDay, on("2027-04-22"))
+        assertEquals("Happy Cinco de Mayo!", greeting("2027-05-05"))
+        // Mother's Day 2027 is May 9th; the weekend greets only on the Sunday.
+        assertEquals(Holiday.MothersDay, on("2027-05-07"))
+        assertNull(greeting("2027-05-08"))
+        assertEquals("Happy Mother's Day!", greeting("2027-05-09"))
+        // Memorial Day 2027 is May 31st.
+        assertEquals(Holiday.MemorialDay, on("2027-05-29"))
+        assertNull(greeting("2027-05-30"))
+        assertEquals("Honoring the fallen", greeting("2027-05-31"))
+    }
+
+    @Test
     fun sliceLiftsHoldsAndSettlesBack() {
         assertEquals(0f, sliceLift(1f))
         assertTrue(sliceLift(3.8f) in 0.1f..0.9f)

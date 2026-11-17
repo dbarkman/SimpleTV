@@ -7,12 +7,18 @@ fun greetingFor(hour: Int): String = when (hour) {
 }
 
 // What the greeting says on a holiday that has its own words, instead of "Good morning".
-// Valentine's week and St. Patrick's say it only on the day itself.
+// Holidays that last several days (Valentine's, St. Patrick's, Easter week, Mother's Day and
+// Memorial Day weekends) say it only on the day itself.
 fun holidayGreeting(holiday: Holiday?, day: java.time.LocalDate): String? = when (holiday) {
     Holiday.Valentines -> if (day.monthValue == 2 && day.dayOfMonth == 14) "Happy Valentine's Day!" else null
     Holiday.PresidentsDay -> "Happy Presidents' Day"
     Holiday.StPatricks -> if (day.monthValue == 3 && day.dayOfMonth == 17) "Happy St. Patrick's Day!" else null
     Holiday.PizzaDay -> "Happy Pizza Day!"
+    Holiday.Easter -> if (day == easter(day.year)) "Happy Easter!" else null
+    Holiday.EarthDay -> "Happy Earth Day!"
+    Holiday.CincoDeMayo -> "Happy Cinco de Mayo!"
+    Holiday.MothersDay -> if (day.dayOfWeek == java.time.DayOfWeek.SUNDAY) "Happy Mother's Day!" else null
+    Holiday.MemorialDay -> if (day.dayOfWeek == java.time.DayOfWeek.MONDAY) "Honoring the fallen" else null
     Holiday.PiDay -> "Happy Pi Day!"
     Holiday.FirstDayOfSpring -> "Hello, spring!"
     Holiday.AprilFools -> "Happy April Fools' Day!"

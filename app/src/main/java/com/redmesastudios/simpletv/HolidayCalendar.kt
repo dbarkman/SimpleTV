@@ -112,6 +112,7 @@ val DrawnHolidays = setOf(
     Holiday.NewYear, Holiday.MlkDay, Holiday.SuperBowl, Holiday.Valentines, Holiday.PresidentsDay,
     Holiday.Epiphany, Holiday.LunarNewYear, Holiday.PopcornDay, Holiday.GroundhogDay,
     Holiday.StPatricks, Holiday.AshWednesday, Holiday.PizzaDay, Holiday.PiDay, Holiday.AprilFools, Holiday.FirstDayOfSpring,
+    Holiday.GoodFriday, Holiday.Easter, Holiday.EarthDay, Holiday.CincoDeMayo, Holiday.MothersDay, Holiday.MemorialDay,
     Holiday.Halloween, Holiday.ElectionDay, Holiday.VeteransDay, Holiday.Thanksgiving, Holiday.Christmas,
 )
 

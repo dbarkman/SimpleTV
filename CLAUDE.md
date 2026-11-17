@@ -240,7 +240,9 @@ source of truth.
   with palms; MLK Day a reflecting pool at dawn; Popcorn Day a theater concession stand;
   Lunar New Year a courtyard with a moon gate; Valentine's a rose garden; game day a
   stadium; Presidents' Day a capitol lawn; Ash Wednesday a churchyard at dusk; April Fools
-  a circus big top; Pizza Day the pizzeria; Pi Day the classroom; St. Patrick's all-green
+  a circus big top; Good Friday three crosses on a hill at dusk; Easter a meadow at
+  sunrise; Earth Day a green valley with wind turbines; Cinco de Mayo an adobe plaza
+  with saguaros; Mother's Day a sunroom; Memorial Day a national cemetery; Pizza Day the pizzeria; Pi Day the classroom; St. Patrick's all-green
   hills; Groundhog Day keeps its snowy hill), the season's until it does.
   Also the holiday preview: Settings → Preview holidays shows the home screen dressed
   for each drawn holiday in the household's packs over the next year, its next
@@ -249,16 +251,20 @@ source of truth.
   Up/Down switch between a holiday's backdrops where it has more than one, Back (or
   Home) leaves. Nothing about
   the household changes.
-- `Places.kt` / `PlacesWinter.kt` — the places (city, desert, reflecting pool, concession
-  stand, courtyard; rose garden, stadium, capitol lawn, churchyard, big top): a sky that stays the plain background behind the header and apps and
+- `Places.kt` / `PlacesWinter.kt` / `PlacesSpring.kt` — the places (city, desert,
+  reflecting pool, concession stand, courtyard; rose garden, stadium, capitol lawn,
+  churchyard, big top; Calvary, Easter meadow, green valley, plaza, sunroom, cemetery): a sky that stays the plain background behind the header and apps and
   deepens only along the band, ground meeting the band's floor at y 868, and what moves
-  (city windows, the pool's shimmer, the popcorn machine, crowd flashes, tent flags).
+  (city windows, the pool's shimmer, the popcorn machine, crowd flashes, tent flags,
+  wind turbines).
 - `Rooms.kt` — the indoor backdrops: a pale wall behind the header and apps, the
   room along the band, a counter or desk at y 868 for the holiday's things, a
   feature at each edge, and what moves (the oven's fire): the pizzeria and the
   classroom.
 - `Holidays.kt` — the decorations' motion, pure math in design px.
 - `NewYearScene.kt` / `EpiphanyScene.kt` / `MlkDayScene.kt` / `PopcornDayScene.kt` /
+  `EasterScene.kt` / `EarthDayScene.kt` / `CincoDeMayoScene.kt` / `MothersDayScene.kt` /
+  `MemorialDayScene.kt` /
   `GroundhogDayScene.kt` / `LunarNewYearScene.kt` / `PizzaDayScene.kt` /
   `AshWednesdayScene.kt` / `ValentinesScene.kt` / `GameDayScene.kt` /
   `PresidentsDayScene.kt` / `PiDayScene.kt` / `StPatricksScene.kt` /
@@ -291,7 +297,15 @@ source of truth.
   First day of spring ("Hello, spring!"): tulips and daffodils, a birdhouse with a robin
   popping out, and butterflies. April Fools ("Happy April Fools' Day!"): a jack-in-the-box
   that cranks and pops, an upside-down APRIL FOOLS! sign, a banana peel and a whoopee
-  cushion. Game day (the second Sunday of February,
+  cushion. Good Friday (no greeting): three crosses on a hill at dusk and candles. Easter
+  week (the week up to Easter; "Happy Easter!" on the Sunday): a basket of painted eggs,
+  eggs in the grass, Easter lilies and a bunny hopping across. Earth Day ("Happy Earth
+  Day!"): a sapling being watered, young staked trees and a recycling bin. Cinco de Mayo
+  ("Happy Cinco de Mayo!"): papel picado, a swinging star piñata, maracas, a guitar and
+  paper flowers. Mother's Day weekend ("Happy Mother's Day!" on the Sunday): a bouquet, a
+  card for Mom, a steaming teacup, a gift and hanging baskets. Memorial Day weekend
+  ("Honoring the fallen" on the Monday): a flag by each front-row headstone, a tall flag,
+  a wreath and poppies. Game day (the second Sunday of February,
   `Holiday.SuperBowl`; "Happy game day!"; no team or league marks): a football kicked
   from its tee through goalposts now and then, a scoreboard whose home score goes up 3
   per kick, a "GO TEAM!" pennant and a bowl of chips. Halloween (Oct 24 – Nov 1):
@@ -331,7 +345,7 @@ source of truth.
   rest by name. Settings, the Play Store (Get Apps) and SimpleTV itself get no
   tile. Launches via the leanback launch intent.
 - `Greeting.kt` — greeting by hour, and the words some holidays use instead
-  (`holidayGreeting`, which takes the date for Valentine's and St. Patrick's).
+  (`holidayGreeting`, which takes the date for holidays that greet only on their day).
 - `ui/theme/` — Fall palette and Manrope type (bundled variable font in
   `res/font`, OFL licence in `FONT-LICENSE-OFL.txt`). Text sizes are the design's
   px values halved.
