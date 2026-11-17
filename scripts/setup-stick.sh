@@ -50,9 +50,10 @@ on appops set "$app" GET_USAGE_STATS allow
 on pm grant "$app" android.permission.RECORD_AUDIO
 on settings put secure screensaver_components "$app/.PhotoDream"
 on appops set "$app" REQUEST_INSTALL_PACKAGES allow
-# The screensaver needs Developer options' "Stay awake" off; sleep stays off so the slideshow
-# keeps running until the TV goes off.
+# The screensaver needs Developer options' "Stay awake" off; it starts after 30 minutes idle,
+# and sleep stays off so the slideshow keeps running until the TV goes off.
 on settings put global stay_on_while_plugged_in 0
+on settings put system screen_off_timeout 1800000
 on settings put secure sleep_timeout -1
 
 # Tailscale, if it's installed for remote help: it starts its tunnel at every boot (always-on

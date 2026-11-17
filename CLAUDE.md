@@ -215,7 +215,8 @@ source of truth.
   DreamService hosting Compose). Chosen once over adb:
   `adb shell settings put secure screensaver_components com.redmesastudios.simpletv/.PhotoDream`;
   `settings delete secure screensaver_components` restores Google TV's own.
-  Dreams can't be started from adb without root, so test by letting the TV idle.
+  It starts after 30 minutes idle (`system screen_off_timeout` 1800000, set by
+  `setup-stick.sh`). Dreams can't be started from adb without root, so test by letting the TV idle.
 - `HolidayCalendar.kt` — which holiday shows on a date. Holidays come in packs
   (US National, Christian, World, Fun days, Seasons, Jewish, Muslim, Indian);
   `holiday_packs=` in home.txt picks them (blank: all but the last three).
