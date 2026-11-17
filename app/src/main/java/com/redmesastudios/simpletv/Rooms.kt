@@ -31,6 +31,7 @@ fun DrawScope.drawRoom(room: Room, unit: Float) {
             Room.Classroom -> drawClassroom()
             Room.Bakery -> drawBakery()
             Room.ComputerRoom -> drawComputerRoom()
+            else -> drawPlace(room)
         }
     }
 }
@@ -40,7 +41,7 @@ fun DrawScope.drawRoomMotion(room: Room, unit: Float, seconds: Float) {
         when (room) {
             Room.Pizzeria -> drawOvenFire(seconds)
             Room.ComputerRoom -> drawServerLights(seconds)
-            else -> {}
+            else -> drawPlaceMotion(room, seconds)
         }
     }
 }

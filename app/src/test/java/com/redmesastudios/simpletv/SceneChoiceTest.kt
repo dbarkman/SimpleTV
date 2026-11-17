@@ -18,6 +18,13 @@ class SceneChoiceTest {
         assertEquals(BackdropKind.Outdoors(Season.Winter), backdropFor(Holiday.Christmas, LocalDate.of(2026, 12, 5), zone = zone))
         assertEquals(BackdropKind.Emerald, backdropFor(Holiday.StPatricks, LocalDate.of(2027, 3, 15), zone = zone))
         assertEquals(BackdropKind.Indoors(Room.Pizzeria), backdropFor(Holiday.PizzaDay, LocalDate.of(2027, 2, 9), zone = zone))
+        assertEquals(BackdropKind.Indoors(Room.CityDusk), backdropFor(Holiday.NewYear, LocalDate.of(2026, 12, 31), zone = zone))
+        assertEquals(BackdropKind.Indoors(Room.Desert), backdropFor(Holiday.Epiphany, LocalDate.of(2027, 1, 6), zone = zone))
+        assertEquals(BackdropKind.Indoors(Room.ReflectingPool), backdropFor(Holiday.MlkDay, LocalDate.of(2027, 1, 18), zone = zone))
+        assertEquals(BackdropKind.Indoors(Room.Concessions), backdropFor(Holiday.PopcornDay, LocalDate.of(2027, 1, 19), zone = zone))
+        assertEquals(BackdropKind.Indoors(Room.Courtyard), backdropFor(Holiday.LunarNewYear, LocalDate.of(2027, 2, 6), zone = zone))
+        // Groundhog Day keeps its snowy hill.
+        assertEquals(BackdropKind.Outdoors(Season.Winter), backdropFor(Holiday.GroundhogDay, LocalDate.of(2027, 2, 2), zone = zone))
     }
 
     @Test

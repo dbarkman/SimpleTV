@@ -235,14 +235,21 @@ source of truth.
 - `SceneChoice.kt` — the backdrop for a day (`backdropFor`): the season's hills and
   trees on ordinary days, the first day of a season, Thanksgiving (fall) and
   Christmas (winter); its own backdrop for any other holiday that has one
-  (`backdropOptions`, chosen one first: Pizza Day the pizzeria; Pi Day the classroom,
-  bakery or computer room; St. Patrick's all-green hills), the season's until it does.
+  (`backdropOptions`, chosen one first: New Year's a city at dusk; Epiphany a desert
+  with palms; MLK Day a reflecting pool at dawn; Popcorn Day a theater concession stand;
+  Lunar New Year a courtyard with a moon gate; Pizza Day the pizzeria; Pi Day the
+  classroom, bakery or computer room; St. Patrick's all-green hills; Groundhog Day keeps
+  its snowy hill), the season's until it does.
   Also the holiday preview: Settings → Preview holidays shows the home screen dressed
   for each drawn holiday in the household's packs over the next year, its next
   birthday and anniversary, and an ordinary day in each season (`previewEntries`, on
   the day that shows each best), with a caption strip at the bottom. Left/Right step,
   Up/Down switch between a holiday's backdrops, Back (or Home) leaves. Nothing about
   the household changes.
+- `Places.kt` — the outdoor places (city, desert, reflecting pool, concession stand,
+  courtyard): a sky that stays the plain background behind the header and apps and
+  deepens only along the band, ground meeting the band's floor at y 868, and what moves
+  (city windows, the pool's shimmer, the popcorn machine).
 - `Rooms.kt` — the indoor backdrops: a pale wall behind the header and apps, the
   room along the band, a counter or desk at y 868 for the holiday's things, a
   feature at each edge, and what moves (the oven's fire, server lights).
