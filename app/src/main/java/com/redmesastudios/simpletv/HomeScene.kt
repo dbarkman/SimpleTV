@@ -129,7 +129,7 @@ fun HomeScene(scene: ShownScene = rememberShownScene(), modifier: Modifier = Mod
                 Holiday.GroundhogDay -> drawGroundhogDayFigures(unit, now)
                 Holiday.PizzaDay -> drawPizzaDayFigures(unit, now)
                 Holiday.AshWednesday -> drawAshWednesdayFigures(unit, now)
-                Holiday.PiDay -> drawPiDayFigures(unit, now, room)
+                Holiday.PiDay -> drawPiDayFigures(unit, now)
                 Holiday.StPatricks -> drawStPatricksFigures(unit, now)
                 Holiday.FirstDayOfSpring -> drawSpringDayFigures(unit, now)
                 Holiday.AprilFools -> drawAprilFoolsFigures(unit, now)

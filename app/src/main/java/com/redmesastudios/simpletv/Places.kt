@@ -23,7 +23,7 @@ import kotlin.math.sin
 private val Plain = Color(0xFFF4ECE1)
 
 // A sky from the plain background at the top to `low` at the band's floor.
-private fun DrawScope.drawSky(mid: Color, low: Color) {
+internal fun DrawScope.drawSky(mid: Color, low: Color) {
     drawRect(
         Brush.verticalGradient(0f to Plain, 0.42f to Plain, 0.68f to mid, 0.84f to low, startY = 0f, endY = SceneHeight),
         Offset.Zero, Size(SceneWidth, SceneHeight),
@@ -342,7 +342,7 @@ fun DrawScope.drawPlace(room: Room) {
         Room.ReflectingPool -> drawReflectingPool()
         Room.Concessions -> drawConcessions()
         Room.Courtyard -> drawCourtyard()
-        else -> {}
+        else -> drawWinterPlace(room)
     }
 }
 
@@ -351,6 +351,6 @@ fun DrawScope.drawPlaceMotion(room: Room, seconds: Float) {
         Room.CityDusk -> drawCityWindows(seconds)
         Room.ReflectingPool -> drawPoolShimmer(seconds)
         Room.Concessions -> drawMachineKernels(seconds)
-        else -> {}
+        else -> drawWinterPlaceMotion(room, seconds)
     }
 }

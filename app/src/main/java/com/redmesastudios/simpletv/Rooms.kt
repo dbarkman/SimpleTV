@@ -20,7 +20,7 @@ import kotlin.math.sin
 // as on the plain background), the room's character along the band between the apps and the
 // cards, a surface at y 866-880 for the holiday's things to stand on, and a feature at each
 // edge where the trees stand outdoors. drawRoom is the still part; drawRoomMotion, on the
-// moving layer, is what flickers or blinks. Drawn in design px (1920x1080).
+// moving layer, is what flickers. Drawn in design px (1920x1080).
 
 const val CounterY = 868f
 
@@ -29,8 +29,6 @@ fun DrawScope.drawRoom(room: Room, unit: Float) {
         when (room) {
             Room.Pizzeria -> drawPizzeria()
             Room.Classroom -> drawClassroom()
-            Room.Bakery -> drawBakery()
-            Room.ComputerRoom -> drawComputerRoom()
             else -> drawPlace(room)
         }
     }
@@ -40,7 +38,6 @@ fun DrawScope.drawRoomMotion(room: Room, unit: Float, seconds: Float) {
     withTransform({ scale(unit, unit, pivot = Offset.Zero) }) {
         when (room) {
             Room.Pizzeria -> drawOvenFire(seconds)
-            Room.ComputerRoom -> drawServerLights(seconds)
             else -> drawPlaceMotion(room, seconds)
         }
     }
@@ -239,126 +236,6 @@ private fun DrawScope.drawBookshelf(x: Float) {
             drawRect(BookColors[k % BookColors.size], Offset(bx, shelf - h), Size(w, h))
             bx += w + 2f
             k++
-        }
-    }
-}
-
-// ---- Bakery (Pi Day) ----
-
-private val BakeryWall = Color(0xFFF8EEE8)
-private val Stripe = Color(0xFFF2E0DA)
-private val BakeryCounter = Color(0xFFE8B4A6)
-private val BakeryCounterTop = Color(0xFFFBF6EC)
-private val BakeryShelf = Color(0xFFC9A16E)
-private val PieTop = Color(0xFFE2A85E)
-private val PieDish = Color(0xFFCFD8DE)
-private val Awning = listOf(Color(0xFFE8796B), Color(0xFFFBF6EC))
-private val SignBlue = Color(0xFF3A5A92)
-
-private val ShopSign = textPaint(android.graphics.Color.rgb(0xFB, 0xF6, 0xEC), 26f)
-
-private fun DrawScope.drawBakery() {
-    drawRect(BakeryWall, Offset.Zero, Size(SceneWidth, SceneHeight))
-    // Striped wallpaper behind the band.
-    var x = 0f
-    var k = 0
-    while (x < SceneWidth) {
-        if (k % 2 == 0) drawRect(Stripe, Offset(x, 600f), Size(40f, CounterY - 600f))
-        x += 40f
-        k++
-    }
-    // A little scalloped awning over the band.
-    var ax = 0f
-    var a = 0
-    while (ax < SceneWidth) {
-        drawRect(Awning[a % 2], Offset(ax, 586f), Size(60f, 24f))
-        drawArc(Awning[a % 2], 0f, 180f, useCenter = true, topLeft = Offset(ax, 596f), size = Size(60f, 28f))
-        ax += 60f
-        a++
-    }
-    // The shop counter: a cream top over a pink front with panels.
-    drawRect(BakeryCounter, Offset(0f, CounterY + 12f), Size(SceneWidth, SceneHeight - CounterY))
-    var px = 30f
-    while (px < SceneWidth) {
-        drawRoundRect(Color(0xFFF0C7BC), Offset(px, CounterY + 34f), Size(150f, 150f), CornerRadius(8f))
-        px += 190f
-    }
-    drawRect(BakeryCounterTop, Offset(0f, CounterY - 2f), Size(SceneWidth, 16f))
-    drawPieShelf(120f)
-    drawPieShelf(1800f)
-    // The shop's sign on the wall, above the counter at the right.
-    drawRoundRect(SignBlue, Offset(1440f, 640f), Size(230f, 60f), CornerRadius(30f))
-    drawIntoCanvas { it.nativeCanvas.drawText("PIE SHOP", 1555f, 680f, ShopSign) }
-}
-
-// A wall shelf of three boards, a pie on each.
-private fun DrawScope.drawPieShelf(x: Float) {
-    listOf(680f, 770f, 860f).forEach { shelf ->
-        drawRect(BakeryShelf, Offset(x - 90f, shelf), Size(180f, 10f))
-        listOf(-46f, 46f).forEach { dx ->
-            val c = Offset(x + dx, shelf - 14f)
-            drawOval(PieDish, Offset(c.x - 36f, c.y - 2f), Size(72f, 16f))
-            drawOval(PieTop, Offset(c.x - 32f, c.y - 14f), Size(64f, 22f))
-            drawLine(Color(0xFFC98A44), Offset(c.x - 12f, c.y - 8f), Offset(c.x + 12f, c.y - 2f), strokeWidth = 2f)
-            drawLine(Color(0xFFC98A44), Offset(c.x - 12f, c.y - 2f), Offset(c.x + 12f, c.y - 8f), strokeWidth = 2f)
-        }
-    }
-}
-
-// ---- Computer room (Pi Day) ----
-
-private val CompWall = Color(0xFFEAEEF2)
-private val Panel = Color(0xFFDDE3E9)
-private val Rack = Color(0xFF3A414A)
-private val RackSlot = Color(0xFF2C3238)
-private val DeskGray = Color(0xFFB8C2CC)
-private val TileFloor = Color(0xFFD3DAE1)
-private val TileLine = Color(0xFFC2CAD3)
-
-private fun DrawScope.drawComputerRoom() {
-    drawRect(CompWall, Offset.Zero, Size(SceneWidth, SceneHeight))
-    // Wall panels along the band.
-    var x = 0f
-    while (x < SceneWidth) {
-        drawRoundRect(Panel, Offset(x + 6f, 610f), Size(228f, CounterY - 620f), CornerRadius(6f))
-        x += 240f
-    }
-    // A raised tile floor below a long desk.
-    drawRect(TileFloor, Offset(0f, CounterY + 12f), Size(SceneWidth, SceneHeight - CounterY))
-    var tx = 0f
-    while (tx < SceneWidth) { drawLine(TileLine, Offset(tx, CounterY + 12f), Offset(tx, SceneHeight), strokeWidth = 2f); tx += 120f }
-    var ty = CounterY + 70f
-    while (ty < SceneHeight) { drawLine(TileLine, Offset(0f, ty), Offset(SceneWidth, ty), strokeWidth = 2f); ty += 60f }
-    drawRect(DeskGray, Offset(240f, CounterY - 2f), Size(SceneWidth - 480f, 14f))
-    drawServerRack(110f)
-    drawServerRack(1810f)
-}
-
-private fun DrawScope.drawServerRack(x: Float) {
-    val top = 560f
-    drawRoundRect(Rack, Offset(x - 100f, top), Size(200f, SceneHeight - top), CornerRadius(6f))
-    var y = top + 16f
-    while (y < CounterY + 40f) {
-        drawRoundRect(RackSlot, Offset(x - 86f, y), Size(172f, 30f), CornerRadius(3f))
-        y += 38f
-    }
-}
-
-private val LedColors = listOf(Color(0xFF6DBE7B), Color(0xFF5FA8D3), Color(0xFFF2C14E))
-
-// Status lights on the racks, each blinking on its own rhythm.
-private fun DrawScope.drawServerLights(seconds: Float) {
-    listOf(110f, 1810f).forEachIndexed { r, x ->
-        var y = 576f
-        var i = r * 17
-        while (y < CounterY + 40f) {
-            repeat(3) { k ->
-                val on = sin(seconds * (2f + (i + k) % 5) + (i * 3 + k) * 1.3f) > 0.2f
-                drawCircle(LedColors[(i + k) % LedColors.size], 3.5f, Offset(x + 40f + k * 14f, y + 15f), alpha = if (on) 1f else 0.25f)
-            }
-            drawRect(Color(0xFF4A525C), Offset(x - 76f, y + 12f), Size(80f, 6f))
-            y += 38f
-            i++
         }
     }
 }

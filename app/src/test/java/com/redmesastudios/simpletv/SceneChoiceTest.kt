@@ -23,18 +23,22 @@ class SceneChoiceTest {
         assertEquals(BackdropKind.Indoors(Room.ReflectingPool), backdropFor(Holiday.MlkDay, LocalDate.of(2027, 1, 18), zone = zone))
         assertEquals(BackdropKind.Indoors(Room.Concessions), backdropFor(Holiday.PopcornDay, LocalDate.of(2027, 1, 19), zone = zone))
         assertEquals(BackdropKind.Indoors(Room.Courtyard), backdropFor(Holiday.LunarNewYear, LocalDate.of(2027, 2, 6), zone = zone))
+        assertEquals(BackdropKind.Indoors(Room.RoseGarden), backdropFor(Holiday.Valentines, LocalDate.of(2027, 2, 12), zone = zone))
+        assertEquals(BackdropKind.Indoors(Room.Stadium), backdropFor(Holiday.SuperBowl, LocalDate.of(2027, 2, 14), zone = zone))
+        assertEquals(BackdropKind.Indoors(Room.CapitolLawn), backdropFor(Holiday.PresidentsDay, LocalDate.of(2027, 2, 15), zone = zone))
+        assertEquals(BackdropKind.Indoors(Room.Churchyard), backdropFor(Holiday.AshWednesday, LocalDate.of(2027, 2, 10), zone = zone))
+        assertEquals(BackdropKind.Indoors(Room.BigTop), backdropFor(Holiday.AprilFools, LocalDate.of(2027, 4, 1), zone = zone))
+        // The first day of spring keeps the season's look.
+        assertEquals(BackdropKind.Outdoors(Season.Spring), backdropFor(Holiday.FirstDayOfSpring, LocalDate.of(2027, 3, 20), zone = zone))
         // Groundhog Day keeps its snowy hill.
         assertEquals(BackdropKind.Outdoors(Season.Winter), backdropFor(Holiday.GroundhogDay, LocalDate.of(2027, 2, 2), zone = zone))
     }
 
     @Test
-    fun piDayHasThreeRoomsToChooseFrom() {
-        val day = LocalDate.of(2027, 3, 14)
-        assertEquals(BackdropKind.Indoors(Room.Classroom), backdropFor(Holiday.PiDay, day, 0, zone))
-        assertEquals(BackdropKind.Indoors(Room.Bakery), backdropFor(Holiday.PiDay, day, 1, zone))
-        assertEquals(BackdropKind.Indoors(Room.ComputerRoom), backdropFor(Holiday.PiDay, day, 2, zone))
-        // Up from the first wraps to the last.
-        assertEquals(BackdropKind.Indoors(Room.ComputerRoom), backdropFor(Holiday.PiDay, day, -1, zone))
+    fun piDayIsInTheClassroom() {
+        assertEquals(BackdropKind.Indoors(Room.Classroom), backdropFor(Holiday.PiDay, LocalDate.of(2027, 3, 14), 0, zone))
+        // A holiday with one backdrop ignores the preview's Up and Down.
+        assertEquals(BackdropKind.Indoors(Room.Classroom), backdropFor(Holiday.PiDay, LocalDate.of(2027, 3, 14), 2, zone))
     }
 
     @Test
@@ -67,8 +71,8 @@ class SceneChoiceTest {
             PreviewEntry("St. Patrick's Day", LocalDate.of(2027, 3, 17), Holiday.StPatricks),
         )
         val start = PreviewState(entries)
-        assertTrue(previewCaption(start).contains("Backdrop 1 of 3"))
-        assertTrue(previewCaption(start.turn(1)).contains("Backdrop 2 of 3"))
+        // No holiday has more than one backdrop now, so the caption doesn't offer Up and Down.
+        assertTrue(!previewCaption(start).contains("Backdrop"))
         assertEquals(1, start.step(-1).index)
         assertEquals(0, start.step(2).index)
         // Stepping to another holiday starts on its chosen backdrop.

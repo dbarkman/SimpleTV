@@ -238,22 +238,25 @@ source of truth.
   Christmas (winter); its own backdrop for any other holiday that has one
   (`backdropOptions`, chosen one first: New Year's a city at dusk; Epiphany a desert
   with palms; MLK Day a reflecting pool at dawn; Popcorn Day a theater concession stand;
-  Lunar New Year a courtyard with a moon gate; Pizza Day the pizzeria; Pi Day the
-  classroom, bakery or computer room; St. Patrick's all-green hills; Groundhog Day keeps
-  its snowy hill), the season's until it does.
+  Lunar New Year a courtyard with a moon gate; Valentine's a rose garden; game day a
+  stadium; Presidents' Day a capitol lawn; Ash Wednesday a churchyard at dusk; April Fools
+  a circus big top; Pizza Day the pizzeria; Pi Day the classroom; St. Patrick's all-green
+  hills; Groundhog Day keeps its snowy hill), the season's until it does.
   Also the holiday preview: Settings → Preview holidays shows the home screen dressed
   for each drawn holiday in the household's packs over the next year, its next
   birthday and anniversary, and an ordinary day in each season (`previewEntries`, on
   the day that shows each best), with a caption strip at the bottom. Left/Right step,
-  Up/Down switch between a holiday's backdrops, Back (or Home) leaves. Nothing about
+  Up/Down switch between a holiday's backdrops where it has more than one, Back (or
+  Home) leaves. Nothing about
   the household changes.
-- `Places.kt` — the outdoor places (city, desert, reflecting pool, concession stand,
-  courtyard): a sky that stays the plain background behind the header and apps and
+- `Places.kt` / `PlacesWinter.kt` — the places (city, desert, reflecting pool, concession
+  stand, courtyard; rose garden, stadium, capitol lawn, churchyard, big top): a sky that stays the plain background behind the header and apps and
   deepens only along the band, ground meeting the band's floor at y 868, and what moves
-  (city windows, the pool's shimmer, the popcorn machine).
+  (city windows, the pool's shimmer, the popcorn machine, crowd flashes, tent flags).
 - `Rooms.kt` — the indoor backdrops: a pale wall behind the header and apps, the
   room along the band, a counter or desk at y 868 for the holiday's things, a
-  feature at each edge, and what moves (the oven's fire, server lights).
+  feature at each edge, and what moves (the oven's fire): the pizzeria and the
+  classroom.
 - `Holidays.kt` — the decorations' motion, pure math in design px.
 - `NewYearScene.kt` / `EpiphanyScene.kt` / `MlkDayScene.kt` / `PopcornDayScene.kt` /
   `GroundhogDayScene.kt` / `LunarNewYearScene.kt` / `PizzaDayScene.kt` /
@@ -280,9 +283,9 @@ source of truth.
   stovepipe hat on a bench. Pizza Day (Feb 9; "Happy Pizza Day!"; in the pizzeria): a steaming
   pepperoni pizza on a board whose slice lifts out with stretching cheese, pizza boxes and a
   parmesan shaker. Ash Wednesday (no greeting): a quiet white chapel with lit windows and
-  a swinging bell, bare shrubs and candles. Pi Day (Mar 14; "Happy Pi Day!"; in one of three rooms): a pie with a
-  π in its crust, the digits of pi scrolling along a ribbon, and a compass drawing circles
-  on a chalkboard. St. Patrick's (Mar 14–17; "Happy St. Patrick's Day!" on the 17th only;
+  a swinging bell, bare shrubs and candles. Pi Day (Mar 14; "Happy Pi Day!"; in the classroom): a pie with a π in
+  its crust on the desk, the digits of pi scrolling in chalk across the board, and a
+  compass drawing circles on it. St. Patrick's (Mar 14–17; "Happy St. Patrick's Day!" on the 17th only;
   its own all-green backdrop with nothing drifting, whatever the season): a rainbow down
   to a pot of gold, a shamrock garland, shamrocks in the grass and a green hat on a stump.
   First day of spring ("Hello, spring!"): tulips and daffodils, a birdhouse with a robin
