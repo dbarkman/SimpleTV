@@ -246,7 +246,9 @@ source of truth.
   the pizzeria; Pentecost a church with stained glass; Donut Day a donut shop; Juneteenth a
   park with a gazebo; Father's Day a backyard patio; Fourth of July a lake at dusk; Emoji Day
   chat bubbles; Ice Cream Day an ice cream parlor; S'mores Day a campsite; Dog Day a dog park;
-  Labor Day a building going up; Grandparents Day a living room; Pizza Day the pizzeria; Pi Day the classroom; St. Patrick's all-green
+  Labor Day a building going up; Grandparents Day a living room; Cheeseburger Day a diner;
+  Talk Like a Pirate Day a cove; Oktoberfest a beer garden under the Alps; Coffee Day a café;
+  Taco Day a taco truck; Cat Day a room with a window seat; Pizza Day the pizzeria; Pi Day the classroom; St. Patrick's all-green
   hills; Groundhog Day keeps its snowy hill), the season's until it does.
   Also the holiday preview: Settings → Preview holidays shows the home screen dressed
   for each drawn holiday in the household's packs over the next year, its next
@@ -256,11 +258,11 @@ source of truth.
   Home) leaves. Nothing about
   the household changes.
 - `Places.kt` / `PlacesWinter.kt` / `PlacesSpring.kt` / `PlacesSummer.kt` /
-  `PlacesLateSummer.kt` — the places (city, desert,
+  `PlacesLateSummer.kt` / `PlacesAutumn.kt` — the places (city, desert,
   reflecting pool, concession stand, courtyard; rose garden, stadium, capitol lawn,
   churchyard, big top; Calvary, Easter meadow, green valley, plaza, sunroom, cemetery;
   stained glass, donut shop, summer park, backyard, lake at dusk; chat sky, ice cream shop,
-  campsite, dog park, worksite, parlor): a sky that stays the plain background behind the header and apps and
+  campsite, dog park, worksite, parlor; diner, cove, beer garden, café, taco truck, cat room): a sky that stays the plain background behind the header and apps and
   deepens only along the band, ground meeting the band's floor at y 868, and what moves
   (city windows, the pool's shimmer, the popcorn machine, crowd flashes, tent flags,
   wind turbines).
@@ -272,8 +274,8 @@ source of truth.
 - `NewYearScene.kt` / `EpiphanyScene.kt` / `MlkDayScene.kt` / `PopcornDayScene.kt` /
   `EasterScene.kt` / `EarthDayScene.kt` / `CincoDeMayoScene.kt` / `MothersDayScene.kt` /
   `MemorialDayScene.kt` / `SummerScenes.kt` (Bitcoin Pizza Day through Fourth of July) /
-  `LateSummerScenes.kt` (Emoji Day through Grandparents Day; each file's header lists its
-  scenes) /
+  `LateSummerScenes.kt` (Emoji Day through Grandparents Day) / `AutumnScenes.kt`
+  (Cheeseburger Day through Cat Day; each file's header lists its scenes) /
   `GroundhogDayScene.kt` / `LunarNewYearScene.kt` / `PizzaDayScene.kt` /
   `AshWednesdayScene.kt` / `ValentinesScene.kt` / `GameDayScene.kt` /
   `PresidentsDayScene.kt` / `PiDayScene.kt` / `StPatricksScene.kt` /

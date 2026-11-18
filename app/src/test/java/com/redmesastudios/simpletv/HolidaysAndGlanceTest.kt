@@ -188,6 +188,23 @@ class HolidaysAndGlanceTest {
     }
 
     @Test
+    fun septemberAndOctoberScenesShowOnTheirDays() {
+        fun on(text: String) = holidayOn(LocalDate.parse(text), DefaultPacks, DrawnHolidays, zone)
+        fun greeting(text: String) = holidayGreeting(on(text), LocalDate.parse(text))
+        assertEquals(Holiday.CheeseburgerDay, on("2027-09-18"))
+        assertEquals("Ahoy, matey!", greeting("2027-09-19"))
+        val fall = seasonStart(2027, Season.Fall, zone).toString()
+        assertEquals(Holiday.FirstDayOfFall, on(fall))
+        assertEquals(Holiday.Oktoberfest, on("2027-09-26"))
+        // Coffee Day takes its day out of Oktoberfest.
+        assertEquals(Holiday.CoffeeDay, on("2027-09-29"))
+        assertEquals(Holiday.TacoDay, on("2027-10-04"))
+        // Cat Day takes its day out of Halloween's stretch.
+        assertEquals(Holiday.CatDay, on("2027-10-29"))
+        assertEquals(Holiday.Halloween, on("2027-10-30"))
+    }
+
+    @Test
     fun sliceLiftsHoldsAndSettlesBack() {
         assertEquals(0f, sliceLift(1f))
         assertTrue(sliceLift(3.8f) in 0.1f..0.9f)

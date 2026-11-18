@@ -26,6 +26,13 @@ fun holidayGreeting(holiday: Holiday?, day: java.time.LocalDate): String? = when
     Holiday.IceCreamDay -> "Happy Ice Cream Day!"
     Holiday.SmoresDay -> "Happy S'mores Day!"
     Holiday.DogDay -> "Happy Dog Day!"
+    Holiday.CheeseburgerDay -> "Happy Cheeseburger Day!"
+    Holiday.PirateDay -> "Ahoy, matey!"
+    Holiday.FirstDayOfFall -> "Hello, fall!"
+    Holiday.Oktoberfest -> "Happy Oktoberfest!"
+    Holiday.CoffeeDay -> "Happy Coffee Day!"
+    Holiday.TacoDay -> "Happy Taco Day!"
+    Holiday.CatDay -> "Happy Cat Day!"
     Holiday.LaborDay -> if (day.dayOfWeek == java.time.DayOfWeek.MONDAY) "Happy Labor Day!" else null
     Holiday.GrandparentsDay -> if (day.dayOfWeek == java.time.DayOfWeek.SUNDAY) "Happy Grandparents Day!" else null
     Holiday.FourthOfJuly -> if (day.monthValue == 7 && day.dayOfMonth == 4) "Happy Fourth of July!" else null

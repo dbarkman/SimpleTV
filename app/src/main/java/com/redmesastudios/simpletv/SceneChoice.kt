@@ -16,7 +16,8 @@ enum class Room { Pizzeria, Classroom, CityDusk, Desert, ReflectingPool, Concess
     RoseGarden, Stadium, CapitolLawn, Churchyard, BigTop,
     Calvary, EasterMeadow, GreenValley, Plaza, Sunroom, Cemetery,
     StainedGlass, DonutShop, SummerPark, Backyard, LakeDusk,
-    ChatSky, IceCreamShop, Campsite, DogPark, Worksite, Parlor }
+    ChatSky, IceCreamShop, Campsite, DogPark, Worksite, Parlor,
+    Diner, Cove, BeerGarden, Cafe, TacoTruck, CatRoom }
 
 sealed interface BackdropKind {
     data class Outdoors(val season: Season) : BackdropKind
@@ -57,6 +58,12 @@ fun backdropOptions(holiday: Holiday?): List<BackdropKind> = when (holiday) {
     Holiday.DogDay -> listOf(BackdropKind.Indoors(Room.DogPark))
     Holiday.LaborDay -> listOf(BackdropKind.Indoors(Room.Worksite))
     Holiday.GrandparentsDay -> listOf(BackdropKind.Indoors(Room.Parlor))
+    Holiday.CheeseburgerDay -> listOf(BackdropKind.Indoors(Room.Diner))
+    Holiday.PirateDay -> listOf(BackdropKind.Indoors(Room.Cove))
+    Holiday.Oktoberfest -> listOf(BackdropKind.Indoors(Room.BeerGarden))
+    Holiday.CoffeeDay -> listOf(BackdropKind.Indoors(Room.Cafe))
+    Holiday.TacoDay -> listOf(BackdropKind.Indoors(Room.TacoTruck))
+    Holiday.CatDay -> listOf(BackdropKind.Indoors(Room.CatRoom))
     Holiday.PizzaDay -> listOf(BackdropKind.Indoors(Room.Pizzeria))
     Holiday.PiDay -> listOf(BackdropKind.Indoors(Room.Classroom))
     else -> emptyList()
