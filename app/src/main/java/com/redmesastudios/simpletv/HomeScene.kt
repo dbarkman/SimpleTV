@@ -100,8 +100,6 @@ fun HomeScene(scene: ShownScene = rememberShownScene(), modifier: Modifier = Mod
                 drawRoom(room, unit)
                 return@Canvas
             }
-            if (holiday == Holiday.Halloween) drawHarvestMoon(unit)
-            if (holiday == Holiday.MlkDay) drawRisingSun(unit)
             drawHillsAndTrees(look, unit)
             if (look.restingColors != null) {
                 resting.forEach { drawLeaf(it.x + it.size / 2, it.y + it.size / 2, it.rotationDegrees, 1f, it.size * look.driftingScale, look.restingColors[it.colorIndex % look.restingColors.size], look.veins, 0.85f, unit) }
@@ -159,6 +157,8 @@ fun HomeScene(scene: ShownScene = rememberShownScene(), modifier: Modifier = Mod
                 Holiday.CoffeeDay -> drawCoffeeDayFigures(unit, now)
                 Holiday.TacoDay -> drawTacoDayFigures(unit, now)
                 Holiday.CatDay -> drawCatDayFigures(unit, now)
+                Holiday.DiaDeLosMuertos -> drawDiaDeLosMuertosFigures(unit, now)
+                Holiday.FirstDayOfWinter -> drawWinterDayFigures(unit, now)
                 else -> {}
             }
             if (family.isNotEmpty()) drawCelebration(unit, now, anniversary, celebrationNames(family))

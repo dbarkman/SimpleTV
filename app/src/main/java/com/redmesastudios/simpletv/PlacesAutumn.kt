@@ -262,7 +262,7 @@ fun DrawScope.drawAutumnPlace(room: Room) {
         Room.Cafe -> drawCafe()
         Room.TacoTruck -> drawTacoTruck()
         Room.CatRoom -> drawCatRoom()
-        else -> {}
+        else -> drawNovemberPlace(room)
     }
 }
 
@@ -270,6 +270,6 @@ fun DrawScope.drawAutumnPlaceMotion(room: Room, seconds: Float) {
     when (room) {
         Room.Cove -> drawWaves(seconds)
         Room.TacoTruck -> drawStringBulbs(seconds)
-        else -> {}
+        else -> drawNovemberPlaceMotion(room, seconds)
     }
 }

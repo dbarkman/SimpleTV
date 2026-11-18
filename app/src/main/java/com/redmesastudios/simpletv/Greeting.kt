@@ -33,6 +33,10 @@ fun holidayGreeting(holiday: Holiday?, day: java.time.LocalDate): String? = when
     Holiday.CoffeeDay -> "Happy Coffee Day!"
     Holiday.TacoDay -> "Happy Taco Day!"
     Holiday.CatDay -> "Happy Cat Day!"
+    Holiday.Halloween -> if (day.monthValue == 10 && day.dayOfMonth == 31) "Happy Halloween!" else null
+    Holiday.ElectionDay -> if (day == electionDay(day.year)) "It's Election Day" else null
+    Holiday.DiaDeLosMuertos -> "Día de los Muertos"
+    Holiday.FirstDayOfWinter -> "Hello, winter!"
     Holiday.LaborDay -> if (day.dayOfWeek == java.time.DayOfWeek.MONDAY) "Happy Labor Day!" else null
     Holiday.GrandparentsDay -> if (day.dayOfWeek == java.time.DayOfWeek.SUNDAY) "Happy Grandparents Day!" else null
     Holiday.FourthOfJuly -> if (day.monthValue == 7 && day.dayOfMonth == 4) "Happy Fourth of July!" else null

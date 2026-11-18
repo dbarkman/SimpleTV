@@ -34,6 +34,8 @@ class SceneChoiceTest {
         assertEquals(BackdropKind.Indoors(Room.Pizzeria), backdropFor(Holiday.BitcoinPizzaDay, LocalDate.of(2027, 5, 22), zone = zone))
         assertEquals(BackdropKind.Indoors(Room.LakeDusk), backdropFor(Holiday.FourthOfJuly, LocalDate.of(2027, 7, 4), zone = zone))
         assertEquals(BackdropKind.Outdoors(Season.Summer), backdropFor(Holiday.FirstDayOfSummer, LocalDate.of(2027, 6, 21), zone = zone))
+        assertEquals(BackdropKind.Indoors(Room.HauntedDusk), backdropFor(Holiday.Halloween, LocalDate.of(2027, 10, 31), zone = zone))
+        assertEquals(BackdropKind.Indoors(Room.VeteransMemorial), backdropFor(Holiday.VeteransDay, LocalDate.of(2027, 11, 11), zone = zone))
         // The first day of spring keeps the season's look.
         assertEquals(BackdropKind.Outdoors(Season.Spring), backdropFor(Holiday.FirstDayOfSpring, LocalDate.of(2027, 3, 20), zone = zone))
         // Groundhog Day keeps its snowy hill.

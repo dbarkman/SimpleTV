@@ -205,6 +205,26 @@ class HolidaysAndGlanceTest {
     }
 
     @Test
+    fun lateOctoberAndNovemberScenesShowOnTheirDays() {
+        fun on(text: String) = holidayOn(LocalDate.parse(text), DefaultPacks, DrawnHolidays, zone)
+        fun greeting(text: String) = holidayGreeting(on(text), LocalDate.parse(text))
+        assertNull(greeting("2027-10-30"))
+        assertEquals("Happy Halloween!", greeting("2027-10-31"))
+        // Día de los Muertos takes November 2nd out of Election Day's stretch, except when
+        // Election Day falls on it, as in 2027.
+        assertEquals(Holiday.DiaDeLosMuertos, on("2028-11-02"))
+        assertEquals("Día de los Muertos", greeting("2028-11-02"))
+        assertEquals(Holiday.ElectionDay, on("2027-11-02"))
+        assertEquals("It's Election Day", greeting("2028-11-07"))
+        assertNull(greeting("2028-11-06"))
+        // The winter solstice falls inside Christmas, which keeps it; the first day of winter
+        // shows for households without the US pack.
+        val winter = seasonStart(2027, Season.Winter, zone)
+        assertEquals(Holiday.Christmas, on(winter.toString()))
+        assertEquals(Holiday.FirstDayOfWinter, holidayOn(winter, setOf(Pack.Seasons), DrawnHolidays, zone))
+    }
+
+    @Test
     fun sliceLiftsHoldsAndSettlesBack() {
         assertEquals(0f, sliceLift(1f))
         assertTrue(sliceLift(3.8f) in 0.1f..0.9f)

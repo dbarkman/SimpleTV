@@ -7,9 +7,9 @@ import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.MutableStateFlow
 
 // What the backdrop behind the home screen is on a given day. Ordinary days, the first day of
-// a season, Thanksgiving (fall) and Christmas (winter) get the season's hills and trees;
-// other holidays get a backdrop of their own as one is built, until then the season's.
-// Some holidays have several backdrops to choose from; the preview steps through them.
+// a season, Thanksgiving (fall), Christmas (winter) and Groundhog Day (its snowy hill) get the
+// season's hills and trees; every other holiday has a place of its own. A holiday can list
+// several to choose from; the preview steps through them.
 
 // Rooms (Rooms.kt) and outdoor places (Places.kt) a holiday can have instead of the season.
 enum class Room { Pizzeria, Classroom, CityDusk, Desert, ReflectingPool, Concessions, Courtyard,
@@ -17,7 +17,8 @@ enum class Room { Pizzeria, Classroom, CityDusk, Desert, ReflectingPool, Concess
     Calvary, EasterMeadow, GreenValley, Plaza, Sunroom, Cemetery,
     StainedGlass, DonutShop, SummerPark, Backyard, LakeDusk,
     ChatSky, IceCreamShop, Campsite, DogPark, Worksite, Parlor,
-    Diner, Cove, BeerGarden, Cafe, TacoTruck, CatRoom }
+    Diner, Cove, BeerGarden, Cafe, TacoTruck, CatRoom,
+    HauntedDusk, OfrendaPlaza, MainStreet, VeteransMemorial }
 
 sealed interface BackdropKind {
     data class Outdoors(val season: Season) : BackdropKind
@@ -64,6 +65,10 @@ fun backdropOptions(holiday: Holiday?): List<BackdropKind> = when (holiday) {
     Holiday.CoffeeDay -> listOf(BackdropKind.Indoors(Room.Cafe))
     Holiday.TacoDay -> listOf(BackdropKind.Indoors(Room.TacoTruck))
     Holiday.CatDay -> listOf(BackdropKind.Indoors(Room.CatRoom))
+    Holiday.Halloween -> listOf(BackdropKind.Indoors(Room.HauntedDusk))
+    Holiday.DiaDeLosMuertos -> listOf(BackdropKind.Indoors(Room.OfrendaPlaza))
+    Holiday.ElectionDay -> listOf(BackdropKind.Indoors(Room.MainStreet))
+    Holiday.VeteransDay -> listOf(BackdropKind.Indoors(Room.VeteransMemorial))
     Holiday.PizzaDay -> listOf(BackdropKind.Indoors(Room.Pizzeria))
     Holiday.PiDay -> listOf(BackdropKind.Indoors(Room.Classroom))
     else -> emptyList()

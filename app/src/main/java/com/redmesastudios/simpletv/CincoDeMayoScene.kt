@@ -43,7 +43,7 @@ fun DrawScope.drawCincoDeMayoFigures(unit: Float, seconds: Float) {
 }
 
 // Rows of cut-paper flags, each with a scalloped hem and little cut-outs, swaying.
-private fun DrawScope.drawPapelPicado(seconds: Float) {
+internal fun DrawScope.drawPapelPicado(seconds: Float) {
     var count = 0
     PicadoAnchors.zipWithNext().forEach { (from, to) ->
         drawPath(Path().apply { moveTo(from, PicadoY); quadraticTo((from + to) / 2, PicadoY + 2f * PicadoDip, to, PicadoY) }, Twine, style = Stroke(2f))

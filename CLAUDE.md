@@ -146,7 +146,7 @@ source of truth.
   `UpdateResult`, which shows Android's install prompt if it asks.
 - `HomeScreen.kt` — header (greeting, date, clock, Get Apps (the Play Store), Movies, Search, Settings), app banner
   tiles in pages of ten (two rows of five), and the At a glance cards along the
-  bottom, all over the fall scene. A page with more apps after it shows nine
+  bottom, all over the day's scene. A page with more apps after it shows nine
   and a More apps tile, which slides the next page in; Back slides back. Apps
   with a folder open it; the rest launch directly. Focus starts on the
   top-left app of the first page, and every Home press returns it there.
@@ -234,22 +234,10 @@ source of truth.
   buttons when it's long) and the scene celebrates instead of any holiday, with the
   name spelled in letter pennants across the band (`celebrationNames`).
 - `SceneChoice.kt` — the backdrop for a day (`backdropFor`): the season's hills and
-  trees on ordinary days, the first day of a season, Thanksgiving (fall) and
-  Christmas (winter); its own backdrop for any other holiday that has one
-  (`backdropOptions`, chosen one first: New Year's a city at dusk; Epiphany a desert
-  with palms; MLK Day a reflecting pool at dawn; Popcorn Day a theater concession stand;
-  Lunar New Year a courtyard with a moon gate; Valentine's a rose garden; game day a
-  stadium; Presidents' Day a capitol lawn; Ash Wednesday a churchyard at dusk; April Fools
-  a circus big top; Good Friday three crosses on a hill at dusk; Easter a meadow at
-  sunrise; Earth Day a green valley with wind turbines; Cinco de Mayo an adobe plaza
-  with saguaros; Mother's Day a sunroom; Memorial Day a national cemetery; Bitcoin Pizza Day
-  the pizzeria; Pentecost a church with stained glass; Donut Day a donut shop; Juneteenth a
-  park with a gazebo; Father's Day a backyard patio; Fourth of July a lake at dusk; Emoji Day
-  chat bubbles; Ice Cream Day an ice cream parlor; S'mores Day a campsite; Dog Day a dog park;
-  Labor Day a building going up; Grandparents Day a living room; Cheeseburger Day a diner;
-  Talk Like a Pirate Day a cove; Oktoberfest a beer garden under the Alps; Coffee Day a café;
-  Taco Day a taco truck; Cat Day a room with a window seat; Pizza Day the pizzeria; Pi Day the classroom; St. Patrick's all-green
-  hills; Groundhog Day keeps its snowy hill), the season's until it does.
+  trees on ordinary days, the first day of each season, Thanksgiving (fall), Christmas
+  (winter) and Groundhog Day (its snowy hill); every other holiday has a place of its own
+  (`backdropOptions`, chosen one first; a `Room` drawn in `Rooms.kt` or one of the
+  `Places*.kt` files), from New Year's city at dusk through Veterans Day's memorial wall.
   Also the holiday preview: Settings → Preview holidays shows the home screen dressed
   for each drawn holiday in the household's packs over the next year, its next
   birthday and anniversary, and an ordinary day in each season (`previewEntries`, on
@@ -258,20 +246,18 @@ source of truth.
   Home) leaves. Nothing about
   the household changes.
 - `Places.kt` / `PlacesWinter.kt` / `PlacesSpring.kt` / `PlacesSummer.kt` /
-  `PlacesLateSummer.kt` / `PlacesAutumn.kt` — the places (city, desert,
-  reflecting pool, concession stand, courtyard; rose garden, stadium, capitol lawn,
-  churchyard, big top; Calvary, Easter meadow, green valley, plaza, sunroom, cemetery;
-  stained glass, donut shop, summer park, backyard, lake at dusk; chat sky, ice cream shop,
-  campsite, dog park, worksite, parlor; diner, cove, beer garden, café, taco truck, cat room): a sky that stays the plain background behind the header and apps and
-  deepens only along the band, ground meeting the band's floor at y 868, and what moves
-  (city windows, the pool's shimmer, the popcorn machine, crowd flashes, tent flags,
-  wind turbines).
+  `PlacesLateSummer.kt` / `PlacesAutumn.kt` / `PlacesNovember.kt` — the holidays' places,
+  in calendar order: a sky that stays the plain background behind the header and apps and
+  deepens only along the band, the place along the band, ground meeting the band's floor
+  at y 868, a feature at each edge, and whatever moves (city windows, a pool's shimmer,
+  turbines, waves, string lights, a fire). Each file's header lists its places.
 - `Rooms.kt` — the indoor backdrops: a pale wall behind the header and apps, the
   room along the band, a counter or desk at y 868 for the holiday's things, a
   feature at each edge, and what moves (the oven's fire): the pizzeria and the
   classroom.
 - `Holidays.kt` — the decorations' motion, pure math in design px.
-- `NewYearScene.kt` / `EpiphanyScene.kt` / `MlkDayScene.kt` / `PopcornDayScene.kt` /
+- `NovemberScenes.kt` (Día de los Muertos, first day of winter) /
+  `NewYearScene.kt` / `EpiphanyScene.kt` / `MlkDayScene.kt` / `PopcornDayScene.kt` /
   `EasterScene.kt` / `EarthDayScene.kt` / `CincoDeMayoScene.kt` / `MothersDayScene.kt` /
   `MemorialDayScene.kt` / `SummerScenes.kt` (Bitcoin Pizza Day through Fourth of July) /
   `LateSummerScenes.kt` (Emoji Day through Grandparents Day) / `AutumnScenes.kt`
@@ -284,7 +270,7 @@ source of truth.
   `ChristmasScene.kt` / `CelebrationScene.kt` — the drawn scenes. New Year's (Dec 31 –
   Jan 1; "Happy New Year!"): a marquee sign with the coming year in chasing lights,
   fireworks over the hill and up between the greeting and the clock, and balloon
-  bunches. MLK Day ("Honoring Dr. King"): a sun rising behind the hill, two lines of
+  bunches. MLK Day ("Honoring Dr. King"): two lines of
   people of every color holding hands with a ripple through their hands, and a dove
   with an olive sprig crossing now and then. Epiphany (Jan 6; "Happy Epiphany"): a
   guiding star with a beam of light and three wise men on camels walking across. Popcorn
@@ -319,15 +305,16 @@ source of truth.
   a wreath and poppies. Game day (the second Sunday of February,
   `Holiday.SuperBowl`; "Happy game day!"; no team or league marks): a football kicked
   from its tee through goalposts now and then, a scoreboard whose home score goes up 3
-  per kick, a "GO TEAM!" pennant and a bowl of chips. Halloween (Oct 24 – Nov 1):
-  harvest moon, bats, graveyard, hay bale with a black cat, corn stalks,
+  per kick, a "GO TEAM!" pennant and a bowl of chips. Halloween (Oct 24 – Nov 1; "Happy Halloween!" on the 31st; a haunted hill at
+  dusk with a crooked house): harvest moon, bats, graveyard, hay bale with a black cat, corn stalks,
   jack-o'-lanterns, a ghost, a skeleton and a mummy walking by. Election Day
-  (Nov 2 through Election Day): bunting, a waving flag, a ballot box, a VOTE
+  (Nov 2 through Election Day; "It's Election Day" on the day; a small-town main
+  street): bunting, a waving flag, a ballot box, a VOTE
   sign, balloons and Uncle Sam marching by. Thanksgiving (day after Election
   Day through Thanksgiving): corn stalks, a hay bale with pumpkins and
   gourds, a cornucopia, and a turkey strutting by that stops to fan its
   tail. Veterans Day (Nov 11, inside Thanksgiving's stretch; the greeting
-  says "Thank you, veterans"): a tall waving flag, rows of small flags along the
+  says "Thank you, veterans"; a memorial wall): a tall waving flag, rows of small flags along the
   hill, a wreath on an easel, twinkling stars, and a bald eagle gliding across
   now and then. Christmas (Saturday after Thanksgiving through Dec 30, always on the
   winter backdrop): twinkling string lights, a decorated tree with a glowing

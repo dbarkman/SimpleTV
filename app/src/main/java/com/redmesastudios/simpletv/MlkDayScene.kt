@@ -9,13 +9,11 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.withTransform
 import kotlin.math.sin
 
-// Martin Luther King Jr. Day on the winter scene: a sun rising behind the hill, two lines of
+// Martin Luther King Jr. Day at the reflecting pool at dawn (Places.kt): two lines of
 // people of every color holding hands along it on either side, a ripple passing through
 // their joined hands, and now and then a dove with an olive sprig crossing the sky. The
 // greeting says "Honoring Dr. King". Drawn in design px (1920x1080).
 
-private val SunCore = Color(0xFFF6CF7A)
-private val SunGlow = Color(0xFFF8DFA2)
 private val SkinTones = listOf(
     Color(0xFF6B4630), Color(0xFFF1CFB0), Color(0xFFA9714B), Color(0xFFE2B48C), Color(0xFF8A5A3B), Color(0xFFC98E62),
 )
@@ -46,16 +44,6 @@ private val RightLine = listOf(
 
 // The dove crosses high over the apps every 46 seconds, left to right.
 val Dove = Bat(cycleSeconds = 46f, flightSeconds = 19f, offsetSeconds = 9f, y = 104f, size = 60f, leftToRight = true)
-
-// The sun behind the far hill, drawn with the backdrop so the hill covers its lower half.
-fun DrawScope.drawRisingSun(unit: Float) {
-    withTransform({ scale(unit, unit, pivot = Offset.Zero) }) {
-        val center = Offset(960f, 856f)
-        drawCircle(SunGlow, 250f, center, alpha = 0.16f)
-        drawCircle(SunGlow, 180f, center, alpha = 0.24f)
-        drawCircle(SunCore, 112f, center, alpha = 0.85f)
-    }
-}
 
 fun DrawScope.drawMlkDayFigures(unit: Float, seconds: Float) {
     withTransform({ scale(unit, unit, pivot = Offset.Zero) }) {
