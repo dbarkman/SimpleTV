@@ -124,7 +124,7 @@ private fun DrawScope.drawPerson(p: HandHolder, color: Int, seconds: Float) {
 }
 
 // A white dove in flight, an olive sprig in its beak, its wings beating slowly.
-private fun DrawScope.drawDove(pose: BatPose) {
+internal fun DrawScope.drawDove(pose: BatPose) {
     val lift = 0.25f + 0.75f * (pose.flap * 0.5f + 0.5f)
     val wing = Path().apply {
         moveTo(6f, -2f)

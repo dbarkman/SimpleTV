@@ -52,7 +52,7 @@ private fun textPaint(color: Int, size: Float, face: Typeface = Typeface.DEFAULT
     }
 
 // A wooden counter top along the band's floor, with its front running down behind the cards.
-private fun DrawScope.drawCounter(top: Color, front: Color, edge: Color) {
+internal fun DrawScope.drawCounter(top: Color, front: Color, edge: Color) {
     drawRect(front, Offset(0f, CounterY + 12f), Size(SceneWidth, SceneHeight - CounterY))
     drawRect(top, Offset(0f, CounterY - 2f), Size(SceneWidth, 16f))
     drawRect(edge, Offset(0f, CounterY + 12f), Size(SceneWidth, 3f))

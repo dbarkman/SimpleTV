@@ -16,7 +16,7 @@ import kotlin.math.sin
 // adobe arches (Cinco de Mayo), a sunroom (Mother's Day) and a national cemetery (Memorial
 // Day). Drawn in design px (1920x1080).
 
-private fun DrawScope.drawRollingHills(far: Color, near: Color) {
+internal fun DrawScope.drawRollingHills(far: Color, near: Color) {
     drawPath(Path().apply {
         moveTo(0f, 850f); cubicTo(360f, 790f, 700f, 830f, 980f, 812f); cubicTo(1300f, 792f, 1640f, 800f, SceneWidth, 836f)
         lineTo(SceneWidth, SceneHeight); lineTo(0f, SceneHeight); close()
@@ -28,7 +28,7 @@ private fun DrawScope.drawRollingHills(far: Color, near: Color) {
 }
 
 // A round-crowned tree at an edge, where the season's trees stand.
-private fun DrawScope.drawEdgeTree(x: Float, trunk: Color, crowns: List<Color>, blossoms: Color? = null) {
+internal fun DrawScope.drawEdgeTree(x: Float, trunk: Color, crowns: List<Color>, blossoms: Color? = null) {
     drawRoundRect(trunk, Offset(x - 8f, 740f), Size(16f, 190f), CornerRadius(6f))
     listOf(Offset(0f, 720f) to 78f, Offset(-48f, 780f) to 56f, Offset(54f, 790f) to 52f).forEachIndexed { i, (d, r) ->
         drawCircle(crowns[i % crowns.size], r, Offset(x + d.x, d.y))
@@ -270,13 +270,13 @@ fun DrawScope.drawSpringPlace(room: Room) {
         Room.Plaza -> drawPlaza()
         Room.Sunroom -> drawSunroom()
         Room.Cemetery -> drawCemetery()
-        else -> {}
+        else -> drawSummerPlace(room)
     }
 }
 
 fun DrawScope.drawSpringPlaceMotion(room: Room, seconds: Float) {
     when (room) {
         Room.GreenValley -> drawTurbineBlades(seconds)
-        else -> {}
+        else -> drawSummerPlaceMotion(room, seconds)
     }
 }

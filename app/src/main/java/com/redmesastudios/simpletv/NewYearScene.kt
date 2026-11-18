@@ -75,8 +75,8 @@ fun DrawScope.drawNewYearFigures(unit: Float, seconds: Float, year: Int) {
     }
 }
 
-private fun DrawScope.drawFirework(pose: FireworkPose, firework: Firework, seconds: Float) {
-    val color = SparkColors[firework.colorIndex % SparkColors.size]
+internal fun DrawScope.drawFirework(pose: FireworkPose, firework: Firework, seconds: Float, colors: List<Color> = SparkColors) {
+    val color = colors[firework.colorIndex % colors.size]
     if (pose.rising) {
         // The shell and a short fading trail below it.
         drawLine(color, Offset(pose.x, pose.y), Offset(pose.x, pose.y + 34f), strokeWidth = 2.5f, cap = StrokeCap.Round, alpha = 0.35f)
@@ -88,7 +88,7 @@ private fun DrawScope.drawFirework(pose: FireworkPose, firework: Firework, secon
     // A soft flash as it opens.
     if (pose.spread < 0.5f) drawCircle(color, firework.radius * 0.7f, center, alpha = 0.28f * (1f - pose.spread * 2f))
     val sparks = 22
-    val second = SparkColors[(firework.colorIndex + 2) % SparkColors.size]
+    val second = colors[(firework.colorIndex + 2) % colors.size]
     repeat(sparks) { i ->
         val angle = (i * 360f / sparks + firework.colorIndex * 11f) * (Math.PI / 180f).toFloat()
         val r = firework.radius * pose.spread * (if (i % 2 == 0) 1f else 0.82f)

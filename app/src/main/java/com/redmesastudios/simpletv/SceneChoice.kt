@@ -14,7 +14,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 // Rooms (Rooms.kt) and outdoor places (Places.kt) a holiday can have instead of the season.
 enum class Room { Pizzeria, Classroom, CityDusk, Desert, ReflectingPool, Concessions, Courtyard,
     RoseGarden, Stadium, CapitolLawn, Churchyard, BigTop,
-    Calvary, EasterMeadow, GreenValley, Plaza, Sunroom, Cemetery }
+    Calvary, EasterMeadow, GreenValley, Plaza, Sunroom, Cemetery,
+    StainedGlass, DonutShop, SummerPark, Backyard, LakeDusk }
 
 sealed interface BackdropKind {
     data class Outdoors(val season: Season) : BackdropKind
@@ -43,6 +44,12 @@ fun backdropOptions(holiday: Holiday?): List<BackdropKind> = when (holiday) {
     Holiday.CincoDeMayo -> listOf(BackdropKind.Indoors(Room.Plaza))
     Holiday.MothersDay -> listOf(BackdropKind.Indoors(Room.Sunroom))
     Holiday.MemorialDay -> listOf(BackdropKind.Indoors(Room.Cemetery))
+    Holiday.BitcoinPizzaDay -> listOf(BackdropKind.Indoors(Room.Pizzeria))
+    Holiday.Pentecost -> listOf(BackdropKind.Indoors(Room.StainedGlass))
+    Holiday.DonutDay -> listOf(BackdropKind.Indoors(Room.DonutShop))
+    Holiday.Juneteenth -> listOf(BackdropKind.Indoors(Room.SummerPark))
+    Holiday.FathersDay -> listOf(BackdropKind.Indoors(Room.Backyard))
+    Holiday.FourthOfJuly -> listOf(BackdropKind.Indoors(Room.LakeDusk))
     Holiday.PizzaDay -> listOf(BackdropKind.Indoors(Room.Pizzeria))
     Holiday.PiDay -> listOf(BackdropKind.Indoors(Room.Classroom))
     else -> emptyList()

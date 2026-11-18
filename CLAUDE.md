@@ -242,7 +242,9 @@ source of truth.
   stadium; Presidents' Day a capitol lawn; Ash Wednesday a churchyard at dusk; April Fools
   a circus big top; Good Friday three crosses on a hill at dusk; Easter a meadow at
   sunrise; Earth Day a green valley with wind turbines; Cinco de Mayo an adobe plaza
-  with saguaros; Mother's Day a sunroom; Memorial Day a national cemetery; Pizza Day the pizzeria; Pi Day the classroom; St. Patrick's all-green
+  with saguaros; Mother's Day a sunroom; Memorial Day a national cemetery; Bitcoin Pizza Day
+  the pizzeria; Pentecost a church with stained glass; Donut Day a donut shop; Juneteenth a
+  park with a gazebo; Father's Day a backyard patio; Fourth of July a lake at dusk; Pizza Day the pizzeria; Pi Day the classroom; St. Patrick's all-green
   hills; Groundhog Day keeps its snowy hill), the season's until it does.
   Also the holiday preview: Settings → Preview holidays shows the home screen dressed
   for each drawn holiday in the household's packs over the next year, its next
@@ -251,9 +253,10 @@ source of truth.
   Up/Down switch between a holiday's backdrops where it has more than one, Back (or
   Home) leaves. Nothing about
   the household changes.
-- `Places.kt` / `PlacesWinter.kt` / `PlacesSpring.kt` — the places (city, desert,
+- `Places.kt` / `PlacesWinter.kt` / `PlacesSpring.kt` / `PlacesSummer.kt` — the places (city, desert,
   reflecting pool, concession stand, courtyard; rose garden, stadium, capitol lawn,
-  churchyard, big top; Calvary, Easter meadow, green valley, plaza, sunroom, cemetery): a sky that stays the plain background behind the header and apps and
+  churchyard, big top; Calvary, Easter meadow, green valley, plaza, sunroom, cemetery;
+  stained glass, donut shop, summer park, backyard, lake at dusk): a sky that stays the plain background behind the header and apps and
   deepens only along the band, ground meeting the band's floor at y 868, and what moves
   (city windows, the pool's shimmer, the popcorn machine, crowd flashes, tent flags,
   wind turbines).
@@ -264,7 +267,8 @@ source of truth.
 - `Holidays.kt` — the decorations' motion, pure math in design px.
 - `NewYearScene.kt` / `EpiphanyScene.kt` / `MlkDayScene.kt` / `PopcornDayScene.kt` /
   `EasterScene.kt` / `EarthDayScene.kt` / `CincoDeMayoScene.kt` / `MothersDayScene.kt` /
-  `MemorialDayScene.kt` /
+  `MemorialDayScene.kt` / `SummerScenes.kt` (Bitcoin Pizza Day through Fourth of July; its
+  header lists each) /
   `GroundhogDayScene.kt` / `LunarNewYearScene.kt` / `PizzaDayScene.kt` /
   `AshWednesdayScene.kt` / `ValentinesScene.kt` / `GameDayScene.kt` /
   `PresidentsDayScene.kt` / `PiDayScene.kt` / `StPatricksScene.kt` /

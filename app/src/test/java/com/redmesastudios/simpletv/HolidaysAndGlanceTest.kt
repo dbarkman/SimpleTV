@@ -152,6 +152,26 @@ class HolidaysAndGlanceTest {
     }
 
     @Test
+    fun mayToJulyScenesShowOnTheirDays() {
+        fun on(text: String) = holidayOn(LocalDate.parse(text), DefaultPacks, DrawnHolidays, zone)
+        fun greeting(text: String) = holidayGreeting(on(text), LocalDate.parse(text))
+        assertEquals(Holiday.BitcoinPizzaDay, on("2027-05-22"))
+        // Pentecost 2027 is May 16th, seven weeks after Easter.
+        assertEquals(Holiday.Pentecost, on("2027-05-16"))
+        assertEquals(Holiday.DonutDay, on("2027-06-04"))
+        assertEquals("Happy Juneteenth!", greeting("2027-06-19"))
+        assertEquals(Holiday.FathersDay, on("2027-06-18"))
+        assertEquals("Happy Father's Day!", greeting("2027-06-20"))
+        // The first day of summer shows when nothing else does.
+        val summer = seasonStart(2027, Season.Summer, zone).toString()
+        assertEquals(Holiday.FirstDayOfSummer, on(summer))
+        assertEquals("Hello, summer!", greeting(summer))
+        assertEquals(Holiday.FourthOfJuly, on("2027-06-30"))
+        assertNull(greeting("2027-07-03"))
+        assertEquals("Happy Fourth of July!", greeting("2027-07-04"))
+    }
+
+    @Test
     fun sliceLiftsHoldsAndSettlesBack() {
         assertEquals(0f, sliceLift(1f))
         assertTrue(sliceLift(3.8f) in 0.1f..0.9f)
