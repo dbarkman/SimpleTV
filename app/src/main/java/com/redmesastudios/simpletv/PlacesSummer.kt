@@ -187,13 +187,13 @@ fun DrawScope.drawSummerPlace(room: Room) {
         Room.SummerPark -> drawSummerPark()
         Room.Backyard -> drawBackyard()
         Room.LakeDusk -> drawLakeDusk()
-        else -> {}
+        else -> drawLateSummerPlace(room)
     }
 }
 
 fun DrawScope.drawSummerPlaceMotion(room: Room, seconds: Float) {
     when (room) {
         Room.LakeDusk -> drawLakeGlints(seconds)
-        else -> {}
+        else -> drawLateSummerPlaceMotion(room, seconds)
     }
 }

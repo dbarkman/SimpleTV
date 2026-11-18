@@ -172,6 +172,22 @@ class HolidaysAndGlanceTest {
     }
 
     @Test
+    fun julyToSeptemberScenesShowOnTheirDays() {
+        fun on(text: String) = holidayOn(LocalDate.parse(text), DefaultPacks, DrawnHolidays, zone)
+        fun greeting(text: String) = holidayGreeting(on(text), LocalDate.parse(text))
+        assertEquals("Happy Emoji Day!", greeting("2027-07-17"))
+        assertEquals(Holiday.IceCreamDay, on("2027-07-18"))
+        assertEquals(Holiday.SmoresDay, on("2027-08-10"))
+        assertEquals(Holiday.DogDay, on("2027-08-26"))
+        // Labor Day 2027 is September 6th; Grandparents Day the Sunday after, the 12th.
+        assertEquals(Holiday.LaborDay, on("2027-09-04"))
+        assertNull(greeting("2027-09-05"))
+        assertEquals("Happy Labor Day!", greeting("2027-09-06"))
+        assertEquals(Holiday.GrandparentsDay, on("2027-09-10"))
+        assertEquals("Happy Grandparents Day!", greeting("2027-09-12"))
+    }
+
+    @Test
     fun sliceLiftsHoldsAndSettlesBack() {
         assertEquals(0f, sliceLift(1f))
         assertTrue(sliceLift(3.8f) in 0.1f..0.9f)

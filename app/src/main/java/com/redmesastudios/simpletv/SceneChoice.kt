@@ -15,7 +15,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 enum class Room { Pizzeria, Classroom, CityDusk, Desert, ReflectingPool, Concessions, Courtyard,
     RoseGarden, Stadium, CapitolLawn, Churchyard, BigTop,
     Calvary, EasterMeadow, GreenValley, Plaza, Sunroom, Cemetery,
-    StainedGlass, DonutShop, SummerPark, Backyard, LakeDusk }
+    StainedGlass, DonutShop, SummerPark, Backyard, LakeDusk,
+    ChatSky, IceCreamShop, Campsite, DogPark, Worksite, Parlor }
 
 sealed interface BackdropKind {
     data class Outdoors(val season: Season) : BackdropKind
@@ -50,6 +51,12 @@ fun backdropOptions(holiday: Holiday?): List<BackdropKind> = when (holiday) {
     Holiday.Juneteenth -> listOf(BackdropKind.Indoors(Room.SummerPark))
     Holiday.FathersDay -> listOf(BackdropKind.Indoors(Room.Backyard))
     Holiday.FourthOfJuly -> listOf(BackdropKind.Indoors(Room.LakeDusk))
+    Holiday.EmojiDay -> listOf(BackdropKind.Indoors(Room.ChatSky))
+    Holiday.IceCreamDay -> listOf(BackdropKind.Indoors(Room.IceCreamShop))
+    Holiday.SmoresDay -> listOf(BackdropKind.Indoors(Room.Campsite))
+    Holiday.DogDay -> listOf(BackdropKind.Indoors(Room.DogPark))
+    Holiday.LaborDay -> listOf(BackdropKind.Indoors(Room.Worksite))
+    Holiday.GrandparentsDay -> listOf(BackdropKind.Indoors(Room.Parlor))
     Holiday.PizzaDay -> listOf(BackdropKind.Indoors(Room.Pizzeria))
     Holiday.PiDay -> listOf(BackdropKind.Indoors(Room.Classroom))
     else -> emptyList()
@@ -144,6 +151,8 @@ fun holidayName(holiday: Holiday): String = when (holiday) {
     Holiday.PiDay -> "Pi Day"
     Holiday.AprilFools -> "April Fools' Day"
     Holiday.BitcoinPizzaDay -> "Bitcoin Pizza Day"
+    Holiday.SmoresDay -> "S'mores Day"
+    Holiday.PirateDay -> "Talk Like a Pirate Day"
     Holiday.FirstDayOfSpring -> "First day of spring"
     Holiday.FirstDayOfSummer -> "First day of summer"
     Holiday.FirstDayOfFall -> "First day of fall"
