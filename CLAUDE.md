@@ -316,7 +316,7 @@ source of truth.
   tail. Veterans Day (Nov 11, inside Thanksgiving's stretch; the greeting
   says "Thank you, veterans"; a memorial wall): a tall waving flag, rows of small flags along the
   hill, a wreath on an easel, twinkling stars, and a bald eagle gliding across
-  now and then. Christmas (Saturday after Thanksgiving through Dec 30, always on the
+  now and then. Christmas (the day after Thanksgiving through Dec 30, always on the
   winter backdrop): twinkling string lights, a decorated tree with a glowing
   star and presents, a waving snowman, and Santa's sleigh crossing under the
   lights now and then. Celebration: the name in letter pennants, rising balloons (hearts

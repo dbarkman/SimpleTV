@@ -163,7 +163,7 @@ fun Holiday.stretchesIn(year: Int, zone: ZoneId = ZoneId.systemDefault()): List<
         Holiday.ElectionDay -> days(date(11, 2), electionDay(year))
         Holiday.VeteransDay -> day(date(11, 11))
         Holiday.Thanksgiving -> days(electionDay(year).plusDays(1), thanksgiving(year))
-        Holiday.Christmas -> days(thanksgiving(year).with(TemporalAdjusters.next(DayOfWeek.SATURDAY)), date(12, 30))
+        Holiday.Christmas -> days(thanksgiving(year).plusDays(1), date(12, 30))
 
         Holiday.Epiphany -> day(date(1, 6))
         Holiday.AshWednesday -> day(easter(year).minusDays(46))

@@ -146,7 +146,7 @@ class HolidayCalendarTest {
         assertEquals(Holiday.Thanksgiving, on("2026-11-09", us))
         assertEquals(Holiday.VeteransDay, on("2026-11-11", us))
         assertEquals(Holiday.Thanksgiving, on("2026-11-26", us))
-        assertNull(on("2026-11-27", us))
+        assertEquals(Holiday.Christmas, on("2026-11-27", us))
         assertEquals(Holiday.Christmas, on("2026-11-28", us))
         assertEquals(Holiday.Christmas, on("2026-12-30", us))
         assertEquals(Holiday.NewYear, on("2026-12-31", us))
